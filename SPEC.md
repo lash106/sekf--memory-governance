@@ -142,8 +142,6 @@ One shared monorepo (the `Atlas-AI` repository). The implementation is a **modul
 ├── pyproject.toml
 ├── .env.example
 ├── .github/
-│   ├── CODEOWNERS
-│   ├── pull_request_template.md
 │   └── workflows/ci.yml
 ├── contracts/v1/               # JSON Schemas GENERATED from Pydantic (do not hand-edit)
 ├── prompts/                    # Versioned role prompts
@@ -192,7 +190,7 @@ One shared monorepo (the `Atlas-AI` repository). The implementation is a **modul
 9. Conflict hotspots are `pyproject.toml`, `Makefile`, `src/sekf/contracts/`, and `src/sekf/api/` router registration. Change them only in small, fast PRs, and announce in the team chat before and after merging.
 10. We do not use GitHub issues. The Sprint backlog in section 18 is the task list; claim a bullet by writing your name next to it in a PR or the team chat so two people do not build the same thing.
 
-Branch protection may require a paid plan for private repositories. If unavailable, enforce the same rules by convention and a `CODEOWNERS` file, and make CI mandatory by team agreement.
+Branch protection may require a paid plan for private repositories. If unavailable, enforce the same rules by convention and make CI mandatory by team agreement.
 
 ### 6.4 Review pairing
 
@@ -221,7 +219,7 @@ A contract change requires: an ADR in `docs/decisions/`; updated models, regener
 - `httpx` for provider calls
 - `pytest`, `pytest-asyncio`, coverage
 - Ruff (format + lint), and `mypy` or `pyright`
-- `uv` for environments and locking (`make setup`)
+- `python -m venv` + `pip` for environments (`make setup`); `constraints.txt` (from `make lock`) pins exact versions for reproducible installs
 - Docker in Sprint 4
 - One provider-neutral LLM adapter for OpenAI-compatible JSON responses (the concrete provider is open decision D1)
 
@@ -275,7 +273,7 @@ Field-level definitions live in `src/sekf/contracts/`. Required objects and thei
 - **SynthesizerRecommendation:** `recommendation_id`, `candidate_claim_id`, `recommended_action`, `confidence`, `historian_assessment_id`, `judge_assessment_id`, `rationale`, `unresolved_questions`, plus call metadata.
 - **DecisionRecord:** `decision_id`, `candidate_claim_id`, `final_action`, `policy_version`, `thresholds`, `rule_ids_fired`, `previous_claim_ids`, `resulting_claim_id`, assessment/recommendation IDs, `explanation`, `created_at`, cost and latency summary.
 
-"Call metadata" = `model`, `prompt_version`, `input_tokens`, `output_tokens`, `latency_ms`, `estimated_cost_usd`.
+"Call metadata" = `model`, `provider`, `prompt_version`, `prompt_hash`, `temperature`, `seed`, `llm_calls`, `input_tokens`, `output_tokens`, `latency_ms`, `estimated_cost_usd`. `provider`, `prompt_hash`, `temperature`, and `llm_calls` are required (a role that omits them fails validation); `seed` may be null. `llm_calls` is the number of real provider calls including repair attempts, copied from the provider result; deterministic or fake roles report 0. Cost-normalized comparisons use this field.
 
 Enums:
 
@@ -353,28 +351,35 @@ All fired rule IDs, the pre-veto `rule_action`, and the thresholds are stored in
 
 ```python
 class MemoryRepository(Protocol):
-    def store_episode(self, episode: EpisodeRecord) -> EpisodeRecord: ...
-    def store_candidate(self, claim: CandidateClaim) -> CandidateClaim: ...
-    def store_evidence(self, evidence: EvidenceRecord) -> EvidenceRecord: ...
     def search_related_claims(self, claim: CandidateClaim) -> list[ExistingClaim]: ...
     def get_claim(self, claim_id: UUID) -> ExistingClaim | None: ...
     def get_claim_history(self, claim_id: UUID) -> list[ExistingClaim]: ...
-    def apply_decision(self, decision: DecisionRecord) -> MemoryDelta: ...
+    def get_bundle(self, decision_id: UUID) -> CommitBundle | None: ...  # answers replays
+    def apply_decision(self, bundle: CommitBundle) -> MemoryDelta: ...
     def get_audit_trace(self, candidate_claim_id: UUID) -> AuditTrace: ...
 ```
 
-`apply_decision` is idempotent by `decision_id` and transactional.
+Reads are side-effect free. `apply_decision` is the only write. It persists a `CommitBundle` (episode, candidate, evidence, role outputs, decision, and resulting state changes) in one transaction, all or nothing, idempotent by `decision_id`. Nothing is written before the policy has decided, so a crash leaves memory untouched and a retry is safe. The bundle also carries `memory_before` (the related claims the roles saw), `role_errors` (typed `RoleFailure` entries) and the `run_config`, so a committed escalation keeps the actual failure. An inconsistent bundle raises `CommitRejected` and writes nothing, and `CommitBundle` itself refuses to be built if its parts contradict each other. `decision_id` is derived from the stable request (full candidate, full evidence records, thresholds, policy version, the whole run configuration including `timeout_s`, optional `idempotency_key`; NOT the memory snapshot, which a committed decision itself changes), never from role outputs; `DecisionRecord.request_hash` stores that fingerprint. In commit mode the ID is computed before any role runs and a retry is answered from the stored bundle (no LLM calls, and the client sees the decision actually committed). Reusing an ID with a different `request_hash` is rejected, and a commit is rejected as stale if the current related-claim set differs in any way from `memory_before` (a claim changed, removed, or newly added); the caller retries with a fresh read. `apply_decision` recomputes `request_hash` and `decision_id` from the bundle rather than trusting them, and `get_audit_trace` returns one entry per decision with the bundle and the `MemoryDelta` it produced. Repositories store and return copies (claims as well as audit records), so callers cannot alter stored memory or audit history. To re-evaluate the same candidate against newer memory, or to force a deliberate re-run, pass a new `idempotency_key`. In `dry_run` mode no write happens. See `docs/decisions/0001-commit-bundle-and-call-metadata.md`.
 
 ### 10.2 Roles and policy
 
 ```python
 class Historian(Protocol):
     async def analyze(self, request: HistorianRequest) -> HistorianAssessment: ...
+
+
 class Judge(Protocol):
     async def evaluate(self, request: JudgeRequest) -> JudgeAssessment: ...
+
+
 class Synthesizer(Protocol):
     async def synthesize(self, request: SynthesisRequest) -> SynthesizerRecommendation: ...
+
+
 class DecisionPolicy(Protocol):
+    def identify(
+        self, context: PolicyContext
+    ) -> tuple[UUID, str]: ...  # (decision_id, request_hash)
     def decide(self, context: PolicyContext) -> DecisionRecord: ...
 ```
 
@@ -399,8 +404,13 @@ Every decision response includes: final action, role outputs, rules fired, memor
 ```python
 class StructuredLLMProvider(Protocol):
     async def complete_json(
-        self, *, messages: list[dict[str, str]], response_model: type[BaseModel],
-        model: str, temperature: float, seed: int | None,
+        self,
+        *,
+        messages: list[dict[str, str]],
+        response_model: type[BaseModel],
+        model: str,
+        temperature: float,
+        seed: int | None,
     ) -> LLMResult: ...
 ```
 
@@ -511,7 +521,7 @@ Dates align with the submitted workbook sprints, but this spec adds a Sprint 0, 
 
 **Goal:** one fixture traverses every module end to end offline with fake roles, so everyone then works against real, stable interfaces.
 
-- **Shailen (critical path, target merged by Oct 11):** `pyproject.toml`, `Makefile`, CI; Pydantic contracts and enums; Protocol stubs for Memory, Historian, Judge, Synthesizer, Policy; fake provider; `/health`; `/v1/decide` calling stub modules; `make contracts`; one example fixture; `CODEOWNERS` and PR template.
+- **Shailen (critical path, target merged by Oct 11):** `pyproject.toml`, `Makefile`, CI; Pydantic contracts and enums; Protocol stubs for Memory, Historian, Judge, Synthesizer, Policy; fake provider; `/health`; `/v1/decide` calling stub modules; `make contracts`; one example fixture.
 - **Krishna (no contract dependency yet):** draft the DB schema and an ADR for the claim/version/relationship model; spike SQLAlchemy models against it; align with Shailen once contracts land.
 - **Mahalakshmi:** pure functions for interval overlap, temporal ordering, and provenance scoring (plain Python, no LLM, no contract imports); draft `ANNOTATION_GUIDE.md`.
 - **Sai Chetan:** resolve D1 (LLM provider, budget, rate limits) and confirm working API access; draft the Judge prompt; write the provider retry/repair design.

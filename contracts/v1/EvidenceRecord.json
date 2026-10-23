@@ -1,0 +1,67 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "content": {
+      "minLength": 1,
+      "title": "Content",
+      "type": "string"
+    },
+    "content_hash": {
+      "default": "",
+      "title": "Content Hash",
+      "type": "string"
+    },
+    "evidence_id": {
+      "format": "uuid",
+      "title": "Evidence Id",
+      "type": "string"
+    },
+    "metadata": {
+      "additionalProperties": true,
+      "title": "Metadata",
+      "type": "object"
+    },
+    "published_at": {
+      "anyOf": [
+        {
+          "format": "date-time",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Published At"
+    },
+    "reliability": {
+      "maximum": 1.0,
+      "minimum": 0.0,
+      "title": "Reliability",
+      "type": "number"
+    },
+    "retrieved_at": {
+      "format": "date-time",
+      "title": "Retrieved At",
+      "type": "string"
+    },
+    "source_id": {
+      "title": "Source Id",
+      "type": "string"
+    },
+    "source_type": {
+      "title": "Source Type",
+      "type": "string"
+    }
+  },
+  "required": [
+    "evidence_id",
+    "content",
+    "source_id",
+    "source_type",
+    "retrieved_at",
+    "reliability"
+  ],
+  "title": "EvidenceRecord",
+  "type": "object"
+}

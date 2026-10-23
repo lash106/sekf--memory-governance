@@ -1,0 +1,32 @@
+{
+  "$defs": {
+    "ClaimStatus": {
+      "enum": [
+        "CANDIDATE",
+        "ACTIVE",
+        "QUARANTINED",
+        "SUPERSEDED",
+        "REJECTED"
+      ],
+      "title": "ClaimStatus",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "claim_id": {
+      "format": "uuid",
+      "title": "Claim Id",
+      "type": "string"
+    },
+    "new_status": {
+      "$ref": "#/$defs/ClaimStatus"
+    }
+  },
+  "required": [
+    "claim_id",
+    "new_status"
+  ],
+  "title": "StatusChange",
+  "type": "object"
+}

@@ -1,0 +1,37 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "estimated_cost_usd": {
+      "default": 0.0,
+      "minimum": 0.0,
+      "title": "Estimated Cost Usd",
+      "type": "number"
+    },
+    "input_tokens": {
+      "default": 0,
+      "minimum": 0,
+      "title": "Input Tokens",
+      "type": "integer"
+    },
+    "latency_ms": {
+      "default": 0,
+      "minimum": 0,
+      "title": "Latency Ms",
+      "type": "integer"
+    },
+    "llm_calls": {
+      "default": 0,
+      "minimum": 0,
+      "title": "Llm Calls",
+      "type": "integer"
+    },
+    "output_tokens": {
+      "default": 0,
+      "minimum": 0,
+      "title": "Output Tokens",
+      "type": "integer"
+    }
+  },
+  "title": "CostSummary",
+  "type": "object"
+}

@@ -1,0 +1,860 @@
+{
+  "$defs": {
+    "ClaimStatus": {
+      "enum": [
+        "CANDIDATE",
+        "ACTIVE",
+        "QUARANTINED",
+        "SUPERSEDED",
+        "REJECTED"
+      ],
+      "title": "ClaimStatus",
+      "type": "string"
+    },
+    "ConflictType": {
+      "enum": [
+        "NONE",
+        "DUPLICATE",
+        "PARAPHRASE",
+        "VALUE_CONFLICT",
+        "TEMPORAL_UPDATE",
+        "SOURCE_CONFLICT",
+        "UNKNOWN"
+      ],
+      "title": "ConflictType",
+      "type": "string"
+    },
+    "CostSummary": {
+      "additionalProperties": false,
+      "properties": {
+        "estimated_cost_usd": {
+          "default": 0.0,
+          "minimum": 0.0,
+          "title": "Estimated Cost Usd",
+          "type": "number"
+        },
+        "input_tokens": {
+          "default": 0,
+          "minimum": 0,
+          "title": "Input Tokens",
+          "type": "integer"
+        },
+        "latency_ms": {
+          "default": 0,
+          "minimum": 0,
+          "title": "Latency Ms",
+          "type": "integer"
+        },
+        "llm_calls": {
+          "default": 0,
+          "minimum": 0,
+          "title": "Llm Calls",
+          "type": "integer"
+        },
+        "output_tokens": {
+          "default": 0,
+          "minimum": 0,
+          "title": "Output Tokens",
+          "type": "integer"
+        }
+      },
+      "title": "CostSummary",
+      "type": "object"
+    },
+    "DecideMode": {
+      "description": "`DRY_RUN` never mutates memory; `COMMIT` applies the decision.",
+      "enum": [
+        "dry_run",
+        "commit"
+      ],
+      "title": "DecideMode",
+      "type": "string"
+    },
+    "DecisionRecord": {
+      "additionalProperties": false,
+      "properties": {
+        "candidate_claim_id": {
+          "format": "uuid",
+          "title": "Candidate Claim Id",
+          "type": "string"
+        },
+        "cost": {
+          "$ref": "#/$defs/CostSummary"
+        },
+        "created_at": {
+          "format": "date-time",
+          "title": "Created At",
+          "type": "string"
+        },
+        "decision_id": {
+          "format": "uuid",
+          "title": "Decision Id",
+          "type": "string"
+        },
+        "explanation": {
+          "title": "Explanation",
+          "type": "string"
+        },
+        "final_action": {
+          "$ref": "#/$defs/FinalAction"
+        },
+        "historian_assessment_id": {
+          "anyOf": [
+            {
+              "format": "uuid",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Historian Assessment Id"
+        },
+        "judge_assessment_id": {
+          "anyOf": [
+            {
+              "format": "uuid",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Judge Assessment Id"
+        },
+        "policy_version": {
+          "title": "Policy Version",
+          "type": "string"
+        },
+        "previous_claim_ids": {
+          "items": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "title": "Previous Claim Ids",
+          "type": "array"
+        },
+        "request_hash": {
+          "maxLength": 64,
+          "minLength": 64,
+          "title": "Request Hash",
+          "type": "string"
+        },
+        "resulting_claim_id": {
+          "anyOf": [
+            {
+              "format": "uuid",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Resulting Claim Id"
+        },
+        "rule_action": {
+          "$ref": "#/$defs/FinalAction"
+        },
+        "rule_ids_fired": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Rule Ids Fired",
+          "type": "array"
+        },
+        "synthesizer_recommendation_id": {
+          "anyOf": [
+            {
+              "format": "uuid",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Synthesizer Recommendation Id"
+        },
+        "thresholds": {
+          "$ref": "#/$defs/Thresholds"
+        }
+      },
+      "required": [
+        "decision_id",
+        "candidate_claim_id",
+        "final_action",
+        "rule_action",
+        "policy_version",
+        "request_hash",
+        "thresholds",
+        "rule_ids_fired",
+        "explanation",
+        "created_at"
+      ],
+      "title": "DecisionRecord",
+      "type": "object"
+    },
+    "FinalAction": {
+      "enum": [
+        "PROMOTE",
+        "ATTACH_EVIDENCE",
+        "KEEP_EPISODIC",
+        "QUARANTINE",
+        "REVISE",
+        "REJECT",
+        "ESCALATE_FOR_REVIEW"
+      ],
+      "title": "FinalAction",
+      "type": "string"
+    },
+    "HistorianAssessment": {
+      "additionalProperties": false,
+      "properties": {
+        "assessment_id": {
+          "format": "uuid",
+          "title": "Assessment Id",
+          "type": "string"
+        },
+        "candidate_claim_id": {
+          "format": "uuid",
+          "title": "Candidate Claim Id",
+          "type": "string"
+        },
+        "confidence": {
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "title": "Confidence",
+          "type": "number"
+        },
+        "conflict_type": {
+          "$ref": "#/$defs/ConflictType"
+        },
+        "estimated_cost_usd": {
+          "default": 0.0,
+          "minimum": 0.0,
+          "title": "Estimated Cost Usd",
+          "type": "number"
+        },
+        "input_tokens": {
+          "default": 0,
+          "minimum": 0,
+          "title": "Input Tokens",
+          "type": "integer"
+        },
+        "latency_ms": {
+          "default": 0,
+          "minimum": 0,
+          "title": "Latency Ms",
+          "type": "integer"
+        },
+        "llm_calls": {
+          "minimum": 0,
+          "title": "Llm Calls",
+          "type": "integer"
+        },
+        "model": {
+          "title": "Model",
+          "type": "string"
+        },
+        "output_tokens": {
+          "default": 0,
+          "minimum": 0,
+          "title": "Output Tokens",
+          "type": "integer"
+        },
+        "prompt_hash": {
+          "minLength": 1,
+          "title": "Prompt Hash",
+          "type": "string"
+        },
+        "prompt_version": {
+          "title": "Prompt Version",
+          "type": "string"
+        },
+        "provenance_quality": {
+          "$ref": "#/$defs/ProvenanceQuality"
+        },
+        "provider": {
+          "minLength": 1,
+          "title": "Provider",
+          "type": "string"
+        },
+        "rationale": {
+          "title": "Rationale",
+          "type": "string"
+        },
+        "related_claim_ids": {
+          "items": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "title": "Related Claim Ids",
+          "type": "array"
+        },
+        "seed": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Seed"
+        },
+        "source_reliability_score": {
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "title": "Source Reliability Score",
+          "type": "number"
+        },
+        "supersedes_claim_id": {
+          "anyOf": [
+            {
+              "format": "uuid",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Supersedes Claim Id"
+        },
+        "temperature": {
+          "minimum": 0.0,
+          "title": "Temperature",
+          "type": "number"
+        },
+        "temporal_relation": {
+          "$ref": "#/$defs/TemporalRelation"
+        }
+      },
+      "required": [
+        "model",
+        "prompt_version",
+        "provider",
+        "temperature",
+        "prompt_hash",
+        "llm_calls",
+        "assessment_id",
+        "candidate_claim_id",
+        "provenance_quality",
+        "temporal_relation",
+        "conflict_type",
+        "source_reliability_score",
+        "confidence",
+        "rationale"
+      ],
+      "title": "HistorianAssessment",
+      "type": "object"
+    },
+    "JudgeAssessment": {
+      "additionalProperties": false,
+      "properties": {
+        "assessment_id": {
+          "format": "uuid",
+          "title": "Assessment Id",
+          "type": "string"
+        },
+        "candidate_claim_id": {
+          "format": "uuid",
+          "title": "Candidate Claim Id",
+          "type": "string"
+        },
+        "confidence": {
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "title": "Confidence",
+          "type": "number"
+        },
+        "estimated_cost_usd": {
+          "default": 0.0,
+          "minimum": 0.0,
+          "title": "Estimated Cost Usd",
+          "type": "number"
+        },
+        "input_tokens": {
+          "default": 0,
+          "minimum": 0,
+          "title": "Input Tokens",
+          "type": "integer"
+        },
+        "label": {
+          "$ref": "#/$defs/JudgeLabel"
+        },
+        "latency_ms": {
+          "default": 0,
+          "minimum": 0,
+          "title": "Latency Ms",
+          "type": "integer"
+        },
+        "llm_calls": {
+          "minimum": 0,
+          "title": "Llm Calls",
+          "type": "integer"
+        },
+        "missing_information": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Missing Information",
+          "type": "array"
+        },
+        "model": {
+          "title": "Model",
+          "type": "string"
+        },
+        "output_tokens": {
+          "default": 0,
+          "minimum": 0,
+          "title": "Output Tokens",
+          "type": "integer"
+        },
+        "prompt_hash": {
+          "minLength": 1,
+          "title": "Prompt Hash",
+          "type": "string"
+        },
+        "prompt_version": {
+          "title": "Prompt Version",
+          "type": "string"
+        },
+        "provider": {
+          "minLength": 1,
+          "title": "Provider",
+          "type": "string"
+        },
+        "rationale": {
+          "title": "Rationale",
+          "type": "string"
+        },
+        "refuting_evidence_ids": {
+          "items": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "title": "Refuting Evidence Ids",
+          "type": "array"
+        },
+        "seed": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Seed"
+        },
+        "supporting_evidence_ids": {
+          "items": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "title": "Supporting Evidence Ids",
+          "type": "array"
+        },
+        "temperature": {
+          "minimum": 0.0,
+          "title": "Temperature",
+          "type": "number"
+        }
+      },
+      "required": [
+        "model",
+        "prompt_version",
+        "provider",
+        "temperature",
+        "prompt_hash",
+        "llm_calls",
+        "assessment_id",
+        "candidate_claim_id",
+        "label",
+        "confidence",
+        "rationale"
+      ],
+      "title": "JudgeAssessment",
+      "type": "object"
+    },
+    "JudgeLabel": {
+      "enum": [
+        "SUPPORTED",
+        "REFUTED",
+        "INSUFFICIENT_EVIDENCE",
+        "MIXED_EVIDENCE",
+        "INVALID_INPUT"
+      ],
+      "title": "JudgeLabel",
+      "type": "string"
+    },
+    "MemoryDelta": {
+      "additionalProperties": false,
+      "description": "What a committed decision changed in memory.",
+      "properties": {
+        "applied": {
+          "title": "Applied",
+          "type": "boolean"
+        },
+        "attached_evidence_ids": {
+          "items": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "title": "Attached Evidence Ids",
+          "type": "array"
+        },
+        "created_claim_ids": {
+          "items": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "title": "Created Claim Ids",
+          "type": "array"
+        },
+        "decision_id": {
+          "format": "uuid",
+          "title": "Decision Id",
+          "type": "string"
+        },
+        "note": {
+          "default": "",
+          "title": "Note",
+          "type": "string"
+        },
+        "replayed": {
+          "default": false,
+          "title": "Replayed",
+          "type": "boolean"
+        },
+        "status_changes": {
+          "items": {
+            "$ref": "#/$defs/StatusChange"
+          },
+          "title": "Status Changes",
+          "type": "array"
+        }
+      },
+      "required": [
+        "decision_id",
+        "applied"
+      ],
+      "title": "MemoryDelta",
+      "type": "object"
+    },
+    "ProvenanceQuality": {
+      "enum": [
+        "HIGH",
+        "MEDIUM",
+        "LOW",
+        "UNKNOWN"
+      ],
+      "title": "ProvenanceQuality",
+      "type": "string"
+    },
+    "RoleFailure": {
+      "additionalProperties": false,
+      "description": "A typed role failure (timeout, invalid output, provider down).",
+      "properties": {
+        "error_type": {
+          "title": "Error Type",
+          "type": "string"
+        },
+        "message": {
+          "title": "Message",
+          "type": "string"
+        },
+        "role": {
+          "title": "Role",
+          "type": "string"
+        }
+      },
+      "required": [
+        "role",
+        "error_type",
+        "message"
+      ],
+      "title": "RoleFailure",
+      "type": "object"
+    },
+    "StatusChange": {
+      "additionalProperties": false,
+      "properties": {
+        "claim_id": {
+          "format": "uuid",
+          "title": "Claim Id",
+          "type": "string"
+        },
+        "new_status": {
+          "$ref": "#/$defs/ClaimStatus"
+        }
+      },
+      "required": [
+        "claim_id",
+        "new_status"
+      ],
+      "title": "StatusChange",
+      "type": "object"
+    },
+    "SynthesizerRecommendation": {
+      "additionalProperties": false,
+      "description": "Advisory only: it may make an outcome more conservative, never less.",
+      "properties": {
+        "candidate_claim_id": {
+          "format": "uuid",
+          "title": "Candidate Claim Id",
+          "type": "string"
+        },
+        "confidence": {
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "title": "Confidence",
+          "type": "number"
+        },
+        "estimated_cost_usd": {
+          "default": 0.0,
+          "minimum": 0.0,
+          "title": "Estimated Cost Usd",
+          "type": "number"
+        },
+        "historian_assessment_id": {
+          "format": "uuid",
+          "title": "Historian Assessment Id",
+          "type": "string"
+        },
+        "input_tokens": {
+          "default": 0,
+          "minimum": 0,
+          "title": "Input Tokens",
+          "type": "integer"
+        },
+        "judge_assessment_id": {
+          "format": "uuid",
+          "title": "Judge Assessment Id",
+          "type": "string"
+        },
+        "latency_ms": {
+          "default": 0,
+          "minimum": 0,
+          "title": "Latency Ms",
+          "type": "integer"
+        },
+        "llm_calls": {
+          "minimum": 0,
+          "title": "Llm Calls",
+          "type": "integer"
+        },
+        "model": {
+          "title": "Model",
+          "type": "string"
+        },
+        "output_tokens": {
+          "default": 0,
+          "minimum": 0,
+          "title": "Output Tokens",
+          "type": "integer"
+        },
+        "prompt_hash": {
+          "minLength": 1,
+          "title": "Prompt Hash",
+          "type": "string"
+        },
+        "prompt_version": {
+          "title": "Prompt Version",
+          "type": "string"
+        },
+        "provider": {
+          "minLength": 1,
+          "title": "Provider",
+          "type": "string"
+        },
+        "rationale": {
+          "title": "Rationale",
+          "type": "string"
+        },
+        "recommendation_id": {
+          "format": "uuid",
+          "title": "Recommendation Id",
+          "type": "string"
+        },
+        "recommended_action": {
+          "$ref": "#/$defs/FinalAction"
+        },
+        "seed": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Seed"
+        },
+        "temperature": {
+          "minimum": 0.0,
+          "title": "Temperature",
+          "type": "number"
+        },
+        "unresolved_questions": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Unresolved Questions",
+          "type": "array"
+        }
+      },
+      "required": [
+        "model",
+        "prompt_version",
+        "provider",
+        "temperature",
+        "prompt_hash",
+        "llm_calls",
+        "recommendation_id",
+        "candidate_claim_id",
+        "recommended_action",
+        "confidence",
+        "historian_assessment_id",
+        "judge_assessment_id",
+        "rationale"
+      ],
+      "title": "SynthesizerRecommendation",
+      "type": "object"
+    },
+    "TemporalRelation": {
+      "enum": [
+        "NO_RELATED_CLAIM",
+        "SAME_PERIOD",
+        "OLDER_INFORMATION",
+        "NEWER_UPDATE",
+        "OVERLAPPING_VALIDITY",
+        "NON_OVERLAPPING_VALIDITY",
+        "UNKNOWN"
+      ],
+      "title": "TemporalRelation",
+      "type": "string"
+    },
+    "Thresholds": {
+      "additionalProperties": false,
+      "properties": {
+        "historian_confidence_threshold": {
+          "default": 0.7,
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "title": "Historian Confidence Threshold",
+          "type": "number"
+        },
+        "refute_threshold": {
+          "default": 0.8,
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "title": "Refute Threshold",
+          "type": "number"
+        },
+        "source_reliability_threshold": {
+          "default": 0.6,
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "title": "Source Reliability Threshold",
+          "type": "number"
+        },
+        "support_threshold": {
+          "default": 0.8,
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "title": "Support Threshold",
+          "type": "number"
+        },
+        "synthesizer_veto_threshold": {
+          "default": 0.8,
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "title": "Synthesizer Veto Threshold",
+          "type": "number"
+        }
+      },
+      "title": "Thresholds",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "decision": {
+      "$ref": "#/$defs/DecisionRecord"
+    },
+    "historian": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/HistorianAssessment"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "judge": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/JudgeAssessment"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "memory_delta": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/MemoryDelta"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "mode": {
+      "$ref": "#/$defs/DecideMode"
+    },
+    "role_errors": {
+      "items": {
+        "$ref": "#/$defs/RoleFailure"
+      },
+      "title": "Role Errors",
+      "type": "array"
+    },
+    "synthesizer": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/SynthesizerRecommendation"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "wall_latency_ms": {
+      "default": 0,
+      "minimum": 0,
+      "title": "Wall Latency Ms",
+      "type": "integer"
+    }
+  },
+  "required": [
+    "mode",
+    "decision"
+  ],
+  "title": "DecideResponse",
+  "type": "object"
+}

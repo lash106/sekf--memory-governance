@@ -1,0 +1,72 @@
+"""Canonical enums (SPEC.md section 9.1). Do not add or rename values without an ADR."""
+
+from enum import StrEnum
+
+
+class TemporalRelation(StrEnum):
+    NO_RELATED_CLAIM = "NO_RELATED_CLAIM"
+    SAME_PERIOD = "SAME_PERIOD"
+    OLDER_INFORMATION = "OLDER_INFORMATION"
+    NEWER_UPDATE = "NEWER_UPDATE"
+    OVERLAPPING_VALIDITY = "OVERLAPPING_VALIDITY"
+    NON_OVERLAPPING_VALIDITY = "NON_OVERLAPPING_VALIDITY"
+    UNKNOWN = "UNKNOWN"
+
+
+class ConflictType(StrEnum):
+    NONE = "NONE"
+    DUPLICATE = "DUPLICATE"
+    PARAPHRASE = "PARAPHRASE"
+    VALUE_CONFLICT = "VALUE_CONFLICT"
+    TEMPORAL_UPDATE = "TEMPORAL_UPDATE"
+    SOURCE_CONFLICT = "SOURCE_CONFLICT"
+    UNKNOWN = "UNKNOWN"
+
+
+class ProvenanceQuality(StrEnum):
+    HIGH = "HIGH"
+    MEDIUM = "MEDIUM"
+    LOW = "LOW"
+    UNKNOWN = "UNKNOWN"
+
+
+class JudgeLabel(StrEnum):
+    SUPPORTED = "SUPPORTED"
+    REFUTED = "REFUTED"
+    INSUFFICIENT_EVIDENCE = "INSUFFICIENT_EVIDENCE"
+    MIXED_EVIDENCE = "MIXED_EVIDENCE"
+    INVALID_INPUT = "INVALID_INPUT"
+
+
+class ClaimStatus(StrEnum):
+    CANDIDATE = "CANDIDATE"
+    ACTIVE = "ACTIVE"
+    QUARANTINED = "QUARANTINED"
+    SUPERSEDED = "SUPERSEDED"
+    REJECTED = "REJECTED"
+
+
+class RelationshipType(StrEnum):
+    SUPPORTS = "SUPPORTS"
+    CONTRADICTS = "CONTRADICTS"
+    SUPERSEDES = "SUPERSEDES"
+    DERIVED_FROM = "DERIVED_FROM"
+    VALID_DURING = "VALID_DURING"
+    DUPLICATES = "DUPLICATES"
+
+
+class FinalAction(StrEnum):
+    PROMOTE = "PROMOTE"
+    ATTACH_EVIDENCE = "ATTACH_EVIDENCE"
+    KEEP_EPISODIC = "KEEP_EPISODIC"
+    QUARANTINE = "QUARANTINE"
+    REVISE = "REVISE"
+    REJECT = "REJECT"
+    ESCALATE_FOR_REVIEW = "ESCALATE_FOR_REVIEW"
+
+
+class DecideMode(StrEnum):
+    """`DRY_RUN` never mutates memory; `COMMIT` applies the decision."""
+
+    DRY_RUN = "dry_run"
+    COMMIT = "commit"

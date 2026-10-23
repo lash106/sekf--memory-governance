@@ -1,0 +1,36 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "model": {
+      "default": "fake/none",
+      "title": "Model",
+      "type": "string"
+    },
+    "seed": {
+      "anyOf": [
+        {
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Seed"
+    },
+    "temperature": {
+      "default": 0.0,
+      "minimum": 0.0,
+      "title": "Temperature",
+      "type": "number"
+    },
+    "timeout_s": {
+      "default": 30.0,
+      "exclusiveMinimum": 0.0,
+      "title": "Timeout S",
+      "type": "number"
+    }
+  },
+  "title": "RunConfig",
+  "type": "object"
+}

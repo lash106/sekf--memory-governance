@@ -1,0 +1,181 @@
+{
+  "$defs": {
+    "ConflictType": {
+      "enum": [
+        "NONE",
+        "DUPLICATE",
+        "PARAPHRASE",
+        "VALUE_CONFLICT",
+        "TEMPORAL_UPDATE",
+        "SOURCE_CONFLICT",
+        "UNKNOWN"
+      ],
+      "title": "ConflictType",
+      "type": "string"
+    },
+    "ProvenanceQuality": {
+      "enum": [
+        "HIGH",
+        "MEDIUM",
+        "LOW",
+        "UNKNOWN"
+      ],
+      "title": "ProvenanceQuality",
+      "type": "string"
+    },
+    "TemporalRelation": {
+      "enum": [
+        "NO_RELATED_CLAIM",
+        "SAME_PERIOD",
+        "OLDER_INFORMATION",
+        "NEWER_UPDATE",
+        "OVERLAPPING_VALIDITY",
+        "NON_OVERLAPPING_VALIDITY",
+        "UNKNOWN"
+      ],
+      "title": "TemporalRelation",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "assessment_id": {
+      "format": "uuid",
+      "title": "Assessment Id",
+      "type": "string"
+    },
+    "candidate_claim_id": {
+      "format": "uuid",
+      "title": "Candidate Claim Id",
+      "type": "string"
+    },
+    "confidence": {
+      "maximum": 1.0,
+      "minimum": 0.0,
+      "title": "Confidence",
+      "type": "number"
+    },
+    "conflict_type": {
+      "$ref": "#/$defs/ConflictType"
+    },
+    "estimated_cost_usd": {
+      "default": 0.0,
+      "minimum": 0.0,
+      "title": "Estimated Cost Usd",
+      "type": "number"
+    },
+    "input_tokens": {
+      "default": 0,
+      "minimum": 0,
+      "title": "Input Tokens",
+      "type": "integer"
+    },
+    "latency_ms": {
+      "default": 0,
+      "minimum": 0,
+      "title": "Latency Ms",
+      "type": "integer"
+    },
+    "llm_calls": {
+      "minimum": 0,
+      "title": "Llm Calls",
+      "type": "integer"
+    },
+    "model": {
+      "title": "Model",
+      "type": "string"
+    },
+    "output_tokens": {
+      "default": 0,
+      "minimum": 0,
+      "title": "Output Tokens",
+      "type": "integer"
+    },
+    "prompt_hash": {
+      "minLength": 1,
+      "title": "Prompt Hash",
+      "type": "string"
+    },
+    "prompt_version": {
+      "title": "Prompt Version",
+      "type": "string"
+    },
+    "provenance_quality": {
+      "$ref": "#/$defs/ProvenanceQuality"
+    },
+    "provider": {
+      "minLength": 1,
+      "title": "Provider",
+      "type": "string"
+    },
+    "rationale": {
+      "title": "Rationale",
+      "type": "string"
+    },
+    "related_claim_ids": {
+      "items": {
+        "format": "uuid",
+        "type": "string"
+      },
+      "title": "Related Claim Ids",
+      "type": "array"
+    },
+    "seed": {
+      "anyOf": [
+        {
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Seed"
+    },
+    "source_reliability_score": {
+      "maximum": 1.0,
+      "minimum": 0.0,
+      "title": "Source Reliability Score",
+      "type": "number"
+    },
+    "supersedes_claim_id": {
+      "anyOf": [
+        {
+          "format": "uuid",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Supersedes Claim Id"
+    },
+    "temperature": {
+      "minimum": 0.0,
+      "title": "Temperature",
+      "type": "number"
+    },
+    "temporal_relation": {
+      "$ref": "#/$defs/TemporalRelation"
+    }
+  },
+  "required": [
+    "model",
+    "prompt_version",
+    "provider",
+    "temperature",
+    "prompt_hash",
+    "llm_calls",
+    "assessment_id",
+    "candidate_claim_id",
+    "provenance_quality",
+    "temporal_relation",
+    "conflict_type",
+    "source_reliability_score",
+    "confidence",
+    "rationale"
+  ],
+  "title": "HistorianAssessment",
+  "type": "object"
+}

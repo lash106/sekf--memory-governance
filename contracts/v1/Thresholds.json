@@ -1,0 +1,42 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "historian_confidence_threshold": {
+      "default": 0.7,
+      "maximum": 1.0,
+      "minimum": 0.0,
+      "title": "Historian Confidence Threshold",
+      "type": "number"
+    },
+    "refute_threshold": {
+      "default": 0.8,
+      "maximum": 1.0,
+      "minimum": 0.0,
+      "title": "Refute Threshold",
+      "type": "number"
+    },
+    "source_reliability_threshold": {
+      "default": 0.6,
+      "maximum": 1.0,
+      "minimum": 0.0,
+      "title": "Source Reliability Threshold",
+      "type": "number"
+    },
+    "support_threshold": {
+      "default": 0.8,
+      "maximum": 1.0,
+      "minimum": 0.0,
+      "title": "Support Threshold",
+      "type": "number"
+    },
+    "synthesizer_veto_threshold": {
+      "default": 0.8,
+      "maximum": 1.0,
+      "minimum": 0.0,
+      "title": "Synthesizer Veto Threshold",
+      "type": "number"
+    }
+  },
+  "title": "Thresholds",
+  "type": "object"
+}

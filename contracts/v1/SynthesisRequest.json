@@ -1,0 +1,470 @@
+{
+  "$defs": {
+    "CandidateClaim": {
+      "additionalProperties": false,
+      "properties": {
+        "claim_id": {
+          "format": "uuid",
+          "title": "Claim Id",
+          "type": "string"
+        },
+        "claim_text": {
+          "minLength": 1,
+          "title": "Claim Text",
+          "type": "string"
+        },
+        "extractor_confidence": {
+          "default": 1.0,
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "title": "Extractor Confidence",
+          "type": "number"
+        },
+        "metadata": {
+          "additionalProperties": true,
+          "title": "Metadata",
+          "type": "object"
+        },
+        "object_text": {
+          "minLength": 1,
+          "title": "Object Text",
+          "type": "string"
+        },
+        "observed_at": {
+          "format": "date-time",
+          "title": "Observed At",
+          "type": "string"
+        },
+        "predicate_key": {
+          "minLength": 1,
+          "title": "Predicate Key",
+          "type": "string"
+        },
+        "source_id": {
+          "title": "Source Id",
+          "type": "string"
+        },
+        "subject_key": {
+          "minLength": 1,
+          "title": "Subject Key",
+          "type": "string"
+        },
+        "valid_from": {
+          "anyOf": [
+            {
+              "format": "date-time",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Valid From"
+        },
+        "valid_to": {
+          "anyOf": [
+            {
+              "format": "date-time",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Valid To"
+        }
+      },
+      "required": [
+        "claim_id",
+        "claim_text",
+        "subject_key",
+        "predicate_key",
+        "object_text",
+        "source_id",
+        "observed_at"
+      ],
+      "title": "CandidateClaim",
+      "type": "object"
+    },
+    "ConflictType": {
+      "enum": [
+        "NONE",
+        "DUPLICATE",
+        "PARAPHRASE",
+        "VALUE_CONFLICT",
+        "TEMPORAL_UPDATE",
+        "SOURCE_CONFLICT",
+        "UNKNOWN"
+      ],
+      "title": "ConflictType",
+      "type": "string"
+    },
+    "HistorianAssessment": {
+      "additionalProperties": false,
+      "properties": {
+        "assessment_id": {
+          "format": "uuid",
+          "title": "Assessment Id",
+          "type": "string"
+        },
+        "candidate_claim_id": {
+          "format": "uuid",
+          "title": "Candidate Claim Id",
+          "type": "string"
+        },
+        "confidence": {
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "title": "Confidence",
+          "type": "number"
+        },
+        "conflict_type": {
+          "$ref": "#/$defs/ConflictType"
+        },
+        "estimated_cost_usd": {
+          "default": 0.0,
+          "minimum": 0.0,
+          "title": "Estimated Cost Usd",
+          "type": "number"
+        },
+        "input_tokens": {
+          "default": 0,
+          "minimum": 0,
+          "title": "Input Tokens",
+          "type": "integer"
+        },
+        "latency_ms": {
+          "default": 0,
+          "minimum": 0,
+          "title": "Latency Ms",
+          "type": "integer"
+        },
+        "llm_calls": {
+          "minimum": 0,
+          "title": "Llm Calls",
+          "type": "integer"
+        },
+        "model": {
+          "title": "Model",
+          "type": "string"
+        },
+        "output_tokens": {
+          "default": 0,
+          "minimum": 0,
+          "title": "Output Tokens",
+          "type": "integer"
+        },
+        "prompt_hash": {
+          "minLength": 1,
+          "title": "Prompt Hash",
+          "type": "string"
+        },
+        "prompt_version": {
+          "title": "Prompt Version",
+          "type": "string"
+        },
+        "provenance_quality": {
+          "$ref": "#/$defs/ProvenanceQuality"
+        },
+        "provider": {
+          "minLength": 1,
+          "title": "Provider",
+          "type": "string"
+        },
+        "rationale": {
+          "title": "Rationale",
+          "type": "string"
+        },
+        "related_claim_ids": {
+          "items": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "title": "Related Claim Ids",
+          "type": "array"
+        },
+        "seed": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Seed"
+        },
+        "source_reliability_score": {
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "title": "Source Reliability Score",
+          "type": "number"
+        },
+        "supersedes_claim_id": {
+          "anyOf": [
+            {
+              "format": "uuid",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Supersedes Claim Id"
+        },
+        "temperature": {
+          "minimum": 0.0,
+          "title": "Temperature",
+          "type": "number"
+        },
+        "temporal_relation": {
+          "$ref": "#/$defs/TemporalRelation"
+        }
+      },
+      "required": [
+        "model",
+        "prompt_version",
+        "provider",
+        "temperature",
+        "prompt_hash",
+        "llm_calls",
+        "assessment_id",
+        "candidate_claim_id",
+        "provenance_quality",
+        "temporal_relation",
+        "conflict_type",
+        "source_reliability_score",
+        "confidence",
+        "rationale"
+      ],
+      "title": "HistorianAssessment",
+      "type": "object"
+    },
+    "JudgeAssessment": {
+      "additionalProperties": false,
+      "properties": {
+        "assessment_id": {
+          "format": "uuid",
+          "title": "Assessment Id",
+          "type": "string"
+        },
+        "candidate_claim_id": {
+          "format": "uuid",
+          "title": "Candidate Claim Id",
+          "type": "string"
+        },
+        "confidence": {
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "title": "Confidence",
+          "type": "number"
+        },
+        "estimated_cost_usd": {
+          "default": 0.0,
+          "minimum": 0.0,
+          "title": "Estimated Cost Usd",
+          "type": "number"
+        },
+        "input_tokens": {
+          "default": 0,
+          "minimum": 0,
+          "title": "Input Tokens",
+          "type": "integer"
+        },
+        "label": {
+          "$ref": "#/$defs/JudgeLabel"
+        },
+        "latency_ms": {
+          "default": 0,
+          "minimum": 0,
+          "title": "Latency Ms",
+          "type": "integer"
+        },
+        "llm_calls": {
+          "minimum": 0,
+          "title": "Llm Calls",
+          "type": "integer"
+        },
+        "missing_information": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Missing Information",
+          "type": "array"
+        },
+        "model": {
+          "title": "Model",
+          "type": "string"
+        },
+        "output_tokens": {
+          "default": 0,
+          "minimum": 0,
+          "title": "Output Tokens",
+          "type": "integer"
+        },
+        "prompt_hash": {
+          "minLength": 1,
+          "title": "Prompt Hash",
+          "type": "string"
+        },
+        "prompt_version": {
+          "title": "Prompt Version",
+          "type": "string"
+        },
+        "provider": {
+          "minLength": 1,
+          "title": "Provider",
+          "type": "string"
+        },
+        "rationale": {
+          "title": "Rationale",
+          "type": "string"
+        },
+        "refuting_evidence_ids": {
+          "items": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "title": "Refuting Evidence Ids",
+          "type": "array"
+        },
+        "seed": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Seed"
+        },
+        "supporting_evidence_ids": {
+          "items": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "title": "Supporting Evidence Ids",
+          "type": "array"
+        },
+        "temperature": {
+          "minimum": 0.0,
+          "title": "Temperature",
+          "type": "number"
+        }
+      },
+      "required": [
+        "model",
+        "prompt_version",
+        "provider",
+        "temperature",
+        "prompt_hash",
+        "llm_calls",
+        "assessment_id",
+        "candidate_claim_id",
+        "label",
+        "confidence",
+        "rationale"
+      ],
+      "title": "JudgeAssessment",
+      "type": "object"
+    },
+    "JudgeLabel": {
+      "enum": [
+        "SUPPORTED",
+        "REFUTED",
+        "INSUFFICIENT_EVIDENCE",
+        "MIXED_EVIDENCE",
+        "INVALID_INPUT"
+      ],
+      "title": "JudgeLabel",
+      "type": "string"
+    },
+    "ProvenanceQuality": {
+      "enum": [
+        "HIGH",
+        "MEDIUM",
+        "LOW",
+        "UNKNOWN"
+      ],
+      "title": "ProvenanceQuality",
+      "type": "string"
+    },
+    "RunConfig": {
+      "additionalProperties": false,
+      "properties": {
+        "model": {
+          "default": "fake/none",
+          "title": "Model",
+          "type": "string"
+        },
+        "seed": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Seed"
+        },
+        "temperature": {
+          "default": 0.0,
+          "minimum": 0.0,
+          "title": "Temperature",
+          "type": "number"
+        },
+        "timeout_s": {
+          "default": 30.0,
+          "exclusiveMinimum": 0.0,
+          "title": "Timeout S",
+          "type": "number"
+        }
+      },
+      "title": "RunConfig",
+      "type": "object"
+    },
+    "TemporalRelation": {
+      "enum": [
+        "NO_RELATED_CLAIM",
+        "SAME_PERIOD",
+        "OLDER_INFORMATION",
+        "NEWER_UPDATE",
+        "OVERLAPPING_VALIDITY",
+        "NON_OVERLAPPING_VALIDITY",
+        "UNKNOWN"
+      ],
+      "title": "TemporalRelation",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "candidate": {
+      "$ref": "#/$defs/CandidateClaim"
+    },
+    "historian": {
+      "$ref": "#/$defs/HistorianAssessment"
+    },
+    "judge": {
+      "$ref": "#/$defs/JudgeAssessment"
+    },
+    "run_config": {
+      "$ref": "#/$defs/RunConfig"
+    }
+  },
+  "required": [
+    "candidate",
+    "historian",
+    "judge"
+  ],
+  "title": "SynthesisRequest",
+  "type": "object"
+}

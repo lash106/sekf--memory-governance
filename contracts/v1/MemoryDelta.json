@@ -1,0 +1,86 @@
+{
+  "$defs": {
+    "ClaimStatus": {
+      "enum": [
+        "CANDIDATE",
+        "ACTIVE",
+        "QUARANTINED",
+        "SUPERSEDED",
+        "REJECTED"
+      ],
+      "title": "ClaimStatus",
+      "type": "string"
+    },
+    "StatusChange": {
+      "additionalProperties": false,
+      "properties": {
+        "claim_id": {
+          "format": "uuid",
+          "title": "Claim Id",
+          "type": "string"
+        },
+        "new_status": {
+          "$ref": "#/$defs/ClaimStatus"
+        }
+      },
+      "required": [
+        "claim_id",
+        "new_status"
+      ],
+      "title": "StatusChange",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "description": "What a committed decision changed in memory.",
+  "properties": {
+    "applied": {
+      "title": "Applied",
+      "type": "boolean"
+    },
+    "attached_evidence_ids": {
+      "items": {
+        "format": "uuid",
+        "type": "string"
+      },
+      "title": "Attached Evidence Ids",
+      "type": "array"
+    },
+    "created_claim_ids": {
+      "items": {
+        "format": "uuid",
+        "type": "string"
+      },
+      "title": "Created Claim Ids",
+      "type": "array"
+    },
+    "decision_id": {
+      "format": "uuid",
+      "title": "Decision Id",
+      "type": "string"
+    },
+    "note": {
+      "default": "",
+      "title": "Note",
+      "type": "string"
+    },
+    "replayed": {
+      "default": false,
+      "title": "Replayed",
+      "type": "boolean"
+    },
+    "status_changes": {
+      "items": {
+        "$ref": "#/$defs/StatusChange"
+      },
+      "title": "Status Changes",
+      "type": "array"
+    }
+  },
+  "required": [
+    "decision_id",
+    "applied"
+  ],
+  "title": "MemoryDelta",
+  "type": "object"
+}

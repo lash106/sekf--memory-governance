@@ -1,0 +1,221 @@
+{
+  "$defs": {
+    "CostSummary": {
+      "additionalProperties": false,
+      "properties": {
+        "estimated_cost_usd": {
+          "default": 0.0,
+          "minimum": 0.0,
+          "title": "Estimated Cost Usd",
+          "type": "number"
+        },
+        "input_tokens": {
+          "default": 0,
+          "minimum": 0,
+          "title": "Input Tokens",
+          "type": "integer"
+        },
+        "latency_ms": {
+          "default": 0,
+          "minimum": 0,
+          "title": "Latency Ms",
+          "type": "integer"
+        },
+        "llm_calls": {
+          "default": 0,
+          "minimum": 0,
+          "title": "Llm Calls",
+          "type": "integer"
+        },
+        "output_tokens": {
+          "default": 0,
+          "minimum": 0,
+          "title": "Output Tokens",
+          "type": "integer"
+        }
+      },
+      "title": "CostSummary",
+      "type": "object"
+    },
+    "FinalAction": {
+      "enum": [
+        "PROMOTE",
+        "ATTACH_EVIDENCE",
+        "KEEP_EPISODIC",
+        "QUARANTINE",
+        "REVISE",
+        "REJECT",
+        "ESCALATE_FOR_REVIEW"
+      ],
+      "title": "FinalAction",
+      "type": "string"
+    },
+    "Thresholds": {
+      "additionalProperties": false,
+      "properties": {
+        "historian_confidence_threshold": {
+          "default": 0.7,
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "title": "Historian Confidence Threshold",
+          "type": "number"
+        },
+        "refute_threshold": {
+          "default": 0.8,
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "title": "Refute Threshold",
+          "type": "number"
+        },
+        "source_reliability_threshold": {
+          "default": 0.6,
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "title": "Source Reliability Threshold",
+          "type": "number"
+        },
+        "support_threshold": {
+          "default": 0.8,
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "title": "Support Threshold",
+          "type": "number"
+        },
+        "synthesizer_veto_threshold": {
+          "default": 0.8,
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "title": "Synthesizer Veto Threshold",
+          "type": "number"
+        }
+      },
+      "title": "Thresholds",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "candidate_claim_id": {
+      "format": "uuid",
+      "title": "Candidate Claim Id",
+      "type": "string"
+    },
+    "cost": {
+      "$ref": "#/$defs/CostSummary"
+    },
+    "created_at": {
+      "format": "date-time",
+      "title": "Created At",
+      "type": "string"
+    },
+    "decision_id": {
+      "format": "uuid",
+      "title": "Decision Id",
+      "type": "string"
+    },
+    "explanation": {
+      "title": "Explanation",
+      "type": "string"
+    },
+    "final_action": {
+      "$ref": "#/$defs/FinalAction"
+    },
+    "historian_assessment_id": {
+      "anyOf": [
+        {
+          "format": "uuid",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Historian Assessment Id"
+    },
+    "judge_assessment_id": {
+      "anyOf": [
+        {
+          "format": "uuid",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Judge Assessment Id"
+    },
+    "policy_version": {
+      "title": "Policy Version",
+      "type": "string"
+    },
+    "previous_claim_ids": {
+      "items": {
+        "format": "uuid",
+        "type": "string"
+      },
+      "title": "Previous Claim Ids",
+      "type": "array"
+    },
+    "request_hash": {
+      "maxLength": 64,
+      "minLength": 64,
+      "title": "Request Hash",
+      "type": "string"
+    },
+    "resulting_claim_id": {
+      "anyOf": [
+        {
+          "format": "uuid",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Resulting Claim Id"
+    },
+    "rule_action": {
+      "$ref": "#/$defs/FinalAction"
+    },
+    "rule_ids_fired": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Rule Ids Fired",
+      "type": "array"
+    },
+    "synthesizer_recommendation_id": {
+      "anyOf": [
+        {
+          "format": "uuid",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Synthesizer Recommendation Id"
+    },
+    "thresholds": {
+      "$ref": "#/$defs/Thresholds"
+    }
+  },
+  "required": [
+    "decision_id",
+    "candidate_claim_id",
+    "final_action",
+    "rule_action",
+    "policy_version",
+    "request_hash",
+    "thresholds",
+    "rule_ids_fired",
+    "explanation",
+    "created_at"
+  ],
+  "title": "DecisionRecord",
+  "type": "object"
+}

@@ -1,0 +1,142 @@
+{
+  "$defs": {
+    "FinalAction": {
+      "enum": [
+        "PROMOTE",
+        "ATTACH_EVIDENCE",
+        "KEEP_EPISODIC",
+        "QUARANTINE",
+        "REVISE",
+        "REJECT",
+        "ESCALATE_FOR_REVIEW"
+      ],
+      "title": "FinalAction",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "description": "Advisory only: it may make an outcome more conservative, never less.",
+  "properties": {
+    "candidate_claim_id": {
+      "format": "uuid",
+      "title": "Candidate Claim Id",
+      "type": "string"
+    },
+    "confidence": {
+      "maximum": 1.0,
+      "minimum": 0.0,
+      "title": "Confidence",
+      "type": "number"
+    },
+    "estimated_cost_usd": {
+      "default": 0.0,
+      "minimum": 0.0,
+      "title": "Estimated Cost Usd",
+      "type": "number"
+    },
+    "historian_assessment_id": {
+      "format": "uuid",
+      "title": "Historian Assessment Id",
+      "type": "string"
+    },
+    "input_tokens": {
+      "default": 0,
+      "minimum": 0,
+      "title": "Input Tokens",
+      "type": "integer"
+    },
+    "judge_assessment_id": {
+      "format": "uuid",
+      "title": "Judge Assessment Id",
+      "type": "string"
+    },
+    "latency_ms": {
+      "default": 0,
+      "minimum": 0,
+      "title": "Latency Ms",
+      "type": "integer"
+    },
+    "llm_calls": {
+      "minimum": 0,
+      "title": "Llm Calls",
+      "type": "integer"
+    },
+    "model": {
+      "title": "Model",
+      "type": "string"
+    },
+    "output_tokens": {
+      "default": 0,
+      "minimum": 0,
+      "title": "Output Tokens",
+      "type": "integer"
+    },
+    "prompt_hash": {
+      "minLength": 1,
+      "title": "Prompt Hash",
+      "type": "string"
+    },
+    "prompt_version": {
+      "title": "Prompt Version",
+      "type": "string"
+    },
+    "provider": {
+      "minLength": 1,
+      "title": "Provider",
+      "type": "string"
+    },
+    "rationale": {
+      "title": "Rationale",
+      "type": "string"
+    },
+    "recommendation_id": {
+      "format": "uuid",
+      "title": "Recommendation Id",
+      "type": "string"
+    },
+    "recommended_action": {
+      "$ref": "#/$defs/FinalAction"
+    },
+    "seed": {
+      "anyOf": [
+        {
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Seed"
+    },
+    "temperature": {
+      "minimum": 0.0,
+      "title": "Temperature",
+      "type": "number"
+    },
+    "unresolved_questions": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Unresolved Questions",
+      "type": "array"
+    }
+  },
+  "required": [
+    "model",
+    "prompt_version",
+    "provider",
+    "temperature",
+    "prompt_hash",
+    "llm_calls",
+    "recommendation_id",
+    "candidate_claim_id",
+    "recommended_action",
+    "confidence",
+    "historian_assessment_id",
+    "judge_assessment_id",
+    "rationale"
+  ],
+  "title": "SynthesizerRecommendation",
+  "type": "object"
+}

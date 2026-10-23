@@ -1,0 +1,64 @@
+{
+  "_instructions": "Copy this file to datasets/dev/<category>-<nn>.json (one case per file). Delete this key. Use fresh UUIDs. Label the gold fields by the meaning in datasets/ANNOTATION_GUIDE.md (should this belong in long-term knowledge given the evidence and memory?), NOT by running or reading the policy rules. Use split 'dev' unless told otherwise; the 'test' split is frozen and double-labeled.",
+  "case_id": "temporal-update-01",
+  "category": "reliable_newer_correction",
+  "split": "dev",
+  "annotators": ["your-name"],
+  "annotation_notes": "Official schedule published before the observation; student chat repeats it.",
+  "initial_memory": [
+    {
+      "claim_id": "11111111-1111-4111-8111-111111111111",
+      "claim_text": "The laboratory closes at 17:00 on Fridays.",
+      "subject_key": "laboratory",
+      "predicate_key": "closing_time_friday",
+      "object_text": "17:00",
+      "status": "ACTIVE",
+      "version": 1,
+      "valid_from": "2026-01-01T00:00:00Z",
+      "valid_to": null,
+      "confidence": 0.9,
+      "created_at": "2026-01-02T00:00:00Z",
+      "updated_at": "2026-01-02T00:00:00Z",
+      "supersedes_claim_id": null,
+      "evidence_ids": []
+    }
+  ],
+  "candidate": {
+    "claim_id": "22222222-2222-4222-8222-222222222222",
+    "claim_text": "The laboratory closes at 18:00 on Fridays.",
+    "subject_key": "laboratory",
+    "predicate_key": "closing_time_friday",
+    "object_text": "18:00",
+    "source_id": "student-chat",
+    "observed_at": "2026-10-01T20:00:00Z",
+    "valid_from": "2026-10-01T00:00:00Z",
+    "valid_to": null,
+    "extractor_confidence": 0.92,
+    "metadata": {}
+  },
+  "evidence": [
+    {
+      "evidence_id": "33333333-3333-4333-8333-333333333333",
+      "content": "Beginning October 1, Friday closing time is 18:00 (6 PM).",
+      "source_id": "official-schedule",
+      "source_type": "official_document",
+      "published_at": "2026-09-28T00:00:00Z",
+      "retrieved_at": "2026-10-01T20:00:00Z",
+      "reliability": 0.95,
+      "metadata": {}
+    }
+  ],
+  "gold": {
+    "judge_label": "SUPPORTED",
+    "temporal_relation": "NEWER_UPDATE",
+    "conflict_type": "TEMPORAL_UPDATE",
+    "final_action": "REVISE",
+    "expected_memory_delta": {
+      "superseded_claim_ids": ["11111111-1111-4111-8111-111111111111"],
+      "new_active_claim_ids": ["22222222-2222-4222-8222-222222222222"],
+      "quarantined_claim_ids": [],
+      "rejected_claim_ids": [],
+      "attached_evidence_ids": []
+    }
+  }
+}

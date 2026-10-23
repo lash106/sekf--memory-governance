@@ -1,0 +1,124 @@
+{
+  "$defs": {
+    "ClaimStatus": {
+      "enum": [
+        "CANDIDATE",
+        "ACTIVE",
+        "QUARANTINED",
+        "SUPERSEDED",
+        "REJECTED"
+      ],
+      "title": "ClaimStatus",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "claim_id": {
+      "format": "uuid",
+      "title": "Claim Id",
+      "type": "string"
+    },
+    "claim_text": {
+      "title": "Claim Text",
+      "type": "string"
+    },
+    "confidence": {
+      "maximum": 1.0,
+      "minimum": 0.0,
+      "title": "Confidence",
+      "type": "number"
+    },
+    "created_at": {
+      "format": "date-time",
+      "title": "Created At",
+      "type": "string"
+    },
+    "evidence_ids": {
+      "items": {
+        "format": "uuid",
+        "type": "string"
+      },
+      "title": "Evidence Ids",
+      "type": "array"
+    },
+    "object_text": {
+      "title": "Object Text",
+      "type": "string"
+    },
+    "predicate_key": {
+      "title": "Predicate Key",
+      "type": "string"
+    },
+    "status": {
+      "$ref": "#/$defs/ClaimStatus"
+    },
+    "subject_key": {
+      "title": "Subject Key",
+      "type": "string"
+    },
+    "supersedes_claim_id": {
+      "anyOf": [
+        {
+          "format": "uuid",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Supersedes Claim Id"
+    },
+    "updated_at": {
+      "format": "date-time",
+      "title": "Updated At",
+      "type": "string"
+    },
+    "valid_from": {
+      "anyOf": [
+        {
+          "format": "date-time",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Valid From"
+    },
+    "valid_to": {
+      "anyOf": [
+        {
+          "format": "date-time",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Valid To"
+    },
+    "version": {
+      "minimum": 1,
+      "title": "Version",
+      "type": "integer"
+    }
+  },
+  "required": [
+    "claim_id",
+    "claim_text",
+    "subject_key",
+    "predicate_key",
+    "object_text",
+    "status",
+    "version",
+    "confidence",
+    "created_at",
+    "updated_at"
+  ],
+  "title": "ExistingClaim",
+  "type": "object"
+}

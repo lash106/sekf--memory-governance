@@ -41,3 +41,14 @@ prompts/        Versioned role prompts
 tests/          Unit, contract, and integration tests
 SPEC.md         Full project specification
 AGENTS.md       Instructions for AI coding agents
+```
+
+## Quick start
+
+```bash
+make setup      # venv + dependencies (Python 3.12)
+make test       # offline tests, fake roles
+make run        # API on http://localhost:8000  (GET /health, POST /v1/decide)
+```
+
+Design and team workflow: see `SPEC.md`. AI-agent rules: `AGENTS.md`.

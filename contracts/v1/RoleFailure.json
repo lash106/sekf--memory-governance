@@ -1,0 +1,25 @@
+{
+  "additionalProperties": false,
+  "description": "A typed role failure (timeout, invalid output, provider down).",
+  "properties": {
+    "error_type": {
+      "title": "Error Type",
+      "type": "string"
+    },
+    "message": {
+      "title": "Message",
+      "type": "string"
+    },
+    "role": {
+      "title": "Role",
+      "type": "string"
+    }
+  },
+  "required": [
+    "role",
+    "error_type",
+    "message"
+  ],
+  "title": "RoleFailure",
+  "type": "object"
+}

@@ -35,7 +35,9 @@ make contracts   # regenerate contracts/v1/*.json from Pydantic
 make run         # start the API locally
 ```
 
-These targets are created in Sprint 0. If one does not exist yet, say so rather than inventing a substitute.
+All targets exist (Python 3.12 required; `make setup` creates `.venv`). If a target is missing or fails, say so rather than inventing a substitute.
+
+Always use the project venv (`.venv`): run tools through `make`, or `source .venv/bin/activate` first. Never `pip install` into the global Python. Add dependencies in `pyproject.toml` (a shared file: small PR), then run `make setup && make lock` and commit the updated `constraints.txt`.
 
 ## Canonical names (use exactly; do not invent alternatives)
 

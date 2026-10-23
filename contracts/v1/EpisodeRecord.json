@@ -1,0 +1,37 @@
+{
+  "additionalProperties": false,
+  "description": "Raw experience, preserved before any claim extraction.",
+  "properties": {
+    "content": {
+      "title": "Content",
+      "type": "string"
+    },
+    "episode_id": {
+      "format": "uuid",
+      "title": "Episode Id",
+      "type": "string"
+    },
+    "metadata": {
+      "additionalProperties": true,
+      "title": "Metadata",
+      "type": "object"
+    },
+    "observed_at": {
+      "format": "date-time",
+      "title": "Observed At",
+      "type": "string"
+    },
+    "source_id": {
+      "title": "Source Id",
+      "type": "string"
+    }
+  },
+  "required": [
+    "episode_id",
+    "content",
+    "source_id",
+    "observed_at"
+  ],
+  "title": "EpisodeRecord",
+  "type": "object"
+}

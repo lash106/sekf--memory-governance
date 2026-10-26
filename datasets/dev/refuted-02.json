@@ -1,0 +1,48 @@
+{
+  "case_id": "refuted-02",
+  "category": "refuted_claim",
+  "split": "dev",
+  "annotators": [
+    "Sai Chetan Muppalla"
+  ],
+  "annotation_notes": "Sai Chetan evidence/governance case (refuted_claim).",
+  "initial_memory": [],
+  "candidate": {
+    "claim_id": "84cc687b-d8a3-4aa6-9cbd-4fad5bc60a2c",
+    "claim_text": "The laboratory closes at 22:00 on Fridays.",
+    "subject_key": "laboratory",
+    "predicate_key": "closing_time_friday",
+    "object_text": "22:00",
+    "source_id": "student-chat",
+    "observed_at": "2026-10-01T20:00:00Z",
+    "valid_from": "2026-10-01T00:00:00Z",
+    "valid_to": null,
+    "extractor_confidence": 0.9,
+    "metadata": {}
+  },
+  "evidence": [
+    {
+      "evidence_id": "5f944c7a-e54b-4129-a6bc-b9ad13657d32",
+      "content": "Security log: lab alarmed at 18:00 Fridays; 22:00 access denied.",
+      "source_id": "official-schedule",
+      "source_type": "official_document",
+      "published_at": "2026-09-28T00:00:00Z",
+      "retrieved_at": "2026-10-01T20:00:00Z",
+      "reliability": 0.95,
+      "metadata": {}
+    }
+  ],
+  "gold": {
+    "judge_label": "REFUTED",
+    "temporal_relation": "NO_RELATED_CLAIM",
+    "conflict_type": "NONE",
+    "final_action": "REJECT",
+    "expected_memory_delta": {
+      "superseded_claim_ids": [],
+      "new_active_claim_ids": [],
+      "quarantined_claim_ids": [],
+      "rejected_claim_ids": [],
+      "attached_evidence_ids": []
+    }
+  }
+}

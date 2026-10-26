@@ -1,0 +1,48 @@
+{
+  "case_id": "insufficient-02",
+  "category": "insufficient_evidence",
+  "split": "dev",
+  "annotators": [
+    "Sai Chetan Muppalla"
+  ],
+  "annotation_notes": "Sai Chetan evidence/governance case (insufficient_evidence).",
+  "initial_memory": [],
+  "candidate": {
+    "claim_id": "ae9b86f1-29af-4a9c-8e4b-246dee7633cd",
+    "claim_text": "The laboratory closes at 15:30 on Fridays.",
+    "subject_key": "laboratory",
+    "predicate_key": "closing_time_friday",
+    "object_text": "15:30",
+    "source_id": "student-chat",
+    "observed_at": "2026-10-01T20:00:00Z",
+    "valid_from": "2026-10-01T00:00:00Z",
+    "valid_to": null,
+    "extractor_confidence": 0.9,
+    "metadata": {}
+  },
+  "evidence": [
+    {
+      "evidence_id": "e1665f2b-5705-4416-856d-b905baaa8632",
+      "content": "No hour information in this facilities PDF excerpt.",
+      "source_id": "official-schedule",
+      "source_type": "official_document",
+      "published_at": "2026-09-28T00:00:00Z",
+      "retrieved_at": "2026-10-01T20:00:00Z",
+      "reliability": 0.5,
+      "metadata": {}
+    }
+  ],
+  "gold": {
+    "judge_label": "INSUFFICIENT_EVIDENCE",
+    "temporal_relation": "NO_RELATED_CLAIM",
+    "conflict_type": "NONE",
+    "final_action": "KEEP_EPISODIC",
+    "expected_memory_delta": {
+      "superseded_claim_ids": [],
+      "new_active_claim_ids": [],
+      "quarantined_claim_ids": [],
+      "rejected_claim_ids": [],
+      "attached_evidence_ids": []
+    }
+  }
+}

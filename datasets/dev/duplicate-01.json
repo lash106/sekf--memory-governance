@@ -1,0 +1,65 @@
+{
+  "case_id": "duplicate-01",
+  "category": "duplicate_paraphrase",
+  "split": "dev",
+  "annotators": [
+    "Sai Chetan Muppalla"
+  ],
+  "annotation_notes": "Sai Chetan evidence/governance case (duplicate_paraphrase).",
+  "initial_memory": [
+    {
+      "claim_id": "158c9f31-5aa6-49c5-b4c0-6d07ba2a3b2b",
+      "claim_text": "The laboratory closes at 18:00 on Fridays.",
+      "subject_key": "laboratory",
+      "predicate_key": "closing_time_friday",
+      "object_text": "18:00",
+      "status": "ACTIVE",
+      "version": 1,
+      "valid_from": "2026-01-01T00:00:00Z",
+      "valid_to": null,
+      "confidence": 0.9,
+      "created_at": "2026-01-02T00:00:00Z",
+      "updated_at": "2026-01-02T00:00:00Z",
+      "supersedes_claim_id": null,
+      "evidence_ids": []
+    }
+  ],
+  "candidate": {
+    "claim_id": "ebed10e4-9a9c-4c2d-a1a8-31d0565395ed",
+    "claim_text": "The laboratory closes at 18:00 on Fridays.",
+    "subject_key": "laboratory",
+    "predicate_key": "closing_time_friday",
+    "object_text": "18:00",
+    "source_id": "student-chat",
+    "observed_at": "2026-10-01T20:00:00Z",
+    "valid_from": "2026-10-01T00:00:00Z",
+    "valid_to": null,
+    "extractor_confidence": 0.9,
+    "metadata": {}
+  },
+  "evidence": [
+    {
+      "evidence_id": "df03d7e9-422f-4f78-91be-1ae90caae9b3",
+      "content": "Reminder: lab still closes Friday at 18:00.",
+      "source_id": "official-schedule",
+      "source_type": "official_document",
+      "published_at": "2026-09-28T00:00:00Z",
+      "retrieved_at": "2026-10-01T20:00:00Z",
+      "reliability": 0.95,
+      "metadata": {}
+    }
+  ],
+  "gold": {
+    "judge_label": "SUPPORTED",
+    "temporal_relation": "SAME_PERIOD",
+    "conflict_type": "DUPLICATE",
+    "final_action": "ATTACH_EVIDENCE",
+    "expected_memory_delta": {
+      "superseded_claim_ids": [],
+      "new_active_claim_ids": [],
+      "quarantined_claim_ids": [],
+      "rejected_claim_ids": [],
+      "attached_evidence_ids": []
+    }
+  }
+}

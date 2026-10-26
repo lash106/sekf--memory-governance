@@ -1,4 +1,4 @@
-"""Sanity-check Sai Chetan labeled dev cases load and cover required categories."""
+"""Sanity-check Sai Chetan `datasets/dev` cases load and cover required categories."""
 
 from __future__ import annotations
 

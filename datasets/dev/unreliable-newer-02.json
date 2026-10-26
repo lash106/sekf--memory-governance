@@ -5,10 +5,10 @@
   "annotators": [
     "Sai Chetan Muppalla"
   ],
-  "annotation_notes": "Sai Chetan Sprint 0-2 case (unreliable_newer_contradiction).",
+  "annotation_notes": "Sai Chetan evidence/governance case (unreliable_newer_contradiction).",
   "initial_memory": [
     {
-      "claim_id": "5c066606-db92-4de6-9274-55af62cbc120",
+      "claim_id": "7b2e8399-ce1d-4fc8-8766-cfbcbb42f75b",
       "claim_text": "The laboratory closes at 17:00 on Fridays.",
       "subject_key": "laboratory",
       "predicate_key": "closing_time_friday",
@@ -25,7 +25,7 @@
     }
   ],
   "candidate": {
-    "claim_id": "a6245523-2e00-42ef-9ff7-7d2aad9ad8dc",
+    "claim_id": "8a5d6b37-3407-428e-8de0-5248a3b797ba",
     "claim_text": "The laboratory closes at 21:00 on Fridays.",
     "subject_key": "laboratory",
     "predicate_key": "closing_time_friday",
@@ -39,7 +39,7 @@
   },
   "evidence": [
     {
-      "evidence_id": "638a31d1-4466-4b1f-b40d-77b464d7b540",
+      "evidence_id": "4dd7130b-ca31-4f21-99e2-fb2515ce9130",
       "content": "TikTok comment: open until 21:00 lol",
       "source_id": "social",
       "source_type": "social",

@@ -5,10 +5,10 @@
   "annotators": [
     "Sai Chetan Muppalla"
   ],
-  "annotation_notes": "Sai Chetan Sprint 0-2 case (non_overlapping_temporal_validity).",
+  "annotation_notes": "Sai Chetan evidence/governance case (non_overlapping_temporal_validity).",
   "initial_memory": [
     {
-      "claim_id": "6d0c205e-7a89-4c80-9754-01126394bd67",
+      "claim_id": "613b4a31-13d1-4b8d-a5bf-7a85551462b7",
       "claim_text": "The laboratory closes at 17:00 on Fridays.",
       "subject_key": "laboratory",
       "predicate_key": "closing_time_friday",
@@ -25,7 +25,7 @@
     }
   ],
   "candidate": {
-    "claim_id": "e0b2c742-cf82-46c8-931e-30f2408e3f89",
+    "claim_id": "4d2ce509-5ed2-4eda-9299-e0b5bee6fba2",
     "claim_text": "The laboratory closes at 18:00 on Fridays.",
     "subject_key": "laboratory",
     "predicate_key": "closing_time_friday",
@@ -39,7 +39,7 @@
   },
   "evidence": [
     {
-      "evidence_id": "38a338da-5fb1-4355-b9ec-fbe4b574ab47",
+      "evidence_id": "98045bfd-957f-41f0-9c49-c71ddc6c4a86",
       "content": "From June onward Fridays close at 18:00.",
       "source_id": "official-schedule",
       "source_type": "official_document",

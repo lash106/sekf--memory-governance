@@ -5,10 +5,10 @@
   "annotators": [
     "Sai Chetan Muppalla"
   ],
-  "annotation_notes": "Sai Chetan Sprint 0-2 case (duplicate_paraphrase).",
+  "annotation_notes": "Sai Chetan evidence/governance case (duplicate_paraphrase).",
   "initial_memory": [
     {
-      "claim_id": "78dfd4e8-19d0-4232-b7bb-9cef2371db15",
+      "claim_id": "158c9f31-5aa6-49c5-b4c0-6d07ba2a3b2b",
       "claim_text": "The laboratory closes at 18:00 on Fridays.",
       "subject_key": "laboratory",
       "predicate_key": "closing_time_friday",
@@ -25,7 +25,7 @@
     }
   ],
   "candidate": {
-    "claim_id": "46813fe1-cbed-45be-b42a-e71735d12354",
+    "claim_id": "ebed10e4-9a9c-4c2d-a1a8-31d0565395ed",
     "claim_text": "The laboratory closes at 18:00 on Fridays.",
     "subject_key": "laboratory",
     "predicate_key": "closing_time_friday",
@@ -39,7 +39,7 @@
   },
   "evidence": [
     {
-      "evidence_id": "37fe4ca7-bd69-4d8d-95f3-ece7d6d98b83",
+      "evidence_id": "df03d7e9-422f-4f78-91be-1ae90caae9b3",
       "content": "Reminder: lab still closes Friday at 18:00.",
       "source_id": "official-schedule",
       "source_type": "official_document",

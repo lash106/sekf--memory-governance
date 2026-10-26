@@ -5,10 +5,10 @@
   "annotators": [
     "Sai Chetan Muppalla"
   ],
-  "annotation_notes": "Sai Chetan Sprint 0-2 case (reliable_newer_correction).",
+  "annotation_notes": "Sai Chetan evidence/governance case (reliable_newer_correction).",
   "initial_memory": [
     {
-      "claim_id": "6f9e0f56-b447-431b-a038-9ad568406cfc",
+      "claim_id": "6f067141-e9f7-4e85-befa-5506f2e67974",
       "claim_text": "The laboratory closes at 16:00 on Fridays.",
       "subject_key": "laboratory",
       "predicate_key": "closing_time_friday",
@@ -25,7 +25,7 @@
     }
   ],
   "candidate": {
-    "claim_id": "db72f7e3-38df-4380-abbd-fbcfd6a32d25",
+    "claim_id": "e7d1fd2a-8020-457c-9204-d26891983093",
     "claim_text": "The laboratory closes at 17:30 on Fridays.",
     "subject_key": "laboratory",
     "predicate_key": "closing_time_friday",
@@ -39,7 +39,7 @@
   },
   "evidence": [
     {
-      "evidence_id": "eab44003-d7a8-4527-b372-6e7d480726a3",
+      "evidence_id": "458bdbb8-4319-46e0-9331-58f2f6731ae1",
       "content": "Facilities bulletin 2026-09-30: Friday close updated to 17:30.",
       "source_id": "official-schedule",
       "source_type": "official_document",

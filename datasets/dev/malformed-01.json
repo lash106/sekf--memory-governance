@@ -5,10 +5,10 @@
   "annotators": [
     "Sai Chetan Muppalla"
   ],
-  "annotation_notes": "Sai Chetan Sprint 0-2 case (malformed_input).",
+  "annotation_notes": "Sai Chetan evidence/governance case (malformed_input).",
   "initial_memory": [],
   "candidate": {
-    "claim_id": "08051667-ac76-47a6-8e18-1b138be250f6",
+    "claim_id": "7591622e-44de-47d1-968f-c9a52efa271c",
     "claim_text": "???",
     "subject_key": "laboratory",
     "predicate_key": "closing_time_friday",
@@ -24,7 +24,7 @@
   },
   "evidence": [
     {
-      "evidence_id": "eeb11b4b-b2d0-4556-80d2-75013d239273",
+      "evidence_id": "f0274684-894e-4137-b5e2-2e6c3a7a6878",
       "content": "n/a",
       "source_id": "official-schedule",
       "source_type": "official_document",

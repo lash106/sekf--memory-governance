@@ -5,10 +5,10 @@
   "annotators": [
     "Sai Chetan Muppalla"
   ],
-  "annotation_notes": "Sai Chetan Sprint 0-2 case (reliable_newer_correction).",
+  "annotation_notes": "Sai Chetan evidence/governance case (reliable_newer_correction).",
   "initial_memory": [
     {
-      "claim_id": "e55b47f4-af0a-4fe0-93c5-2359d310a785",
+      "claim_id": "f9a8184b-49a3-4d12-a2ac-200777a3c610",
       "claim_text": "The laboratory closes at 17:00 on Fridays.",
       "subject_key": "laboratory",
       "predicate_key": "closing_time_friday",
@@ -25,7 +25,7 @@
     }
   ],
   "candidate": {
-    "claim_id": "f0b47fcc-6a90-4030-96e6-1d5f25ec03fa",
+    "claim_id": "9aa5fef9-233b-4d6f-b936-170b3d953743",
     "claim_text": "The laboratory closes at 18:00 on Fridays.",
     "subject_key": "laboratory",
     "predicate_key": "closing_time_friday",
@@ -39,7 +39,7 @@
   },
   "evidence": [
     {
-      "evidence_id": "7c970202-9475-4771-b02a-91773c738abe",
+      "evidence_id": "5f5ca871-7c68-4212-afbc-5fcade57a033",
       "content": "Beginning October 1, Friday closing time is 18:00 (6 PM).",
       "source_id": "official-schedule",
       "source_type": "official_document",

@@ -1,7 +1,7 @@
-# Provider retry / repair design (Sprint 0 deliverable)
+# Provider retry / repair design
 
 Owner: Sai Chetan Muppalla  
-Implements SPEC.md section 11.
+Implements SPEC.md section 11. See also `docs/decisions/0002-llm-provider-d1.md`.
 
 ## Goals
 
@@ -15,7 +15,7 @@ Implements SPEC.md section 11.
 1. Call the chat-completions endpoint with `response_format={"type":"json_object"}` (or provider equivalent).
 2. Parse the assistant content as JSON; validate with `response_model.model_validate`.
 3. On success: return `LLMResult` with `llm_calls = attempts`, summed tokens/latency/cost.
-4. On `ValidationError` or JSON decode error, if `attempts < 1 + MAX_REPAIRS` (MAX_REPAIRS=2):
+4. On `ValidationError` or JSON decode error, if attempts remain:
    - Append a short repair user message listing the validation errors.
    - Retry with the same model, temperature, and seed.
 5. After repairs are exhausted: raise `RoleOutputInvalid`.
@@ -29,4 +29,5 @@ Implements SPEC.md section 11.
 
 ## Offline testing
 
-`FakeProvider` remains single-shot. Repair behavior is covered by unit tests that stub HTTP or use a sequence responder in `tests/unit/test_openai_compatible_provider.py` with a transport mock — no live network in CI.
+`FakeProvider` remains single-shot. Repair behavior is covered by
+`tests/unit/test_openai_compatible_provider.py` with `httpx.MockTransport` — no live network in CI.

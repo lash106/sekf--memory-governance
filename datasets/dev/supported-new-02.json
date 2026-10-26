@@ -5,10 +5,10 @@
   "annotators": [
     "Sai Chetan Muppalla"
   ],
-  "annotation_notes": "Sai Chetan Sprint 0-2 case (supported_new_claim).",
+  "annotation_notes": "Sai Chetan evidence/governance case (supported_new_claim).",
   "initial_memory": [],
   "candidate": {
-    "claim_id": "0c0a3623-e883-4253-a17e-f7b098f1c305",
+    "claim_id": "52bc833e-a4e2-4f2c-85c1-401feef1162c",
     "claim_text": "The laboratory closes at 18:00 on Fridays.",
     "subject_key": "laboratory",
     "predicate_key": "closing_time_friday",
@@ -22,7 +22,7 @@
   },
   "evidence": [
     {
-      "evidence_id": "f37774e6-4643-4cb7-97b5-3d5ed3049806",
+      "evidence_id": "52660327-55e3-4362-9ed8-e32671dce53b",
       "content": "University calendar export: Laboratory Friday End=18:00.",
       "source_id": "official-schedule",
       "source_type": "official_document",

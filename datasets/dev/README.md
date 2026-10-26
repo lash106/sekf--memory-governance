@@ -1,9 +1,9 @@
-# Dev cases — Sai Chetan contribution
+# Dev evaluation cases
 
-Files here were authored for SPEC Sprint 0–2 (evidence / Judge / baseline evaluation).
+Labeled cases under this folder are used for prompt/threshold work on `dev` only.
 
-- Annotator: Sai Chetan Muppalla
-- Regenerator: `python scripts/generate_sai_chetan_cases.py`
-- Do not tune prompts against a future frozen `test/` split
+- Contributor cases from Sai Chetan live as `*.json` here (template: `datasets/CASE_TEMPLATE.json`).
+- Regenerate Sai Chetan’s set with: `python scripts/generate_sai_chetan_cases.py`
+- Do not tune against a frozen `test/` split.
 
-Mahalakshmi owns `ANNOTATION_GUIDE.md`; gold final actions here follow the template meanings and should be re-checked once that guide lands.
+Gold final actions should be re-checked against `datasets/ANNOTATION_GUIDE.md` once that guide is published (Mahalakshmi).

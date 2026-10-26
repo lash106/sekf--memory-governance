@@ -1,13 +1,13 @@
 # ADR 0002: LLM provider choice (SPEC decision D1)
 
-- Status: accepted for Sprint 1–2 development (Sai Chetan ownership)
+- Status: accepted (Sai Chetan ownership)
 - Date: 2026-10-26
 - Owner: Sai Chetan Muppalla
 - Affected owners: Sai Chetan (providers/Judge); others consume via `StructuredLLMProvider`
 
 ## Context
 
-SPEC.md decision D1 (due Oct 13) requires choosing the LLM provider, exact model, budget source, rate limits, and whether to cache dev responses. Tests must stay offline via `FakeProvider`.
+SPEC.md decision D1 requires choosing the LLM provider, exact model, budget source, rate limits, and whether to cache dev responses. Tests must stay offline via `FakeProvider`.
 
 ## Decision
 

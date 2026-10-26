@@ -5,10 +5,10 @@
   "annotators": [
     "Sai Chetan Muppalla"
   ],
-  "annotation_notes": "Sai Chetan Sprint 0-2 case (insufficient_evidence).",
+  "annotation_notes": "Sai Chetan evidence/governance case (insufficient_evidence).",
   "initial_memory": [],
   "candidate": {
-    "claim_id": "ac58796d-8146-4880-9b42-3629b5b9014e",
+    "claim_id": "234757f6-fc41-49d0-9814-29f5e87ec22d",
     "claim_text": "The laboratory closes at 18:00 on Fridays.",
     "subject_key": "laboratory",
     "predicate_key": "closing_time_friday",
@@ -22,7 +22,7 @@
   },
   "evidence": [
     {
-      "evidence_id": "ce62d560-e2fa-4d95-a804-ff7ab57f9818",
+      "evidence_id": "a49da95c-c365-4761-9748-7e21aa650068",
       "content": "Someone mentioned lab hours changed.",
       "source_id": "chat",
       "source_type": "chat",

@@ -1,4 +1,4 @@
-"""Generate Sai Chetan Sprint 0-2 labeled dev cases (offline).
+"""Generate Sai Chetan labeled `datasets/dev` cases (offline).
 
 Run: python scripts/generate_sai_chetan_cases.py
 """
@@ -397,7 +397,7 @@ def main() -> None:
             "category": category,
             "split": "dev",
             "annotators": ["Sai Chetan Muppalla"],
-            "annotation_notes": f"Sai Chetan Sprint 0-2 case ({category}).",
+            "annotation_notes": f"Sai Chetan evidence/governance case ({category}).",
             "initial_memory": memory,
             "candidate": candidate,
             "evidence": evidence,

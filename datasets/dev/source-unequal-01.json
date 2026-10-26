@@ -5,10 +5,10 @@
   "annotators": [
     "Sai Chetan Muppalla"
   ],
-  "annotation_notes": "Sai Chetan Sprint 0-2 case (conflicting_sources_unequal_reliability).",
+  "annotation_notes": "Sai Chetan evidence/governance case (conflicting_sources_unequal_reliability).",
   "initial_memory": [
     {
-      "claim_id": "c6df3556-458d-495b-b7c2-71e7af8c0cec",
+      "claim_id": "0ca51cc2-0014-4dc4-8098-4902f61f50f8",
       "claim_text": "The laboratory closes at 17:00 on Fridays.",
       "subject_key": "laboratory",
       "predicate_key": "closing_time_friday",
@@ -25,7 +25,7 @@
     }
   ],
   "candidate": {
-    "claim_id": "b3390f5d-7bc6-405b-9c7c-b6c6c12fc890",
+    "claim_id": "b0bc6ab7-af2f-448b-a374-3d4c4f3f5d70",
     "claim_text": "The laboratory closes at 18:00 on Fridays.",
     "subject_key": "laboratory",
     "predicate_key": "closing_time_friday",
@@ -39,7 +39,7 @@
   },
   "evidence": [
     {
-      "evidence_id": "ffac6d6d-a78a-409f-9b28-ce36353b280d",
+      "evidence_id": "84991e46-2c69-4357-8765-de4a3d6c14bb",
       "content": "Official registrar: Friday close 18:00.",
       "source_id": "official-schedule",
       "source_type": "official_document",
@@ -49,7 +49,7 @@
       "metadata": {}
     },
     {
-      "evidence_id": "2825e1b4-5aa7-42db-8e24-0edd1e54a4a9",
+      "evidence_id": "35fd9405-3281-46ae-96b3-5077dd7aca47",
       "content": "Anonymous blog: still 17:00.",
       "source_id": "blog",
       "source_type": "web",

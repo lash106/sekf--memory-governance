@@ -1,0 +1,36 @@
+Sprint 1 deliverable — Sai Chetan Muppalla
+SPEC.md section 18 (Sprint 1): Judge v1, versioned prompt, evidence-ID validation
+Ownership (AGENTS.md / SPEC.md section 6.2): judge/, providers/, evidence fixtures
+Branch: SaiChetan/sprint1-judge
+Does not include: synthesizer (Mahalakshmi), single_judge baseline (Sprint 2), real OpenAI adapter
+
+What this Sprint 1 change adds
+1. prompts/judge/v1.txt
+   - Judge-only prompt: candidate + evidence; no gold labels or final actions
+   - Structured fields: label, confidence, supporting/refuting evidence ids,
+     missing_information, rationale
+
+2. src/sekf/providers/prompts.py and serialize.py
+   - Versioned prompt loader under prompts/<role>/<version>.txt
+   - load_role_prompt / load_prompt / render_prompt (no silent missing-key fallback)
+   - Shared JSON dump helpers for LLM payloads (reusable by later baselines)
+
+3. src/sekf/judge/llm/
+   - LLMJudge implements Judge.evaluate via StructuredLLMProvider.complete_json
+   - Private JudgeLLMOutput schema (not a contracts ADR change)
+   - Validates supporting_evidence_ids and refuting_evidence_ids against request.evidence;
+     unknown ids raise RoleOutputInvalid -> orchestrator role_errors -> policy R1
+   - Records CallMetadata: model, provider, prompt_version, prompt_hash, temperature,
+     seed, llm_calls, tokens, latency, cost
+   - FakeJudge remains the default for the skeleton API
+
+4. Offline tests
+   - tests/unit/test_prompt_loader.py
+   - tests/unit/test_llm_judge.py (SUPPORTED path, hallucinated id rejection,
+     Governance + FakeHistorian + FakeSynthesizer + PolicyEngine wiring)
+
+How to verify (offline, no API keys)
+  python -m pytest -q tests/unit/test_prompt_loader.py tests/unit/test_llm_judge.py
+
+Files in this peer_review folder mirror the repo-root paths above for co-author reading.
+Live editable code is at the repository root under the same relative paths.

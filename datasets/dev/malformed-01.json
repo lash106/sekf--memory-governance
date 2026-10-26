@@ -1,0 +1,50 @@
+{
+  "case_id": "malformed-01",
+  "category": "malformed_input",
+  "split": "dev",
+  "annotators": [
+    "Sai Chetan Muppalla"
+  ],
+  "annotation_notes": "Sai Chetan Sprint 0-2 case (malformed_input).",
+  "initial_memory": [],
+  "candidate": {
+    "claim_id": "08051667-ac76-47a6-8e18-1b138be250f6",
+    "claim_text": "???",
+    "subject_key": "laboratory",
+    "predicate_key": "closing_time_friday",
+    "object_text": "UNKNOWN_MALFORMED",
+    "source_id": "corrupt-extractor",
+    "observed_at": "2026-10-01T20:00:00Z",
+    "valid_from": null,
+    "valid_to": null,
+    "extractor_confidence": 0.1,
+    "metadata": {
+      "malformed": true
+    }
+  },
+  "evidence": [
+    {
+      "evidence_id": "eeb11b4b-b2d0-4556-80d2-75013d239273",
+      "content": "n/a",
+      "source_id": "official-schedule",
+      "source_type": "official_document",
+      "published_at": "2026-09-28T00:00:00Z",
+      "retrieved_at": "2026-10-01T20:00:00Z",
+      "reliability": 0.95,
+      "metadata": {}
+    }
+  ],
+  "gold": {
+    "judge_label": "INVALID_INPUT",
+    "temporal_relation": "NO_RELATED_CLAIM",
+    "conflict_type": "NONE",
+    "final_action": "ESCALATE_FOR_REVIEW",
+    "expected_memory_delta": {
+      "superseded_claim_ids": [],
+      "new_active_claim_ids": [],
+      "quarantined_claim_ids": [],
+      "rejected_claim_ids": [],
+      "attached_evidence_ids": []
+    }
+  }
+}

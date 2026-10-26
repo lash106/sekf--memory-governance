@@ -1,0 +1,18 @@
+Peer-review pack for Sai Chetan — do not push until co-authors sign off.
+
+Folders
+  sprint1_judge/          Sprint 1 only (Judge + prompts + provider helpers)
+  sprint2_single_judge/   Sprint 2 only (single_judge baseline)
+  colab_smoke_test.ipynb  Open in Google Colab or Jupyter after uploading the repo zip
+  run_offline_smoke.py    Same checks as the notebook, runnable from a terminal
+
+Suggested review order
+  1. Read sprint1_judge/CONTENTS.txt then the files under that folder
+  2. Read sprint2_single_judge/CONTENTS.txt then that folder
+  3. Run offline smoke (no API keys):
+
+       python peer_review/SaiChetan/run_offline_smoke.py
+       python -m pytest -q tests/unit/test_prompt_loader.py tests/unit/test_llm_judge.py tests/unit/test_single_judge.py
+
+Live code also sits at the repo root (src/, prompts/, tests/) so the package imports work.
+These peer_review folders are the clean split for co-author reading and tomorrow's separate PRs.

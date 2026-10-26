@@ -1,0 +1,26 @@
+Local fill branch (do not push until asked): SaiChetan/Sprint0-1-2-fill
+
+Completes remaining Sai Chetan Sprint 0–2 items beyond the already-merged
+Sprint1-Judge and Sprint2-SingleJudge PRs.
+
+Sprint 0
+  - docs/decisions/0002-llm-provider-d1.md
+  - docs/sai_chetan/provider-repair-design.md
+  - 5+ labeled cases among datasets/dev/* (21 total covering required categories)
+
+Sprint 1
+  - src/sekf/providers/openai_compatible.py (≤2 repairs, typed errors)
+  - src/sekf/providers/factory.py
+  - .env.example updated
+  - datasets/dev evidence/governance cases (>=12 evidence-oriented)
+
+Sprint 2
+  - src/sekf/baselines/generic_ensemble/
+  - src/sekf/baselines/matched_settings.py
+  - src/sekf/judge/metrics.py (accuracy + contradiction F1)
+  - offline unit tests for all of the above
+
+Not done here (needs other owners or live keys)
+  - Wire LLMJudge into api/app.py (Shailen module)
+  - Live API smoke with a real key
+  - SQL memory / Historian / Synthesizer / experiment runner

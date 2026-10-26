@@ -1,0 +1,75 @@
+{
+  "case_id": "source-similar-01",
+  "category": "conflicting_sources_similar_reliability",
+  "split": "dev",
+  "annotators": [
+    "Sai Chetan Muppalla"
+  ],
+  "annotation_notes": "Sai Chetan Sprint 0-2 case (conflicting_sources_similar_reliability).",
+  "initial_memory": [
+    {
+      "claim_id": "75859d4e-7068-4e89-ab5a-7e4a859362a5",
+      "claim_text": "The laboratory closes at 17:00 on Fridays.",
+      "subject_key": "laboratory",
+      "predicate_key": "closing_time_friday",
+      "object_text": "17:00",
+      "status": "ACTIVE",
+      "version": 1,
+      "valid_from": "2026-01-01T00:00:00Z",
+      "valid_to": null,
+      "confidence": 0.9,
+      "created_at": "2026-01-02T00:00:00Z",
+      "updated_at": "2026-01-02T00:00:00Z",
+      "supersedes_claim_id": null,
+      "evidence_ids": []
+    }
+  ],
+  "candidate": {
+    "claim_id": "204b5dd8-2d4a-45e1-82f5-90cf9a730a7f",
+    "claim_text": "The laboratory closes at 18:00 on Fridays.",
+    "subject_key": "laboratory",
+    "predicate_key": "closing_time_friday",
+    "object_text": "18:00",
+    "source_id": "student-chat",
+    "observed_at": "2026-10-01T20:00:00Z",
+    "valid_from": "2026-10-01T00:00:00Z",
+    "valid_to": null,
+    "extractor_confidence": 0.9,
+    "metadata": {}
+  },
+  "evidence": [
+    {
+      "evidence_id": "05a484e7-f815-4783-91e6-4ba722ad5a65",
+      "content": "Dept site A: closes 18:00.",
+      "source_id": "site-a",
+      "source_type": "official_document",
+      "published_at": "2026-09-28T00:00:00Z",
+      "retrieved_at": "2026-10-01T20:00:00Z",
+      "reliability": 0.7,
+      "metadata": {}
+    },
+    {
+      "evidence_id": "4fa9a91f-38f3-42ad-b9c1-9bd67029cf09",
+      "content": "Dept site B: closes 17:00.",
+      "source_id": "site-b",
+      "source_type": "official_document",
+      "published_at": "2026-09-28T00:00:00Z",
+      "retrieved_at": "2026-10-01T20:00:00Z",
+      "reliability": 0.7,
+      "metadata": {}
+    }
+  ],
+  "gold": {
+    "judge_label": "MIXED_EVIDENCE",
+    "temporal_relation": "NEWER_UPDATE",
+    "conflict_type": "SOURCE_CONFLICT",
+    "final_action": "QUARANTINE",
+    "expected_memory_delta": {
+      "superseded_claim_ids": [],
+      "new_active_claim_ids": [],
+      "quarantined_claim_ids": [],
+      "rejected_claim_ids": [],
+      "attached_evidence_ids": []
+    }
+  }
+}

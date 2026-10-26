@@ -1,0 +1,26 @@
+Sprint 2 deliverable — Sai Chetan Muppalla
+SPEC.md section 18 (Sprint 2): single_judge baseline
+Ownership (AGENTS.md / SPEC.md section 6.2): baselines/single_judge
+Branch: SaiChetan/Sprint2-SingleJudge (stacked on SaiChetan/Sprint1-Judge)
+Depends on: Sprint 1 prompt loader + serialize helpers
+
+What this Sprint 2 change adds
+1. prompts/baselines/single_judge/v1.txt
+   - One-pass Mem0-style action recommendation over candidate, related claims, evidence
+   - Canonical FinalAction names only
+
+2. src/sekf/baselines/single_judge/
+   - SingleJudgeBaseline.decide(DecideRequest) -> DecideResponse
+   - Does not run council PolicyEngine on the happy path
+   - policy_version=single-judge-v1 (separate decision-id namespace from policy-v1)
+   - RoleOutputInvalid / RoleTimeout / SekfError -> ESCALATE_FOR_REVIEW, rule_ids_fired=["R1"]
+   - dry_run only in this slice: no memory writes
+   - Constructor knobs: prompt_version, policy_version, optional MemoryRepository
+
+3. Offline tests
+   - tests/unit/test_single_judge.py (REVISE path, invalid output R1, SekfError R1)
+
+How to verify (offline, no API keys)
+  python -m pytest -q tests/unit/test_single_judge.py
+
+Out of scope here: generic_ensemble, API /v1/baselines wiring, commit-mode memory writes.

@@ -8,7 +8,7 @@
   "annotation_notes": "Sai Chetan evidence/governance case (reliable_newer_correction).",
   "initial_memory": [
     {
-      "claim_id": "6f067141-e9f7-4e85-befa-5506f2e67974",
+      "claim_id": "1ac1d8f4-fd68-5169-b2fa-db551a2e76da",
       "claim_text": "The laboratory closes at 16:00 on Fridays.",
       "subject_key": "laboratory",
       "predicate_key": "closing_time_friday",
@@ -25,7 +25,7 @@
     }
   ],
   "candidate": {
-    "claim_id": "e7d1fd2a-8020-457c-9204-d26891983093",
+    "claim_id": "089b8388-f27a-5cc2-b30a-2f9fb649cde9",
     "claim_text": "The laboratory closes at 17:30 on Fridays.",
     "subject_key": "laboratory",
     "predicate_key": "closing_time_friday",
@@ -39,7 +39,7 @@
   },
   "evidence": [
     {
-      "evidence_id": "458bdbb8-4319-46e0-9331-58f2f6731ae1",
+      "evidence_id": "ca7696c4-00f6-5d0b-87d0-bc40550c3a5a",
       "content": "Facilities bulletin 2026-09-30: Friday close updated to 17:30.",
       "source_id": "official-schedule",
       "source_type": "official_document",
@@ -55,8 +55,12 @@
     "conflict_type": "TEMPORAL_UPDATE",
     "final_action": "REVISE",
     "expected_memory_delta": {
-      "superseded_claim_ids": [],
-      "new_active_claim_ids": [],
+      "superseded_claim_ids": [
+        "1ac1d8f4-fd68-5169-b2fa-db551a2e76da"
+      ],
+      "new_active_claim_ids": [
+        "089b8388-f27a-5cc2-b30a-2f9fb649cde9"
+      ],
       "quarantined_claim_ids": [],
       "rejected_claim_ids": [],
       "attached_evidence_ids": []

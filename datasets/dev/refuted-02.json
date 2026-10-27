@@ -8,7 +8,7 @@
   "annotation_notes": "Sai Chetan evidence/governance case (refuted_claim).",
   "initial_memory": [],
   "candidate": {
-    "claim_id": "84cc687b-d8a3-4aa6-9cbd-4fad5bc60a2c",
+    "claim_id": "5169186e-30af-5858-8b46-18f6373eb482",
     "claim_text": "The laboratory closes at 22:00 on Fridays.",
     "subject_key": "laboratory",
     "predicate_key": "closing_time_friday",
@@ -22,7 +22,7 @@
   },
   "evidence": [
     {
-      "evidence_id": "5f944c7a-e54b-4129-a6bc-b9ad13657d32",
+      "evidence_id": "ff46bc9b-41ba-51f7-99ea-c1c9753f8866",
       "content": "Security log: lab alarmed at 18:00 Fridays; 22:00 access denied.",
       "source_id": "official-schedule",
       "source_type": "official_document",
@@ -41,7 +41,9 @@
       "superseded_claim_ids": [],
       "new_active_claim_ids": [],
       "quarantined_claim_ids": [],
-      "rejected_claim_ids": [],
+      "rejected_claim_ids": [
+        "5169186e-30af-5858-8b46-18f6373eb482"
+      ],
       "attached_evidence_ids": []
     }
   }

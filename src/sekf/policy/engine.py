@@ -91,12 +91,15 @@ class PolicyEngine:
 
         h, j, s = context.historian, context.judge, context.synthesizer
         parts = [r for r in (h, j, s) if r is not None]
+        failed = context.role_errors
         cost = CostSummary(
-            llm_calls=sum(r.llm_calls for r in parts),
-            input_tokens=sum(r.input_tokens for r in parts),
-            output_tokens=sum(r.output_tokens for r in parts),
-            latency_ms=sum(r.latency_ms for r in parts),
-            estimated_cost_usd=sum(r.estimated_cost_usd for r in parts),
+            llm_calls=sum(r.llm_calls for r in parts) + sum(e.llm_calls for e in failed),
+            input_tokens=sum(r.input_tokens for r in parts) + sum(e.input_tokens for e in failed),
+            output_tokens=sum(r.output_tokens for r in parts)
+            + sum(e.output_tokens for e in failed),
+            latency_ms=sum(r.latency_ms for r in parts) + sum(e.latency_ms for e in failed),
+            estimated_cost_usd=sum(r.estimated_cost_usd for r in parts)
+            + sum(e.estimated_cost_usd for e in failed),
         )
         decision_id, digest = self.identify(context)
         return DecisionRecord(

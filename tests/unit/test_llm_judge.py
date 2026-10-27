@@ -8,7 +8,7 @@ from tests.conftest import NOW
 
 from sekf.api import Governance
 from sekf.contracts import DecideRequest, EvidenceRecord, FinalAction, JudgeLabel, JudgeRequest
-from sekf.errors import RoleOutputInvalid
+from sekf.errors import CallUsage, RoleOutputInvalid
 from sekf.historian import FakeHistorian
 from sekf.judge import LLMJudge
 from sekf.memory import InMemoryRepository
@@ -56,6 +56,8 @@ async def test_llm_judge_supports_claim_with_real_evidence_id(
     assert assessment.prompt_hash == load_role_prompt("judge", "v1").prompt_hash
     assert assessment.provider == "fake"
     assert assessment.candidate_claim_id == decide_request.candidate.claim_id
+    again = await judge.evaluate(_judge_request(decide_request))
+    assert again.assessment_id != assessment.assessment_id
 
 
 async def test_llm_judge_rejects_hallucinated_evidence_id(
@@ -106,6 +108,32 @@ async def test_hallucinated_evidence_id_escalates_in_governance(
         err.role == "judge" and err.error_type == "RoleOutputInvalid"
         for err in response.role_errors
     )
+
+
+async def test_governance_records_cost_when_judge_repairs_fail(
+    repo: InMemoryRepository, decide_request: DecideRequest
+) -> None:
+    class _FailingJudge:
+        async def evaluate(self, _request: JudgeRequest) -> None:
+            raise RoleOutputInvalid(
+                "repairs exhausted",
+                usage=CallUsage(llm_calls=3, input_tokens=15, estimated_cost_usd=0.01),
+            )
+
+    governance = Governance(
+        memory=repo,
+        historian=FakeHistorian(),
+        judge=_FailingJudge(),
+        synthesizer=FakeSynthesizer(),
+        policy=PolicyEngine(),
+        clock=lambda: NOW,
+    )
+    response = await governance.decide(decide_request)
+    assert response.decision.final_action is FinalAction.ESCALATE_FOR_REVIEW
+    assert response.decision.cost.llm_calls == 3
+    assert response.decision.cost.input_tokens == 15
+    assert response.decision.cost.estimated_cost_usd == pytest.approx(0.01)
+    assert response.role_errors[0].llm_calls == 3
 
 
 def test_lab_fixture_evidence_id(decide_request: DecideRequest) -> None:

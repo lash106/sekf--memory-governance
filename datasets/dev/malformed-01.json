@@ -8,7 +8,7 @@
   "annotation_notes": "Sai Chetan evidence/governance case (malformed_input).",
   "initial_memory": [],
   "candidate": {
-    "claim_id": "7591622e-44de-47d1-968f-c9a52efa271c",
+    "claim_id": "ef025b57-830a-5987-9356-c9ff284c4019",
     "claim_text": "???",
     "subject_key": "laboratory",
     "predicate_key": "closing_time_friday",
@@ -24,7 +24,7 @@
   },
   "evidence": [
     {
-      "evidence_id": "f0274684-894e-4137-b5e2-2e6c3a7a6878",
+      "evidence_id": "2d3b7394-7405-5ac8-946a-9bf783ba0cbc",
       "content": "n/a",
       "source_id": "official-schedule",
       "source_type": "official_document",

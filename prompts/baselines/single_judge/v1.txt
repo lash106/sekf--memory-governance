@@ -17,6 +17,7 @@ Return a JSON object with exactly these fields:
 - recommended_action: one of PROMOTE, ATTACH_EVIDENCE, KEEP_EPISODIC, QUARANTINE, REVISE, REJECT, ESCALATE_FOR_REVIEW
 - confidence: number between 0 and 1
 - rationale: a concise explanation
+- target_claim_id: the claim_id of the ACTIVE related claim that REVISE supersedes or that ATTACH_EVIDENCE updates; null for every other action
 
 Use these action meanings:
 - PROMOTE: new claim should become ACTIVE

@@ -191,11 +191,20 @@ class CostSummary(Contract):
 
 
 class RoleFailure(Contract):
-    """A typed role failure (timeout, invalid output, provider down)."""
+    """A typed role failure (timeout, invalid output, provider down).
+
+    Token and call totals cover attempts that failed validation, so a repaired-then-rejected
+    role is not recorded as free. Defaults stay zero for failures that never reached a model.
+    """
 
     role: str
     error_type: str
     message: str
+    llm_calls: int = Field(default=0, ge=0)
+    input_tokens: int = Field(default=0, ge=0)
+    output_tokens: int = Field(default=0, ge=0)
+    latency_ms: int = Field(default=0, ge=0)
+    estimated_cost_usd: float = Field(default=0.0, ge=0.0)
 
 
 class PolicyContext(Contract):

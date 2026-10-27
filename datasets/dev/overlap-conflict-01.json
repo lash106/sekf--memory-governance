@@ -8,7 +8,7 @@
   "annotation_notes": "Sai Chetan evidence/governance case (overlapping_temporal_conflict).",
   "initial_memory": [
     {
-      "claim_id": "59f269c0-3c56-4f0a-ad89-c57746e6901d",
+      "claim_id": "9a5c54a8-95a4-502c-a8ce-d782b5551c27",
       "claim_text": "The laboratory closes at 17:00 on Fridays.",
       "subject_key": "laboratory",
       "predicate_key": "closing_time_friday",
@@ -25,7 +25,7 @@
     }
   ],
   "candidate": {
-    "claim_id": "541612db-43a0-4827-ae0c-1e8903e8d3cb",
+    "claim_id": "b2ce547e-dd20-5a34-be94-06d67624f49b",
     "claim_text": "The laboratory closes at 18:00 on Fridays.",
     "subject_key": "laboratory",
     "predicate_key": "closing_time_friday",
@@ -39,7 +39,7 @@
   },
   "evidence": [
     {
-      "evidence_id": "6362038f-deb6-476d-b2b8-b4f91ca738e8",
+      "evidence_id": "7d8f18a7-ed67-5060-be84-9b8fcbee2b46",
       "content": "Schedule A says 18:00 for all of 2026.",
       "source_id": "official-schedule",
       "source_type": "official_document",
@@ -49,7 +49,7 @@
       "metadata": {}
     },
     {
-      "evidence_id": "3d2e086e-1de4-4407-8834-b6e76a649419",
+      "evidence_id": "ee3c5dab-80c1-5fdd-b756-bf9488dff573",
       "content": "Schedule B still lists 17:00 through December.",
       "source_id": "schedule-b",
       "source_type": "official_document",
@@ -67,7 +67,9 @@
     "expected_memory_delta": {
       "superseded_claim_ids": [],
       "new_active_claim_ids": [],
-      "quarantined_claim_ids": [],
+      "quarantined_claim_ids": [
+        "b2ce547e-dd20-5a34-be94-06d67624f49b"
+      ],
       "rejected_claim_ids": [],
       "attached_evidence_ids": []
     }

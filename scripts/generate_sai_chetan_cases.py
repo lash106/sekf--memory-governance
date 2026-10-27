@@ -7,17 +7,64 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
-from uuid import uuid4
+from uuid import NAMESPACE_URL, uuid5
 
 ROOT = Path(__file__).resolve().parents[1] / "datasets" / "dev"
 NOW = "2026-10-01T20:00:00Z"
 EARLIER = "2026-01-02T00:00:00Z"
+_N = 0
+
+
+def _reset_ids() -> None:
+    global _N
+    _N = 0
+
+
+def _id() -> str:
+    """Stable id. Call order inside `build_cases` is the seed; reruns do not reshuffle."""
+
+    global _N
+    _N += 1
+    return str(uuid5(NAMESPACE_URL, f"sekf:sai-chetan:dev:v1:{_N}"))
+
+
+def expected_memory_delta(
+    action: str, memory: list[dict], candidate: dict, evidence: list[dict]
+) -> dict[str, list[str]]:
+    """Gold state change for `action`. Empty only when governed memory is unchanged."""
+
+    delta: dict[str, list[str]] = {
+        "superseded_claim_ids": [],
+        "new_active_claim_ids": [],
+        "quarantined_claim_ids": [],
+        "rejected_claim_ids": [],
+        "attached_evidence_ids": [],
+    }
+    candidate_id = candidate["claim_id"]
+    active_ids = [item["claim_id"] for item in memory if item.get("status") == "ACTIVE"]
+    evidence_ids = [item["evidence_id"] for item in evidence]
+    if action == "PROMOTE":
+        delta["new_active_claim_ids"] = [candidate_id]
+    elif action == "REVISE":
+        delta["superseded_claim_ids"] = active_ids
+        delta["new_active_claim_ids"] = [candidate_id]
+    elif action == "REJECT":
+        delta["rejected_claim_ids"] = [candidate_id]
+    elif action == "QUARANTINE":
+        delta["quarantined_claim_ids"] = [candidate_id]
+    elif action == "ATTACH_EVIDENCE":
+        delta["attached_evidence_ids"] = evidence_ids
+    elif action in {"KEEP_EPISODIC", "ESCALATE_FOR_REVIEW"}:
+        return delta
+    else:
+        raise ValueError(f"no memory-delta rule for action {action}")
+    return delta
 
 
 def base_memory(object_text: str = "17:00") -> list[dict]:
     return [
         {
-            "claim_id": str(uuid4()),
+            "claim_id": _id(),
             "claim_text": f"The laboratory closes at {object_text} on Fridays.",
             "subject_key": "laboratory",
             "predicate_key": "closing_time_friday",
@@ -37,7 +84,7 @@ def base_memory(object_text: str = "17:00") -> list[dict]:
 
 def cand(object_text: str, source: str = "student-chat", conf: float = 0.9) -> dict:
     return {
-        "claim_id": str(uuid4()),
+        "claim_id": _id(),
         "claim_text": f"The laboratory closes at {object_text} on Fridays.",
         "subject_key": "laboratory",
         "predicate_key": "closing_time_friday",
@@ -58,7 +105,7 @@ def evid(
     stype: str = "official_document",
 ) -> dict:
     return {
-        "evidence_id": str(uuid4()),
+        "evidence_id": _id(),
         "content": content,
         "source_id": source,
         "source_type": stype,
@@ -69,8 +116,10 @@ def evid(
     }
 
 
-def main() -> None:
-    ROOT.mkdir(parents=True, exist_ok=True)
+def build_cases() -> list[dict]:
+    """Return the labeled dev cases. Ids are stable across calls."""
+
+    _reset_ids()
     mem17 = base_memory("17:00")
     mem18 = base_memory("18:00")
     mem16 = base_memory("16:00")
@@ -240,7 +289,7 @@ def main() -> None:
             "malformed_input",
             [],
             {
-                "claim_id": str(uuid4()),
+                "claim_id": _id(),
                 "claim_text": "???",
                 "subject_key": "laboratory",
                 "predicate_key": "closing_time_friday",
@@ -390,7 +439,7 @@ def main() -> None:
         ),
     ]
 
-    written: list[str] = []
+    written: list[dict] = []
     for case_id, category, memory, candidate, evidence, jlabel, temporal, conflict, action in defs:
         case = {
             "case_id": case_id,
@@ -406,19 +455,20 @@ def main() -> None:
                 "temporal_relation": temporal,
                 "conflict_type": conflict,
                 "final_action": action,
-                "expected_memory_delta": {
-                    "superseded_claim_ids": [],
-                    "new_active_claim_ids": [],
-                    "quarantined_claim_ids": [],
-                    "rejected_claim_ids": [],
-                    "attached_evidence_ids": [],
-                },
+                "expected_memory_delta": expected_memory_delta(action, memory, candidate, evidence),
             },
         }
-        path = ROOT / f"{case_id}.json"
+        written.append(case)
+    return written
+
+
+def main() -> None:
+    ROOT.mkdir(parents=True, exist_ok=True)
+    cases = build_cases()
+    for case in cases:
+        path = ROOT / f"{case['case_id']}.json"
         path.write_text(json.dumps(case, indent=2) + "\n", encoding="utf-8")
-        written.append(path.name)
-    print(f"wrote {len(written)} cases to {ROOT}")
+    print(f"wrote {len(cases)} cases to {ROOT}")
 
 
 if __name__ == "__main__":

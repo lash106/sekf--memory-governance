@@ -8,7 +8,7 @@
   "annotation_notes": "Sai Chetan evidence/governance case (conflicting_sources_similar_reliability).",
   "initial_memory": [
     {
-      "claim_id": "cfb1f211-b156-43e2-9f20-46682b438daf",
+      "claim_id": "7d1a298f-cd80-51a7-bdcb-464044d433ad",
       "claim_text": "The laboratory closes at 17:00 on Fridays.",
       "subject_key": "laboratory",
       "predicate_key": "closing_time_friday",
@@ -25,7 +25,7 @@
     }
   ],
   "candidate": {
-    "claim_id": "9739d56a-e4d9-4859-a263-ef6ce58e7bd3",
+    "claim_id": "91047c78-ff73-5371-a9c0-3872a9636dfe",
     "claim_text": "The laboratory closes at 18:00 on Fridays.",
     "subject_key": "laboratory",
     "predicate_key": "closing_time_friday",
@@ -39,7 +39,7 @@
   },
   "evidence": [
     {
-      "evidence_id": "48d092d2-67a9-4c26-9093-6d76a2cdc113",
+      "evidence_id": "c2f31fbb-3a40-5c8e-9d77-4a7d32c7d414",
       "content": "Dept site A: closes 18:00.",
       "source_id": "site-a",
       "source_type": "official_document",
@@ -49,7 +49,7 @@
       "metadata": {}
     },
     {
-      "evidence_id": "44a1464f-6352-4265-8c38-1737232e687d",
+      "evidence_id": "0b079d6e-db11-5d0f-9a9b-1fec2076a476",
       "content": "Dept site B: closes 17:00.",
       "source_id": "site-b",
       "source_type": "official_document",
@@ -67,7 +67,9 @@
     "expected_memory_delta": {
       "superseded_claim_ids": [],
       "new_active_claim_ids": [],
-      "quarantined_claim_ids": [],
+      "quarantined_claim_ids": [
+        "91047c78-ff73-5371-a9c0-3872a9636dfe"
+      ],
       "rejected_claim_ids": [],
       "attached_evidence_ids": []
     }

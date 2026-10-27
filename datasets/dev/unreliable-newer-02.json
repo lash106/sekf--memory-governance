@@ -8,7 +8,7 @@
   "annotation_notes": "Sai Chetan evidence/governance case (unreliable_newer_contradiction).",
   "initial_memory": [
     {
-      "claim_id": "7b2e8399-ce1d-4fc8-8766-cfbcbb42f75b",
+      "claim_id": "89743aab-901b-5516-ac2d-42a6fd3be391",
       "claim_text": "The laboratory closes at 17:00 on Fridays.",
       "subject_key": "laboratory",
       "predicate_key": "closing_time_friday",
@@ -25,7 +25,7 @@
     }
   ],
   "candidate": {
-    "claim_id": "8a5d6b37-3407-428e-8de0-5248a3b797ba",
+    "claim_id": "3d7e67a2-86e9-5b76-8514-d4ee01db9ffe",
     "claim_text": "The laboratory closes at 21:00 on Fridays.",
     "subject_key": "laboratory",
     "predicate_key": "closing_time_friday",
@@ -39,7 +39,7 @@
   },
   "evidence": [
     {
-      "evidence_id": "4dd7130b-ca31-4f21-99e2-fb2515ce9130",
+      "evidence_id": "2c426da1-b4ed-5217-a21c-a82b25028f13",
       "content": "TikTok comment: open until 21:00 lol",
       "source_id": "social",
       "source_type": "social",
@@ -57,7 +57,9 @@
     "expected_memory_delta": {
       "superseded_claim_ids": [],
       "new_active_claim_ids": [],
-      "quarantined_claim_ids": [],
+      "quarantined_claim_ids": [
+        "3d7e67a2-86e9-5b76-8514-d4ee01db9ffe"
+      ],
       "rejected_claim_ids": [],
       "attached_evidence_ids": []
     }

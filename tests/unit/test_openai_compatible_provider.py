@@ -50,6 +50,7 @@ async def test_valid_first_attempt() -> None:
     assert result.parsed == Answer(value=3)
     assert result.llm_calls == 1
     assert result.provider == "openai_compatible"
+    assert result.estimated_cost_usd == pytest.approx((10 * 0.15 + 5 * 0.60) / 1_000_000)
     await client.aclose()
 
 
@@ -83,7 +84,7 @@ async def test_repairs_exhausted_raises_role_output_invalid() -> None:
     )
     client = httpx.AsyncClient(transport=transport)
     provider = OpenAICompatibleProvider(api_key="test-key", client=client)
-    with pytest.raises(RoleOutputInvalid):
+    with pytest.raises(RoleOutputInvalid) as caught:
         await provider.complete_json(
             messages=[{"role": "user", "content": "hi"}],
             response_model=Answer,
@@ -91,6 +92,27 @@ async def test_repairs_exhausted_raises_role_output_invalid() -> None:
             temperature=0.0,
             seed=0,
         )
+    assert caught.value.usage is not None
+    assert caught.value.usage.llm_calls == 3
+    assert caught.value.usage.input_tokens == 30
+    assert caught.value.usage.estimated_cost_usd > 0
+    await client.aclose()
+
+
+@pytest.mark.asyncio
+async def test_unknown_model_is_not_priced_as_mini() -> None:
+    transport = _handler_factory([_completion('{"value": 1}')])
+    client = httpx.AsyncClient(transport=transport)
+    provider = OpenAICompatibleProvider(api_key="test-key", client=client)
+    result = await provider.complete_json(
+        messages=[{"role": "user", "content": "hi"}],
+        response_model=Answer,
+        model="local-research-model",
+        temperature=0.0,
+        seed=0,
+    )
+    assert result.input_tokens == 10
+    assert result.estimated_cost_usd == 0.0
     await client.aclose()
 
 

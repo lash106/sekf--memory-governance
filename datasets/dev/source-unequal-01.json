@@ -8,7 +8,7 @@
   "annotation_notes": "Sai Chetan evidence/governance case (conflicting_sources_unequal_reliability).",
   "initial_memory": [
     {
-      "claim_id": "0ca51cc2-0014-4dc4-8098-4902f61f50f8",
+      "claim_id": "372077b5-aeda-5797-ad71-682cffec1493",
       "claim_text": "The laboratory closes at 17:00 on Fridays.",
       "subject_key": "laboratory",
       "predicate_key": "closing_time_friday",
@@ -25,7 +25,7 @@
     }
   ],
   "candidate": {
-    "claim_id": "b0bc6ab7-af2f-448b-a374-3d4c4f3f5d70",
+    "claim_id": "d698436d-7827-55de-aa0a-d93bfb2dca57",
     "claim_text": "The laboratory closes at 18:00 on Fridays.",
     "subject_key": "laboratory",
     "predicate_key": "closing_time_friday",
@@ -39,7 +39,7 @@
   },
   "evidence": [
     {
-      "evidence_id": "84991e46-2c69-4357-8765-de4a3d6c14bb",
+      "evidence_id": "300ea144-5faf-5668-98b1-101060e78365",
       "content": "Official registrar: Friday close 18:00.",
       "source_id": "official-schedule",
       "source_type": "official_document",
@@ -49,7 +49,7 @@
       "metadata": {}
     },
     {
-      "evidence_id": "35fd9405-3281-46ae-96b3-5077dd7aca47",
+      "evidence_id": "3e82fd0f-d1bd-5c4f-a6ab-2dcebdb72c61",
       "content": "Anonymous blog: still 17:00.",
       "source_id": "blog",
       "source_type": "web",
@@ -65,8 +65,12 @@
     "conflict_type": "SOURCE_CONFLICT",
     "final_action": "REVISE",
     "expected_memory_delta": {
-      "superseded_claim_ids": [],
-      "new_active_claim_ids": [],
+      "superseded_claim_ids": [
+        "372077b5-aeda-5797-ad71-682cffec1493"
+      ],
+      "new_active_claim_ids": [
+        "d698436d-7827-55de-aa0a-d93bfb2dca57"
+      ],
       "quarantined_claim_ids": [],
       "rejected_claim_ids": [],
       "attached_evidence_ids": []

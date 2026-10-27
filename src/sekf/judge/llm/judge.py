@@ -5,7 +5,7 @@ Assesses evidence support only. Never receives gold labels or a final action.
 
 from __future__ import annotations
 
-from uuid import NAMESPACE_URL, uuid5
+from uuid import uuid4
 
 from sekf.contracts import JudgeAssessment, JudgeRequest
 from sekf.errors import RoleOutputInvalid
@@ -61,19 +61,10 @@ class LLMJudge:
             raise RoleOutputInvalid("provider returned a non-JudgeLLMOutput payload")
         self._validate_cited_ids(parsed, request)
 
-        evidence_fingerprint = "".join(
-            str(item.evidence_id) + item.content_hash for item in request.evidence
-        )
+        # Fresh id per call. The same candidate and prompt can yield different labels,
+        # so a content hash of the request would collide in storage.
         return JudgeAssessment(
-            assessment_id=uuid5(
-                NAMESPACE_URL,
-                "llm-judge:"
-                + str(request.candidate.claim_id)
-                + ":"
-                + evidence_fingerprint
-                + ":"
-                + self._prompt.prompt_hash,
-            ),
+            assessment_id=uuid4(),
             candidate_claim_id=request.candidate.claim_id,
             label=parsed.label,
             confidence=parsed.confidence,

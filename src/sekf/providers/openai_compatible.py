@@ -13,16 +13,18 @@ from typing import Any
 import httpx
 from pydantic import BaseModel, ValidationError
 
-from sekf.errors import ProviderUnavailable, RoleOutputInvalid
+from sekf.errors import CallUsage, ProviderUnavailable, RoleOutputInvalid
 from sekf.providers.base import LLMResult
 
 MAX_REPAIR_ATTEMPTS = 2  # after the first call => at most 3 total LLM calls
 DEFAULT_BASE_URL = "https://api.openai.com/v1"
 DEFAULT_MODEL = "gpt-4o-mini"
 
-# Rough USD / 1M tokens for gpt-4o-mini-class models; recorded for audit, not billing.
-_DEFAULT_INPUT_COST_PER_MTOK = 0.15
-_DEFAULT_OUTPUT_COST_PER_MTOK = 0.60
+# Versioned public list prices (USD per 1M tokens). Unknown models are not priced as mini.
+COST_RATE_VERSION = "openai-public-2026-10"
+MODEL_USD_PER_MTOK: dict[str, tuple[float, float]] = {
+    "gpt-4o-mini": (0.15, 0.60),
+}
 
 
 class OpenAICompatibleProvider:
@@ -37,8 +39,9 @@ class OpenAICompatibleProvider:
         timeout_s: float = 60.0,
         max_repair_attempts: int = MAX_REPAIR_ATTEMPTS,
         client: httpx.AsyncClient | None = None,
-        input_cost_per_mtok: float = _DEFAULT_INPUT_COST_PER_MTOK,
-        output_cost_per_mtok: float = _DEFAULT_OUTPUT_COST_PER_MTOK,
+        input_cost_per_mtok: float | None = None,
+        output_cost_per_mtok: float | None = None,
+        cost_rate_version: str = COST_RATE_VERSION,
     ) -> None:
         self._api_key = api_key if api_key is not None else os.getenv("SEKF_LLM_API_KEY", "")
         self._base_url = (base_url or os.getenv("SEKF_LLM_BASE_URL") or DEFAULT_BASE_URL).rstrip(
@@ -49,14 +52,55 @@ class OpenAICompatibleProvider:
         self._max_repair_attempts = max_repair_attempts
         self._client = client
         self._owns_client = client is None
+        if (input_cost_per_mtok is None) != (output_cost_per_mtok is None):
+            raise ValueError("set both input_cost_per_mtok and output_cost_per_mtok, or neither")
         self._input_cost_per_mtok = input_cost_per_mtok
         self._output_cost_per_mtok = output_cost_per_mtok
+        self.cost_rate_version = cost_rate_version
 
     @classmethod
     def from_env(cls) -> OpenAICompatibleProvider:
-        """Build from `SEKF_LLM_*` environment variables."""
+        """Build from `SEKF_LLM_*` environment variables.
 
-        return cls()
+        `SEKF_LLM_INPUT_COST_PER_MTOK` and `SEKF_LLM_OUTPUT_COST_PER_MTOK` override the
+        versioned table for every model in this process. Omit both to use `MODEL_USD_PER_MTOK`.
+        """
+
+        raw_in = os.getenv("SEKF_LLM_INPUT_COST_PER_MTOK")
+        raw_out = os.getenv("SEKF_LLM_OUTPUT_COST_PER_MTOK")
+        if (raw_in is None) != (raw_out is None):
+            raise ProviderUnavailable(
+                "set both SEKF_LLM_INPUT_COST_PER_MTOK and "
+                "SEKF_LLM_OUTPUT_COST_PER_MTOK, or neither"
+            )
+        if raw_in is None or raw_out is None:
+            return cls()
+        return cls(input_cost_per_mtok=float(raw_in), output_cost_per_mtok=float(raw_out))
+
+    def rates_for(self, model_id: str) -> tuple[float, float]:
+        """USD per 1M tokens for `model_id`. Unknown models cost 0, not the mini rate."""
+
+        if self._input_cost_per_mtok is not None and self._output_cost_per_mtok is not None:
+            return self._input_cost_per_mtok, self._output_cost_per_mtok
+        if model_id in MODEL_USD_PER_MTOK:
+            return MODEL_USD_PER_MTOK[model_id]
+        for known, rates in MODEL_USD_PER_MTOK.items():
+            if model_id.startswith(known + "-"):
+                return rates
+        return 0.0, 0.0
+
+    def _usage(
+        self, *, attempts: int, total_in: int, total_out: int, latency_ms: int, model_id: str
+    ) -> CallUsage:
+        input_rate, output_rate = self.rates_for(model_id)
+        cost = (total_in / 1_000_000.0) * input_rate + (total_out / 1_000_000.0) * output_rate
+        return CallUsage(
+            llm_calls=attempts,
+            input_tokens=total_in,
+            output_tokens=total_out,
+            latency_ms=latency_ms,
+            estimated_cost_usd=cost,
+        )
 
     async def aclose(self) -> None:
         if self._owns_client and self._client is not None:
@@ -90,19 +134,35 @@ class OpenAICompatibleProvider:
             attempts += 1
             started = time.perf_counter()
             try:
-                raw_text, usage = await self._chat_completion(
+                raw_text, token_usage = await self._chat_completion(
                     messages=working,
                     model=model_id,
                     temperature=temperature,
                     seed=seed,
                 )
-            except ProviderUnavailable:
+            except ProviderUnavailable as exc:
+                exc.usage = self._usage(
+                    attempts=attempts,
+                    total_in=total_in,
+                    total_out=total_out,
+                    latency_ms=total_latency,
+                    model_id=model_id,
+                )
                 raise
             except Exception as exc:  # network / protocol
-                raise ProviderUnavailable(f"LLM request failed: {exc}") from exc
+                raise ProviderUnavailable(
+                    f"LLM request failed: {exc}",
+                    usage=self._usage(
+                        attempts=attempts,
+                        total_in=total_in,
+                        total_out=total_out,
+                        latency_ms=total_latency,
+                        model_id=model_id,
+                    ),
+                ) from exc
             total_latency += int((time.perf_counter() - started) * 1000)
-            total_in += int(usage.get("prompt_tokens", 0))
-            total_out += int(usage.get("completion_tokens", 0))
+            total_in += int(token_usage.get("prompt_tokens", 0))
+            total_out += int(token_usage.get("completion_tokens", 0))
 
             try:
                 data = json.loads(raw_text)
@@ -124,22 +184,34 @@ class OpenAICompatibleProvider:
                 ]
                 continue
 
-            cost = (total_in / 1_000_000.0) * self._input_cost_per_mtok + (
-                total_out / 1_000_000.0
-            ) * self._output_cost_per_mtok
+            call_usage = self._usage(
+                attempts=attempts,
+                total_in=total_in,
+                total_out=total_out,
+                latency_ms=total_latency,
+                model_id=model_id,
+            )
             return LLMResult(
                 parsed=parsed,
                 model=model_id,
                 provider="openai_compatible",
-                llm_calls=attempts,
-                input_tokens=total_in,
-                output_tokens=total_out,
-                latency_ms=total_latency,
-                estimated_cost_usd=cost,
+                llm_calls=call_usage.llm_calls,
+                input_tokens=call_usage.input_tokens,
+                output_tokens=call_usage.output_tokens,
+                latency_ms=call_usage.latency_ms,
+                estimated_cost_usd=call_usage.estimated_cost_usd,
             )
 
+        call_usage = self._usage(
+            attempts=attempts,
+            total_in=total_in,
+            total_out=total_out,
+            latency_ms=total_latency,
+            model_id=model_id,
+        )
         raise RoleOutputInvalid(
-            f"structured output invalid after {attempts} attempt(s): {last_error}"
+            f"structured output invalid after {attempts} attempt(s): {last_error}",
+            usage=call_usage,
         )
 
     async def _chat_completion(

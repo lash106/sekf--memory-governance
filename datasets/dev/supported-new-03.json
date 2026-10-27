@@ -8,7 +8,7 @@
   "annotation_notes": "Sai Chetan evidence/governance case (supported_new_claim).",
   "initial_memory": [],
   "candidate": {
-    "claim_id": "5c565634-358d-40b2-ad30-b5e68a182596",
+    "claim_id": "19e3a265-c669-50fa-8f95-88f3d6095cd0",
     "claim_text": "The laboratory closes at 18:00 on Fridays.",
     "subject_key": "laboratory",
     "predicate_key": "closing_time_friday",
@@ -22,7 +22,7 @@
   },
   "evidence": [
     {
-      "evidence_id": "8e1de20f-af76-4758-87d5-3aced2fffdd6",
+      "evidence_id": "afde3264-199e-5eef-b70f-aa78ebe6db10",
       "content": "Maintenance notice footer confirms Friday close remains 18:00.",
       "source_id": "official-schedule",
       "source_type": "official_document",
@@ -39,7 +39,9 @@
     "final_action": "PROMOTE",
     "expected_memory_delta": {
       "superseded_claim_ids": [],
-      "new_active_claim_ids": [],
+      "new_active_claim_ids": [
+        "19e3a265-c669-50fa-8f95-88f3d6095cd0"
+      ],
       "quarantined_claim_ids": [],
       "rejected_claim_ids": [],
       "attached_evidence_ids": []

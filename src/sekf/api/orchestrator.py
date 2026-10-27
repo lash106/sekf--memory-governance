@@ -27,7 +27,7 @@ from sekf.contracts import (
     SynthesizerRecommendation,
     Thresholds,
 )
-from sekf.errors import RoleTimeout, SekfError
+from sekf.errors import CallUsage, RoleTimeout, SekfError
 from sekf.historian import Historian
 from sekf.judge import Judge
 from sekf.memory import MemoryRepository
@@ -204,4 +204,14 @@ class Governance:
                 role=name, error_type=RoleTimeout.__name__, message=f"exceeded {timeout}s"
             )
         except SekfError as exc:
-            return RoleFailure(role=name, error_type=type(exc).__name__, message=str(exc))
+            usage = exc.usage if isinstance(exc.usage, CallUsage) else None
+            return RoleFailure(
+                role=name,
+                error_type=type(exc).__name__,
+                message=str(exc),
+                llm_calls=0 if usage is None else usage.llm_calls,
+                input_tokens=0 if usage is None else usage.input_tokens,
+                output_tokens=0 if usage is None else usage.output_tokens,
+                latency_ms=0 if usage is None else usage.latency_ms,
+                estimated_cost_usd=0.0 if usage is None else usage.estimated_cost_usd,
+            )

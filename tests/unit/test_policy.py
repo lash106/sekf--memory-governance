@@ -258,6 +258,26 @@ def test_cost_is_aggregated(engine: PolicyEngine) -> None:
     assert d.cost.estimated_cost_usd == pytest.approx(0.03)
 
 
+def test_failed_role_usage_is_included_in_cost(engine: PolicyEngine) -> None:
+    cand = make_candidate()
+    historian = make_historian(cand)
+    historian.llm_calls = 1
+    historian.input_tokens = 5
+    failure = RoleFailure(
+        role="judge",
+        error_type="RoleOutputInvalid",
+        message="repairs exhausted",
+        llm_calls=3,
+        input_tokens=12,
+        estimated_cost_usd=0.02,
+    )
+    decision = run(engine, candidate=cand, historian=historian, role_errors=[failure])
+    assert decision.final_action is A.ESCALATE_FOR_REVIEW
+    assert decision.cost.llm_calls == 4
+    assert decision.cost.input_tokens == 17
+    assert decision.cost.estimated_cost_usd == pytest.approx(0.02)
+
+
 def test_r7_unreliable_duplicate_still_attaches_evidence(engine: PolicyEngine) -> None:
     """SPEC 9.4: R7 has no reliability condition; attaching evidence is non-destructive."""
     cand, active = make_candidate(), make_existing()

@@ -9,7 +9,8 @@ import pytest
 from tests.conftest import NOW
 
 from sekf.baselines import GenericEnsembleBaseline, GenericEnsembleJudge, majority_judge_label
-from sekf.contracts import DecideRequest, FinalAction, JudgeLabel, JudgeRequest
+from sekf.contracts import DecideMode, DecideRequest, FinalAction, JudgeLabel, JudgeRequest
+from sekf.errors import CommitRejected
 from sekf.judge import LLMJudge
 from sekf.memory import InMemoryRepository
 from sekf.providers import FakeProvider
@@ -68,6 +69,14 @@ async def test_ensemble_baseline_decide(
         clock=lambda: NOW,
     )
     response = await baseline.decide(decide_request)
-    assert response.decision.final_action is FinalAction.REVISE
+    # Supported vote promotes. It must not REVISE via FakeHistorian + PolicyEngine.
+    assert response.decision.final_action is FinalAction.PROMOTE
+    assert response.historian is None
+    assert response.synthesizer is None
     assert response.judge is not None
     assert response.judge.label is JudgeLabel.SUPPORTED
+    assert response.mode is DecideMode.DRY_RUN
+    committed = decide_request.model_copy(update={"mode": DecideMode.COMMIT})
+    with pytest.raises(CommitRejected, match="dry_run"):
+        await baseline.decide(committed)
+    assert repo.decision_count() == 0

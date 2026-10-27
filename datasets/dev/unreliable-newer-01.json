@@ -8,7 +8,7 @@
   "annotation_notes": "Sai Chetan evidence/governance case (unreliable_newer_contradiction).",
   "initial_memory": [
     {
-      "claim_id": "046f9e68-e580-4f1e-8244-4e15a6904577",
+      "claim_id": "069b242c-3051-5d00-8078-f55b8d5f5a93",
       "claim_text": "The laboratory closes at 17:00 on Fridays.",
       "subject_key": "laboratory",
       "predicate_key": "closing_time_friday",
@@ -25,7 +25,7 @@
     }
   ],
   "candidate": {
-    "claim_id": "3b8aaaec-d8b0-4bb0-a1a8-9298a6ec92a7",
+    "claim_id": "fd921738-9064-5fe3-a102-7879ec58e512",
     "claim_text": "The laboratory closes at 20:00 on Fridays.",
     "subject_key": "laboratory",
     "predicate_key": "closing_time_friday",
@@ -39,7 +39,7 @@
   },
   "evidence": [
     {
-      "evidence_id": "e111ca02-07f2-4c72-b8b4-0279e424013a",
+      "evidence_id": "45af3ac4-f88f-53c9-ba4e-a948d6566f57",
       "content": "Heard in hallway: maybe closes at 20:00 now?",
       "source_id": "rumor",
       "source_type": "hearsay",
@@ -57,7 +57,9 @@
     "expected_memory_delta": {
       "superseded_claim_ids": [],
       "new_active_claim_ids": [],
-      "quarantined_claim_ids": [],
+      "quarantined_claim_ids": [
+        "fd921738-9064-5fe3-a102-7879ec58e512"
+      ],
       "rejected_claim_ids": [],
       "attached_evidence_ids": []
     }

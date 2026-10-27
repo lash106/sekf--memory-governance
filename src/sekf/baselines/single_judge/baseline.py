@@ -110,6 +110,7 @@ class SingleJudgeBaseline:
             idempotency_key=request.idempotency_key,
         )
         decision_id = compute_decision_id(self._policy_version, digest)
+        cost = CostSummary()
 
         try:
             parsed, cost = await self._recommend(request, related)
@@ -128,7 +129,11 @@ class SingleJudgeBaseline:
             previous, resulting = [], None
             fired = ["R1"]
             usage = exc.usage if isinstance(exc.usage, CallUsage) else None
-            cost = _cost_from_usage(usage)
+            failed_cost = _cost_from_usage(usage)
+            # A provider failure carries usage. A later bookkeeping error must keep the
+            # cost of the call that already succeeded.
+            if failed_cost.llm_calls or failed_cost.input_tokens or failed_cost.output_tokens:
+                cost = failed_cost
             role_errors = [
                 RoleFailure(
                     role="single_judge",

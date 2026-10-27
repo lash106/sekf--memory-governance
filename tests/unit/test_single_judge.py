@@ -10,6 +10,7 @@ from tests.conftest import NOW
 
 from sekf.baselines import POLICY_VERSION, SingleJudgeBaseline
 from sekf.baselines.single_judge import DEFAULT_POLICY_VERSION
+from sekf.baselines.single_judge.schemas import SingleJudgeLLMOutput
 from sekf.contracts import DecideMode, DecideRequest, FinalAction
 from sekf.errors import CommitRejected, SekfError
 from sekf.memory import InMemoryRepository
@@ -140,3 +141,40 @@ async def test_single_judge_honors_timeout(decide_request: DecideRequest) -> Non
     assert elapsed < 0.15
     assert response.decision.final_action is FinalAction.ESCALATE_FOR_REVIEW
     assert response.role_errors[0].error_type == "RoleTimeout"
+
+
+class _PaidAmbiguousProvider:
+    async def complete_json(self, **_kwargs: Any) -> LLMResult:
+        return LLMResult(
+            parsed=SingleJudgeLLMOutput(
+                recommended_action=FinalAction.ATTACH_EVIDENCE,
+                confidence=0.9,
+                rationale="two active claims",
+            ),
+            model="fake/deterministic",
+            provider="fake",
+            llm_calls=2,
+            input_tokens=11,
+        )
+
+
+async def test_ambiguous_target_keeps_the_successful_call_cost(
+    repo: InMemoryRepository, decide_request: DecideRequest
+) -> None:
+    from tests.conftest import make_existing
+
+    first = repo.get_claim(UUID("11111111-1111-4111-8111-111111111111"))
+    assert first is not None
+    second = make_existing().model_copy(
+        update={
+            "subject_key": decide_request.candidate.subject_key,
+            "predicate_key": decide_request.candidate.predicate_key,
+        }
+    )
+    memory = InMemoryRepository([first, second])
+    baseline = SingleJudgeBaseline(_PaidAmbiguousProvider(), memory, clock=lambda: NOW)
+    response = await baseline.decide(decide_request)
+    assert response.decision.final_action is FinalAction.ESCALATE_FOR_REVIEW
+    assert response.decision.cost.llm_calls == 2
+    assert response.decision.cost.input_tokens == 11
+    assert memory.decision_count() == 0

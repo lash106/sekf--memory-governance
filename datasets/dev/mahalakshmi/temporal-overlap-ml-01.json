@@ -1,0 +1,77 @@
+{
+  "case_id": "temporal-overlap-ml-01",
+  "category": "overlapping_temporal_conflict",
+  "split": "dev",
+  "annotators": [
+    "Mahalakshmi Rajkumar"
+  ],
+  "annotation_notes": "Two values claimed for the same period from sources of similar reliability; cannot tell which is right, so it must not replace the active claim.",
+  "initial_memory": [
+    {
+      "claim_id": "aed70ecb-e375-568f-8440-ab28fcc6b7c7",
+      "claim_text": "The fall 2026 registration deadline is November 14.",
+      "subject_key": "fall_2026_registration",
+      "predicate_key": "deadline",
+      "object_text": "2026-11-14",
+      "status": "ACTIVE",
+      "version": 1,
+      "valid_from": "2026-08-01T00:00:00Z",
+      "valid_to": "2026-12-01T00:00:00Z",
+      "confidence": 0.9,
+      "created_at": "2026-08-02T00:00:00Z",
+      "updated_at": "2026-08-02T00:00:00Z",
+      "supersedes_claim_id": null,
+      "evidence_ids": []
+    }
+  ],
+  "candidate": {
+    "claim_id": "13476edf-0bc5-51f6-b34f-def1f7ddec7d",
+    "claim_text": "The fall 2026 registration deadline is November 7.",
+    "subject_key": "fall_2026_registration",
+    "predicate_key": "deadline",
+    "object_text": "2026-11-07",
+    "source_id": "advisor-email",
+    "observed_at": "2026-10-22T16:00:00Z",
+    "valid_from": "2026-08-01T00:00:00Z",
+    "valid_to": "2026-12-01T00:00:00Z",
+    "extractor_confidence": 0.9,
+    "metadata": {}
+  },
+  "evidence": [
+    {
+      "evidence_id": "ad6b5c1d-ab1c-561d-b442-c7a2b7cb3be6",
+      "content": "Reminder: register for fall courses by November 7.",
+      "source_id": "advisor-email",
+      "source_type": "email",
+      "published_at": "2026-10-22T15:00:00Z",
+      "retrieved_at": "2026-10-22T16:00:00Z",
+      "reliability": 0.7,
+      "metadata": {}
+    },
+    {
+      "evidence_id": "1d89fda1-08eb-572c-9ed6-09929dcf7e28",
+      "content": "Fall 2026 registration closes November 14.",
+      "source_id": "department-newsletter",
+      "source_type": "newsletter",
+      "published_at": "2026-10-15T00:00:00Z",
+      "retrieved_at": "2026-10-22T16:00:00Z",
+      "reliability": 0.7,
+      "metadata": {}
+    }
+  ],
+  "gold": {
+    "judge_label": "MIXED_EVIDENCE",
+    "temporal_relation": "OVERLAPPING_VALIDITY",
+    "conflict_type": "VALUE_CONFLICT",
+    "final_action": "QUARANTINE",
+    "expected_memory_delta": {
+      "superseded_claim_ids": [],
+      "new_active_claim_ids": [],
+      "quarantined_claim_ids": [
+        "13476edf-0bc5-51f6-b34f-def1f7ddec7d"
+      ],
+      "rejected_claim_ids": [],
+      "attached_evidence_ids": []
+    }
+  }
+}

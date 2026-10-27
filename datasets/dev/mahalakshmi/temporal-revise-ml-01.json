@@ -1,0 +1,69 @@
+{
+  "case_id": "temporal-revise-ml-01",
+  "category": "reliable_newer_correction",
+  "split": "dev",
+  "annotators": [
+    "Mahalakshmi Rajkumar"
+  ],
+  "annotation_notes": "Official notice changes the value from a stated date. The old claim was true until then and should be kept as history (superseded), not deleted.",
+  "initial_memory": [
+    {
+      "claim_id": "7611683f-c430-5548-95bc-9b3b0f0b542a",
+      "claim_text": "The shuttle runs every 20 minutes.",
+      "subject_key": "campus_shuttle",
+      "predicate_key": "frequency_minutes",
+      "object_text": "20",
+      "status": "ACTIVE",
+      "version": 1,
+      "valid_from": "2026-01-01T00:00:00Z",
+      "valid_to": null,
+      "confidence": 0.9,
+      "created_at": "2026-01-02T00:00:00Z",
+      "updated_at": "2026-01-02T00:00:00Z",
+      "supersedes_claim_id": null,
+      "evidence_ids": []
+    }
+  ],
+  "candidate": {
+    "claim_id": "e8e8d7a0-dde3-52f3-97af-5b0f9f2e51f7",
+    "claim_text": "The shuttle runs every 15 minutes starting November 1, 2026.",
+    "subject_key": "campus_shuttle",
+    "predicate_key": "frequency_minutes",
+    "object_text": "15",
+    "source_id": "transportation-office",
+    "observed_at": "2026-10-25T17:00:00Z",
+    "valid_from": "2026-11-01T00:00:00Z",
+    "valid_to": null,
+    "extractor_confidence": 0.9,
+    "metadata": {}
+  },
+  "evidence": [
+    {
+      "evidence_id": "17789179-ab29-583a-83b0-5eb752129dcf",
+      "content": "Effective November 1, 2026, campus shuttle frequency increases from every 20 minutes to every 15 minutes.",
+      "source_id": "transportation-office",
+      "source_type": "official_document",
+      "published_at": "2026-10-25T00:00:00Z",
+      "retrieved_at": "2026-10-25T17:00:00Z",
+      "reliability": 0.95,
+      "metadata": {}
+    }
+  ],
+  "gold": {
+    "judge_label": "SUPPORTED",
+    "temporal_relation": "NEWER_UPDATE",
+    "conflict_type": "TEMPORAL_UPDATE",
+    "final_action": "REVISE",
+    "expected_memory_delta": {
+      "superseded_claim_ids": [
+        "7611683f-c430-5548-95bc-9b3b0f0b542a"
+      ],
+      "new_active_claim_ids": [
+        "e8e8d7a0-dde3-52f3-97af-5b0f9f2e51f7"
+      ],
+      "quarantined_claim_ids": [],
+      "rejected_claim_ids": [],
+      "attached_evidence_ids": []
+    }
+  }
+}

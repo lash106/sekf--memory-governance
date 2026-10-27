@@ -52,6 +52,20 @@ async def test_single_judge_baseline_returns_decide_response(
     assert response.memory_delta is None
     assert response.role_errors == []
     assert repo.decision_count() == 0
+    audit = response.baseline_audit
+    assert audit is not None
+    prompt = load_baseline_prompt("single_judge", "v1")
+    assert audit.provider == "fake"
+    assert audit.model == "fake/deterministic"
+    assert audit.model != decide_request.run_config.model
+    assert audit.prompt_version == prompt.version
+    assert audit.prompt_hash == prompt.prompt_hash
+    assert audit.temperature == decide_request.run_config.temperature
+    assert audit.seed == decide_request.run_config.seed
+    assert audit.confidence == pytest.approx(0.88)
+    assert audit.recommended_action is FinalAction.REVISE
+    assert audit.raw_output["recommended_action"] == "REVISE"
+    assert audit.raw_output["rationale"].startswith("Newer official")
     assert baseline.policy_version == POLICY_VERSION
     assert load_baseline_prompt("single_judge", "v1").version == "baselines/single_judge/v1"
 
@@ -74,6 +88,7 @@ async def test_single_judge_sekf_error_escalates(decide_request: DecideRequest) 
     assert response.decision.previous_claim_ids == []
     assert response.decision.rule_ids_fired == ["R1"]
     assert response.role_errors[0].error_type == "SekfError"
+    assert response.baseline_audit is None
 
 
 def _keep(_messages: Any, _model: Any) -> dict[str, Any]:
@@ -177,4 +192,8 @@ async def test_ambiguous_target_keeps_the_successful_call_cost(
     assert response.decision.final_action is FinalAction.ESCALATE_FOR_REVIEW
     assert response.decision.cost.llm_calls == 2
     assert response.decision.cost.input_tokens == 11
+    assert response.baseline_audit is not None
+    assert response.baseline_audit.confidence == pytest.approx(0.9)
+    assert response.baseline_audit.llm_calls == 2
+    assert response.baseline_audit.raw_output["recommended_action"] == "ATTACH_EVIDENCE"
     assert memory.decision_count() == 0

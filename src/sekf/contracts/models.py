@@ -163,6 +163,24 @@ class SynthesizerRecommendation(CallMetadata):
     unresolved_questions: list[str] = Field(default_factory=list)
 
 
+class BaselineAudit(CallMetadata):
+    """Reproducibility record for a baseline that is not a council role.
+
+    SPEC.md section 15. `model` and `provider` are the values the call actually
+    used. `temperature` and `seed` are the values that call observed. `raw_output`
+    is the validated structured payload. `RunConfig.model` is not a substitute:
+    `fake/none` resolves to the provider's default model.
+    """
+
+    audit_id: UUID
+    baseline_name: str = Field(min_length=1)
+    recommended_action: FinalAction
+    confidence: UnitFloat
+    rationale: str
+    target_claim_id: UUID | None = None
+    raw_output: dict[str, Any] = Field(default_factory=dict)
+
+
 # ------------------------------------------------------------- policy and decision
 
 
@@ -460,5 +478,8 @@ class DecideResponse(Contract):
     judge: JudgeAssessment | None = None
     synthesizer: SynthesizerRecommendation | None = None
     memory_delta: MemoryDelta | None = None
+    # Present for baselines that recommend an action directly (single_judge).
+    # Absent for the council, which records Historian, Judge, and Synthesizer instead.
+    baseline_audit: BaselineAudit | None = None
     role_errors: list[RoleFailure] = Field(default_factory=list)
     wall_latency_ms: int = Field(default=0, ge=0)

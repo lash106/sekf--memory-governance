@@ -200,6 +200,8 @@ class OpenAICompatibleProvider:
                 output_tokens=call_usage.output_tokens,
                 latency_ms=call_usage.latency_ms,
                 estimated_cost_usd=call_usage.estimated_cost_usd,
+                temperature=temperature,
+                seed=seed,
             )
 
         call_usage = self._usage(

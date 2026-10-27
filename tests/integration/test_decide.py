@@ -33,6 +33,36 @@ def client_for(governance: Governance) -> TestClient:
     return TestClient(create_app(governance))
 
 
+def test_lifespan_closes_the_live_provider() -> None:
+    closed = False
+
+    class _Closable:
+        async def aclose(self) -> None:
+            nonlocal closed
+            closed = True
+
+    class _Judge:
+        def __init__(self) -> None:
+            self._provider = _Closable()
+
+        async def aclose(self) -> None:
+            await self._provider.aclose()
+
+        async def evaluate(self, _request: JudgeRequest) -> JudgeAssessment:
+            raise AssertionError("health does not call the judge")
+
+    governance = Governance(
+        memory=InMemoryRepository(),
+        historian=FakeHistorian(),
+        judge=_Judge(),
+        synthesizer=FakeSynthesizer(),
+        policy=PolicyEngine(),
+    )
+    with TestClient(create_app(governance)) as client:
+        assert client.get("/health").json()["status"] == "ok"
+    assert closed is True
+
+
 def test_health() -> None:
     body = TestClient(create_app()).get("/health").json()
     assert body["status"] == "ok"

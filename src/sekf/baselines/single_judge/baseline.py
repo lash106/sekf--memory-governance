@@ -12,6 +12,7 @@ import asyncio
 import time
 from collections.abc import Callable
 from datetime import UTC, datetime
+from uuid import uuid4
 
 from sekf.baselines.decision_links import action_claim_links
 from sekf.baselines.single_judge.constants import (
@@ -23,6 +24,7 @@ from sekf.baselines.single_judge.constants import (
 )
 from sekf.baselines.single_judge.schemas import SingleJudgeLLMOutput
 from sekf.contracts import (
+    BaselineAudit,
     CostSummary,
     DecideMode,
     DecideRequest,
@@ -37,7 +39,7 @@ from sekf.contracts import (
 )
 from sekf.errors import CallUsage, CommitRejected, RoleOutputInvalid, RoleTimeout, SekfError
 from sekf.memory import MemoryRepository
-from sekf.providers.base import StructuredLLMProvider
+from sekf.providers.base import LLMResult, StructuredLLMProvider
 from sekf.providers.prompts import LoadedPrompt, load_baseline_prompt, render_prompt
 from sekf.providers.serialize import dump_contract_json, dump_contract_list_json
 
@@ -76,6 +78,7 @@ class SingleJudgeBaseline:
         self._provider = provider
         self._memory = memory
         self._clock = clock
+        self._baseline_name = baseline_name
         self._policy_version = policy_version
         self._prompt = prompt or load_baseline_prompt(baseline_name, prompt_version)
         self._system_message = system_message
@@ -111,9 +114,18 @@ class SingleJudgeBaseline:
         )
         decision_id = compute_decision_id(self._policy_version, digest)
         cost = CostSummary()
+        audit: BaselineAudit | None = None
 
         try:
-            parsed, cost = await self._recommend(request, related)
+            parsed, result = await self._recommend(request, related)
+            audit = self._audit(parsed, result)
+            cost = CostSummary(
+                llm_calls=result.llm_calls,
+                input_tokens=result.input_tokens,
+                output_tokens=result.output_tokens,
+                latency_ms=result.latency_ms,
+                estimated_cost_usd=result.estimated_cost_usd,
+            )
             action = parsed.recommended_action
             previous, resulting = action_claim_links(
                 action,
@@ -166,13 +178,42 @@ class SingleJudgeBaseline:
         return DecideResponse(
             mode=DecideMode.DRY_RUN,
             decision=decision,
+            baseline_audit=audit,
             role_errors=role_errors,
             wall_latency_ms=int((time.perf_counter() - started) * 1000),
         )
 
+    def _audit(self, parsed: SingleJudgeLLMOutput, result: LLMResult) -> BaselineAudit:
+        """Record what the call actually used, not only `RunConfig`.
+
+        `result.model` is the provider's resolved id. A request model of `fake/none`
+        therefore does not hide the model that ran.
+        """
+
+        return BaselineAudit(
+            audit_id=uuid4(),
+            baseline_name=self._baseline_name,
+            model=result.model,
+            provider=result.provider,
+            prompt_version=self._prompt.version,
+            prompt_hash=self._prompt.prompt_hash,
+            temperature=result.temperature,
+            seed=result.seed,
+            llm_calls=result.llm_calls,
+            input_tokens=result.input_tokens,
+            output_tokens=result.output_tokens,
+            latency_ms=result.latency_ms,
+            estimated_cost_usd=result.estimated_cost_usd,
+            recommended_action=parsed.recommended_action,
+            confidence=parsed.confidence,
+            rationale=parsed.rationale,
+            target_claim_id=parsed.target_claim_id,
+            raw_output=parsed.model_dump(mode="json"),
+        )
+
     async def _recommend(
         self, request: DecideRequest, related: list[ExistingClaim]
-    ) -> tuple[SingleJudgeLLMOutput, CostSummary]:
+    ) -> tuple[SingleJudgeLLMOutput, LLMResult]:
         user_content = render_prompt(
             self._prompt.text,
             candidate_json=dump_contract_json(request.candidate),
@@ -197,12 +238,14 @@ class SingleJudgeBaseline:
             raise RoleTimeout(f"exceeded {request.run_config.timeout_s}s") from exc
         parsed = result.parsed
         if not isinstance(parsed, SingleJudgeLLMOutput):
-            raise RoleOutputInvalid("provider returned a non-SingleJudgeLLMOutput payload")
-        cost = CostSummary(
-            llm_calls=result.llm_calls,
-            input_tokens=result.input_tokens,
-            output_tokens=result.output_tokens,
-            latency_ms=result.latency_ms,
-            estimated_cost_usd=result.estimated_cost_usd,
-        )
-        return parsed, cost
+            raise RoleOutputInvalid(
+                "provider returned a non-SingleJudgeLLMOutput payload",
+                usage=CallUsage(
+                    llm_calls=result.llm_calls,
+                    input_tokens=result.input_tokens,
+                    output_tokens=result.output_tokens,
+                    latency_ms=result.latency_ms,
+                    estimated_cost_usd=result.estimated_cost_usd,
+                ),
+            )
+        return parsed, result

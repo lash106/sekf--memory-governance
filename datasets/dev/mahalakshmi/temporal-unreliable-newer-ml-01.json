@@ -1,0 +1,65 @@
+{
+  "case_id": "temporal-unreliable-newer-ml-01",
+  "category": "unreliable_newer_contradiction",
+  "split": "dev",
+  "annotators": [
+    "Mahalakshmi Rajkumar"
+  ],
+  "annotation_notes": "Newer claim comes only from an anonymous forum post; a newer claim is not automatically a true claim. Active knowledge must stay unchanged.",
+  "initial_memory": [
+    {
+      "claim_id": "19ae344c-c6ed-5730-8719-4531baf89f61",
+      "claim_text": "The campus library closes at 22:00 on weekdays.",
+      "subject_key": "campus_library",
+      "predicate_key": "closing_time_weekday",
+      "object_text": "22:00",
+      "status": "ACTIVE",
+      "version": 1,
+      "valid_from": "2026-01-01T00:00:00Z",
+      "valid_to": null,
+      "confidence": 0.9,
+      "created_at": "2026-01-02T00:00:00Z",
+      "updated_at": "2026-01-02T00:00:00Z",
+      "supersedes_claim_id": null,
+      "evidence_ids": []
+    }
+  ],
+  "candidate": {
+    "claim_id": "4d5d4eaa-2801-5f9b-a34f-03bcbeacaafb",
+    "claim_text": "The campus library closes at 20:00 on weekdays.",
+    "subject_key": "campus_library",
+    "predicate_key": "closing_time_weekday",
+    "object_text": "20:00",
+    "source_id": "anonymous-forum",
+    "observed_at": "2026-10-24T03:00:00Z",
+    "valid_from": "2026-10-24T00:00:00Z",
+    "valid_to": null,
+    "extractor_confidence": 0.9,
+    "metadata": {}
+  },
+  "evidence": [
+    {
+      "evidence_id": "28aafa4b-f0cd-5349-bb2e-0c6b05d99346",
+      "content": "heard the library closes at 8pm now??",
+      "source_id": "anonymous-forum",
+      "source_type": "forum_post",
+      "published_at": "2026-10-24T02:30:00Z",
+      "retrieved_at": "2026-10-24T03:00:00Z",
+      "reliability": 0.2,
+      "metadata": {}
+    }
+  ],
+  "gold": {
+    "judge_label": "INSUFFICIENT_EVIDENCE",
+    "temporal_relation": "NEWER_UPDATE",
+    "conflict_type": "VALUE_CONFLICT",
+    "final_action": "KEEP_EPISODIC",
+    "expected_memory_delta": {
+      "superseded_claim_ids": [],
+      "new_active_claim_ids": [],
+      "quarantined_claim_ids": [],
+      "rejected_claim_ids": [],
+      "attached_evidence_ids": []
+    }
+  }
+}

@@ -1,0 +1,67 @@
+{
+  "case_id": "temporal-nonoverlap-ml-01",
+  "category": "non_overlapping_temporal_validity",
+  "split": "dev",
+  "annotators": [
+    "Mahalakshmi Rajkumar"
+  ],
+  "annotation_notes": "Different holders for disjoint terms; the new claim covers a past period and does not contradict the current one. Both belong in long-term knowledge.",
+  "initial_memory": [
+    {
+      "claim_id": "5374b3ec-aad7-56ca-8cd1-f920c7d12098",
+      "claim_text": "Dr. Rivera is chair of the CS department.",
+      "subject_key": "cs_department",
+      "predicate_key": "chair",
+      "object_text": "Dr. Rivera",
+      "status": "ACTIVE",
+      "version": 1,
+      "valid_from": "2025-07-01T00:00:00Z",
+      "valid_to": null,
+      "confidence": 0.9,
+      "created_at": "2025-07-02T00:00:00Z",
+      "updated_at": "2025-07-02T00:00:00Z",
+      "supersedes_claim_id": null,
+      "evidence_ids": []
+    }
+  ],
+  "candidate": {
+    "claim_id": "24c8c89d-7c0e-5dfa-a91b-4526249d3445",
+    "claim_text": "Dr. Okafor was chair of the CS department from July 2021 to June 2025.",
+    "subject_key": "cs_department",
+    "predicate_key": "chair",
+    "object_text": "Dr. Okafor",
+    "source_id": "dept-history-page",
+    "observed_at": "2026-10-20T18:00:00Z",
+    "valid_from": "2021-07-01T00:00:00Z",
+    "valid_to": "2025-07-01T00:00:00Z",
+    "extractor_confidence": 0.9,
+    "metadata": {}
+  },
+  "evidence": [
+    {
+      "evidence_id": "590c9142-1d3c-5725-8774-b92048c97fb5",
+      "content": "Dr. Okafor served as department chair from July 2021 through June 2025, followed by Dr. Rivera.",
+      "source_id": "university-archive",
+      "source_type": "official_document",
+      "published_at": "2025-07-15T00:00:00Z",
+      "retrieved_at": "2026-10-20T18:00:00Z",
+      "reliability": 0.9,
+      "metadata": {}
+    }
+  ],
+  "gold": {
+    "judge_label": "SUPPORTED",
+    "temporal_relation": "NON_OVERLAPPING_VALIDITY",
+    "conflict_type": "NONE",
+    "final_action": "PROMOTE",
+    "expected_memory_delta": {
+      "superseded_claim_ids": [],
+      "new_active_claim_ids": [
+        "24c8c89d-7c0e-5dfa-a91b-4526249d3445"
+      ],
+      "quarantined_claim_ids": [],
+      "rejected_claim_ids": [],
+      "attached_evidence_ids": []
+    }
+  }
+}

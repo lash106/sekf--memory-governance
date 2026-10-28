@@ -1,9 +1,10 @@
 """Throwaway in-memory repository so the skeleton runs end to end.
 
-Krishna replaces this with the SQLAlchemy implementation in Sprint 1. It deliberately does
-NOT perform claim state transitions: `apply_decision` only records the bundle, so the
-skeleton milestone ("no memory mutation") holds. It does model the commit contract: the
-bundle is validated first, then written all-or-nothing, idempotently by `decision_id`.
+The persistent store is `SqlMemoryRepository` (sekf.memory.sql); this stays as a test
+double. It deliberately does NOT perform claim state transitions: `apply_decision` only
+records the bundle, so the skeleton milestone ("no memory mutation") holds. It does model the
+commit contract: the bundle is validated first, then written all-or-nothing, idempotently by
+`decision_id`.
 """
 
 from uuid import UUID
@@ -52,8 +53,10 @@ class InMemoryRepository:
 
     def get_claim_history(self, claim_id: UUID) -> list[ExistingClaim]:
         history: list[ExistingClaim] = []
+        seen: set[UUID] = set()
         current = self._claims.get(claim_id)
-        while current is not None:
+        while current is not None and current.claim_id not in seen:
+            seen.add(current.claim_id)
             history.append(current.model_copy(deep=True))
             current = (
                 self._claims.get(current.supersedes_claim_id)

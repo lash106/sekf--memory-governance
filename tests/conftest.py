@@ -166,3 +166,9 @@ def governance(repo: InMemoryRepository) -> Governance:
 @pytest.fixture
 def decide_request(lab_fixture: dict[str, Any]) -> DecideRequest:
     return DecideRequest.model_validate(lab_fixture["request"])
+
+
+@pytest.fixture(autouse=True)
+def _in_memory_database(monkeypatch: pytest.MonkeyPatch) -> None:
+    """The app defaults to the SQL store; tests must never create ./data/sekf.sqlite3."""
+    monkeypatch.setenv("SEKF_DB_URL", "sqlite://")

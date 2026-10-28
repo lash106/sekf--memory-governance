@@ -175,6 +175,24 @@ class Governance:
             wall_latency_ms=int((time.perf_counter() - started) * 1000),
         )
 
+    async def aclose(self) -> None:
+        """Release resources owned by the roles and the store (HTTP clients, DB connections).
+
+        A component opts in by defining `aclose()` (awaited) or `close()` (called). Every one
+        is attempted even if an earlier one fails; the first failure is re-raised afterwards.
+        """
+        first_error: Exception | None = None
+        for part in (self._historian, self._judge, self._synthesizer, self._memory):
+            try:
+                if (aclose := getattr(part, "aclose", None)) is not None:
+                    await aclose()
+                elif (close := getattr(part, "close", None)) is not None:
+                    close()
+            except Exception as exc:
+                first_error = first_error or exc
+        if first_error is not None:
+            raise first_error
+
     @staticmethod
     def _replay_response(stored: CommitBundle, started: float) -> DecideResponse:
         """Answer a retry with the originally committed decision and role outputs."""

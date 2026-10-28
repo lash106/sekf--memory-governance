@@ -1,0 +1,50 @@
+{
+  "case_id": "shailen-supported-new-01",
+  "category": "supported_new_claim",
+  "split": "dev",
+  "annotators": [
+    "Shailen Sutradhar"
+  ],
+  "annotation_notes": "Nothing about this deadline is in memory; the registrar's own calendar states the date, so it is a clean new fact.",
+  "initial_memory": [],
+  "candidate": {
+    "claim_id": "d974aa9d-ae3a-5bfd-beef-4845dbe854b4",
+    "claim_text": "The fall 2026 add/drop deadline is September 11, 2026.",
+    "subject_key": "registrar",
+    "predicate_key": "add_drop_deadline_fall_2026",
+    "object_text": "2026-09-11",
+    "source_id": "student-chat",
+    "observed_at": "2026-09-01T16:00:00Z",
+    "valid_from": null,
+    "valid_to": null,
+    "extractor_confidence": 0.9,
+    "metadata": {}
+  },
+  "evidence": [
+    {
+      "evidence_id": "bfb2173c-e373-5be3-87ae-852e52b928c9",
+      "content": "Registrar academic calendar: last day to add or drop fall 2026 classes without a W is 2026-09-11.",
+      "source_id": "registrar-calendar",
+      "source_type": "official_document",
+      "published_at": "2026-07-15T00:00:00Z",
+      "retrieved_at": "2026-09-01T16:00:00Z",
+      "reliability": 0.95,
+      "metadata": {}
+    }
+  ],
+  "gold": {
+    "judge_label": "SUPPORTED",
+    "temporal_relation": "NO_RELATED_CLAIM",
+    "conflict_type": "NONE",
+    "final_action": "PROMOTE",
+    "expected_memory_delta": {
+      "superseded_claim_ids": [],
+      "new_active_claim_ids": [
+        "d974aa9d-ae3a-5bfd-beef-4845dbe854b4"
+      ],
+      "quarantined_claim_ids": [],
+      "rejected_claim_ids": [],
+      "attached_evidence_ids": []
+    }
+  }
+}

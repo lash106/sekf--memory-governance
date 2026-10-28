@@ -34,6 +34,18 @@ def test_claim_history_follows_supersedes_chain() -> None:
     ]
 
 
+def test_claim_history_stops_on_a_supersedes_cycle() -> None:
+    first = make_existing()
+    second = make_existing()
+    first.supersedes_claim_id = second.claim_id
+    second.supersedes_claim_id = first.claim_id
+    repository = InMemoryRepository([first, second])
+
+    history = repository.get_claim_history(first.claim_id)
+
+    assert [claim.claim_id for claim in history] == [first.claim_id, second.claim_id]
+
+
 def _bundle(engine: PolicyEngine) -> CommitBundle:
     cand = make_candidate()
     h, j = make_historian(cand), make_judge(cand)

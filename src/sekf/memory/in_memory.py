@@ -52,8 +52,10 @@ class InMemoryRepository:
 
     def get_claim_history(self, claim_id: UUID) -> list[ExistingClaim]:
         history: list[ExistingClaim] = []
+        visited: set[UUID] = set()
         current = self._claims.get(claim_id)
-        while current is not None:
+        while current is not None and current.claim_id not in visited:
+            visited.add(current.claim_id)
             history.append(current.model_copy(deep=True))
             current = (
                 self._claims.get(current.supersedes_claim_id)

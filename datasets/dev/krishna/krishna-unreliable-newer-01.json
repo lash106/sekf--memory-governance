@@ -1,0 +1,67 @@
+{
+  "case_id": "krishna-unreliable-newer-01",
+  "category": "unreliable_newer_contradiction",
+  "split": "dev",
+  "annotators": [
+    "Krishna Panjiyar"
+  ],
+  "annotation_notes": "Newer, but the only source is an anonymous post that the gym schedule does not confirm. It should not replace knowledge yet. Storage check: candidate stored as QUARANTINED; the ACTIVE 06:00 claim is unchanged.",
+  "initial_memory": [
+    {
+      "claim_id": "bb25ee63-eb90-5185-86e7-83687b8c6d8d",
+      "claim_text": "The gym opens at 06:00 on weekdays.",
+      "subject_key": "gym",
+      "predicate_key": "opening_time_weekday",
+      "object_text": "06:00",
+      "status": "ACTIVE",
+      "version": 1,
+      "valid_from": "2026-01-01T00:00:00Z",
+      "valid_to": null,
+      "confidence": 0.9,
+      "created_at": "2026-01-02T00:00:00Z",
+      "updated_at": "2026-01-02T00:00:00Z",
+      "supersedes_claim_id": null,
+      "evidence_ids": []
+    }
+  ],
+  "candidate": {
+    "claim_id": "77d223f3-6614-57e8-9813-45972a26c819",
+    "claim_text": "The gym opens at 09:00 on weekdays.",
+    "subject_key": "gym",
+    "predicate_key": "opening_time_weekday",
+    "object_text": "09:00",
+    "source_id": "anonymous-post",
+    "observed_at": "2026-10-08T18:00:00Z",
+    "valid_from": null,
+    "valid_to": null,
+    "extractor_confidence": 0.6,
+    "metadata": {}
+  },
+  "evidence": [
+    {
+      "evidence_id": "54e8007c-e636-5833-80ea-b38f63474e61",
+      "content": "heard the gym opens at 9 now??",
+      "source_id": "anonymous-post",
+      "source_type": "social_media",
+      "published_at": "2026-10-08T17:55:00Z",
+      "retrieved_at": "2026-10-08T18:00:00Z",
+      "reliability": 0.2,
+      "metadata": {}
+    }
+  ],
+  "gold": {
+    "judge_label": "INSUFFICIENT_EVIDENCE",
+    "temporal_relation": "NEWER_UPDATE",
+    "conflict_type": "VALUE_CONFLICT",
+    "final_action": "QUARANTINE",
+    "expected_memory_delta": {
+      "superseded_claim_ids": [],
+      "new_active_claim_ids": [],
+      "quarantined_claim_ids": [
+        "77d223f3-6614-57e8-9813-45972a26c819"
+      ],
+      "rejected_claim_ids": [],
+      "attached_evidence_ids": []
+    }
+  }
+}

@@ -1,0 +1,85 @@
+{
+  "case_id": "krishna-reliable-newer-correction-01",
+  "category": "reliable_newer_correction",
+  "split": "dev",
+  "annotators": [
+    "Krishna Panjiyar"
+  ],
+  "annotation_notes": "Memory already has a two-version history (v1 SUPERSEDED by v2). Facilities announced a refit. Storage check: v2 becomes SUPERSEDED, the candidate becomes ACTIVE v3, and v1 is untouched.",
+  "initial_memory": [
+    {
+      "claim_id": "d365e0b6-fa67-5226-a343-9e6ea52f52d5",
+      "claim_text": "Room 210 holds 30 students.",
+      "subject_key": "room_210",
+      "predicate_key": "capacity",
+      "object_text": "30",
+      "status": "SUPERSEDED",
+      "version": 1,
+      "valid_from": "2026-01-01T00:00:00Z",
+      "valid_to": "2026-03-01T00:00:00Z",
+      "confidence": 0.9,
+      "created_at": "2026-01-02T00:00:00Z",
+      "updated_at": "2026-01-02T00:00:00Z",
+      "supersedes_claim_id": null,
+      "evidence_ids": []
+    },
+    {
+      "claim_id": "b2bbf393-4c82-5adb-88f9-50a9f56bf7db",
+      "claim_text": "Room 210 holds 40 students.",
+      "subject_key": "room_210",
+      "predicate_key": "capacity",
+      "object_text": "40",
+      "status": "ACTIVE",
+      "version": 2,
+      "valid_from": "2026-03-01T00:00:00Z",
+      "valid_to": null,
+      "confidence": 0.9,
+      "created_at": "2026-03-02T00:00:00Z",
+      "updated_at": "2026-03-02T00:00:00Z",
+      "supersedes_claim_id": "d365e0b6-fa67-5226-a343-9e6ea52f52d5",
+      "evidence_ids": []
+    }
+  ],
+  "candidate": {
+    "claim_id": "1c9449d1-4fec-5ed3-b3c8-5c29a7639236",
+    "claim_text": "Room 210 holds 45 students.",
+    "subject_key": "room_210",
+    "predicate_key": "capacity",
+    "object_text": "45",
+    "source_id": "facilities-email",
+    "observed_at": "2026-10-07T09:00:00Z",
+    "valid_from": "2026-10-01T00:00:00Z",
+    "valid_to": null,
+    "extractor_confidence": 0.9,
+    "metadata": {}
+  },
+  "evidence": [
+    {
+      "evidence_id": "723205f0-398b-5c78-bfea-aa6845511fee",
+      "content": "After the September refit, Room 210 seats 45 students from October 1.",
+      "source_id": "facilities-office",
+      "source_type": "official_document",
+      "published_at": "2026-09-29T00:00:00Z",
+      "retrieved_at": "2026-10-07T09:00:00Z",
+      "reliability": 0.95,
+      "metadata": {}
+    }
+  ],
+  "gold": {
+    "judge_label": "SUPPORTED",
+    "temporal_relation": "NEWER_UPDATE",
+    "conflict_type": "TEMPORAL_UPDATE",
+    "final_action": "REVISE",
+    "expected_memory_delta": {
+      "superseded_claim_ids": [
+        "b2bbf393-4c82-5adb-88f9-50a9f56bf7db"
+      ],
+      "new_active_claim_ids": [
+        "1c9449d1-4fec-5ed3-b3c8-5c29a7639236"
+      ],
+      "quarantined_claim_ids": [],
+      "rejected_claim_ids": [],
+      "attached_evidence_ids": []
+    }
+  }
+}

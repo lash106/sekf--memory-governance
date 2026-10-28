@@ -1,0 +1,50 @@
+{
+  "case_id": "krishna-supported-new-01",
+  "category": "supported_new_claim",
+  "split": "dev",
+  "annotators": [
+    "Krishna Panjiyar"
+  ],
+  "annotation_notes": "Nothing about library hours is in memory; the official library page states the opening time. Storage check: a new ACTIVE claim at version 1 with the evidence linked.",
+  "initial_memory": [],
+  "candidate": {
+    "claim_id": "d1c3c409-ea7c-59bc-acd9-a14b473bebc2",
+    "claim_text": "The library opens at 08:00 on weekdays.",
+    "subject_key": "library",
+    "predicate_key": "opening_time_weekday",
+    "object_text": "08:00",
+    "source_id": "student-chat",
+    "observed_at": "2026-10-05T15:00:00Z",
+    "valid_from": null,
+    "valid_to": null,
+    "extractor_confidence": 0.9,
+    "metadata": {}
+  },
+  "evidence": [
+    {
+      "evidence_id": "f3a07d99-05e4-5ba2-856e-dfdb5636c002",
+      "content": "Library hours: Monday to Friday 08:00 to 22:00.",
+      "source_id": "library-website",
+      "source_type": "official_document",
+      "published_at": "2026-08-20T00:00:00Z",
+      "retrieved_at": "2026-10-05T15:00:00Z",
+      "reliability": 0.95,
+      "metadata": {}
+    }
+  ],
+  "gold": {
+    "judge_label": "SUPPORTED",
+    "temporal_relation": "NO_RELATED_CLAIM",
+    "conflict_type": "NONE",
+    "final_action": "PROMOTE",
+    "expected_memory_delta": {
+      "superseded_claim_ids": [],
+      "new_active_claim_ids": [
+        "d1c3c409-ea7c-59bc-acd9-a14b473bebc2"
+      ],
+      "quarantined_claim_ids": [],
+      "rejected_claim_ids": [],
+      "attached_evidence_ids": []
+    }
+  }
+}

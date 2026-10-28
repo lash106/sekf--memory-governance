@@ -1,0 +1,69 @@
+{
+  "case_id": "krishna-duplicate-paraphrase-01",
+  "category": "duplicate_paraphrase",
+  "split": "dev",
+  "annotators": [
+    "Krishna Panjiyar"
+  ],
+  "annotation_notes": "Same fact as the ACTIVE claim in different words. Storage check: no new claim or version; only the new evidence is attached to the existing ACTIVE claim (its earlier evidence stays linked).",
+  "initial_memory": [
+    {
+      "claim_id": "93b1d182-b03b-5a44-bf8b-9aa11147996b",
+      "claim_text": "The cafeteria closes at 15:00 on Saturdays.",
+      "subject_key": "cafeteria",
+      "predicate_key": "closing_time_saturday",
+      "object_text": "15:00",
+      "status": "ACTIVE",
+      "version": 1,
+      "valid_from": "2026-01-01T00:00:00Z",
+      "valid_to": null,
+      "confidence": 0.9,
+      "created_at": "2026-01-02T00:00:00Z",
+      "updated_at": "2026-01-02T00:00:00Z",
+      "supersedes_claim_id": null,
+      "evidence_ids": [
+        "4172b8ce-b10e-5cfd-b3b1-80da6c6d77e6"
+      ]
+    }
+  ],
+  "candidate": {
+    "claim_id": "b49b65fa-f943-576b-a3c6-a7b7d483fb59",
+    "claim_text": "On Saturdays the cafeteria shuts at 3 PM.",
+    "subject_key": "cafeteria",
+    "predicate_key": "closing_time_saturday",
+    "object_text": "15:00",
+    "source_id": "student-forum",
+    "observed_at": "2026-10-06T12:00:00Z",
+    "valid_from": null,
+    "valid_to": null,
+    "extractor_confidence": 0.9,
+    "metadata": {}
+  },
+  "evidence": [
+    {
+      "evidence_id": "7f29b240-2361-5fea-9188-4c971032f225",
+      "content": "Cafeteria weekend hours: Saturday 09:00-15:00, Sunday closed.",
+      "source_id": "dining-services",
+      "source_type": "official_document",
+      "published_at": "2026-09-01T00:00:00Z",
+      "retrieved_at": "2026-10-06T12:00:00Z",
+      "reliability": 0.9,
+      "metadata": {}
+    }
+  ],
+  "gold": {
+    "judge_label": "SUPPORTED",
+    "temporal_relation": "SAME_PERIOD",
+    "conflict_type": "PARAPHRASE",
+    "final_action": "ATTACH_EVIDENCE",
+    "expected_memory_delta": {
+      "superseded_claim_ids": [],
+      "new_active_claim_ids": [],
+      "quarantined_claim_ids": [],
+      "rejected_claim_ids": [],
+      "attached_evidence_ids": [
+        "7f29b240-2361-5fea-9188-4c971032f225"
+      ]
+    }
+  }
+}

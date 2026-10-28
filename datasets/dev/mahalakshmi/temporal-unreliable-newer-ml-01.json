@@ -52,7 +52,7 @@
   "gold": {
     "judge_label": "INSUFFICIENT_EVIDENCE",
     "temporal_relation": "NEWER_UPDATE",
-    "conflict_type": "VALUE_CONFLICT",
+    "conflict_type": "TEMPORAL_UPDATE",
     "final_action": "KEEP_EPISODIC",
     "expected_memory_delta": {
       "superseded_claim_ids": [],

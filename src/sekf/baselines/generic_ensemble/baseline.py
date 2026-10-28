@@ -1,16 +1,19 @@
 """Generic-ensemble baseline as a DecideResponse producer.
 
-Three identical Judge calls vote on a label. The majority label maps to a final action
-with no Historian, no Synthesizer, and no council PolicyEngine. Ties become
-INSUFFICIENT_EVIDENCE. SUPPORTED promotes; this baseline does not revise or attach
-evidence, because those actions need specialized temporal reasoning.
+Identical Judge calls vote on a label. A label maps to a final action only when a
+majority of the full panel agrees (2 of 3). There is no Historian, no Synthesizer,
+and no council PolicyEngine. A tie among a full panel becomes INSUFFICIENT_EVIDENCE.
+Fewer agreeing votes than that quorum escalates, and the decision cost includes
+every member call, including failed repairs. SUPPORTED promotes; this baseline does
+not revise or attach evidence, because those actions need specialized temporal reasoning.
+
+The member calls run concurrently. `run_config.timeout_s` is one budget for the batch.
 
 Owner: Sai Chetan. SPEC.md sections 10.2 and 12.1.
 """
 
 from __future__ import annotations
 
-import asyncio
 import time
 from collections.abc import Callable
 from datetime import UTC, datetime
@@ -107,15 +110,13 @@ class GenericEnsembleBaseline:
         role_errors: list[RoleFailure] = []
         judge = None
         try:
-            judge = await asyncio.wait_for(
-                self._judge.evaluate(
-                    JudgeRequest(
-                        candidate=request.candidate,
-                        evidence=request.evidence,
-                        run_config=request.run_config,
-                    )
-                ),
-                request.run_config.timeout_s,
+            # Timeout lives inside GenericEnsembleJudge: one budget, concurrent members.
+            judge = await self._judge.evaluate(
+                JudgeRequest(
+                    candidate=request.candidate,
+                    evidence=request.evidence,
+                    run_config=request.run_config,
+                )
             )
             action = LABEL_TO_ACTION[judge.label]
             previous, resulting = action_claim_links(
@@ -130,21 +131,7 @@ class GenericEnsembleBaseline:
                 latency_ms=judge.latency_ms,
                 estimated_cost_usd=judge.estimated_cost_usd,
             )
-        except TimeoutError:
-            action = FinalAction.ESCALATE_FOR_REVIEW
-            previous, resulting = [], None
-            fired = ["R1"]
-            explanation = f"generic_ensemble exceeded {request.run_config.timeout_s}s"
-            cost = CostSummary()
-            judge = None
-            role_errors = [
-                RoleFailure(
-                    role="generic_ensemble",
-                    error_type=RoleTimeout.__name__,
-                    message=explanation,
-                )
-            ]
-        except (RoleOutputInvalid, SekfError) as exc:
+        except (RoleOutputInvalid, RoleTimeout, SekfError) as exc:
             action = FinalAction.ESCALATE_FOR_REVIEW
             previous, resulting = [], None
             fired = ["R1"]

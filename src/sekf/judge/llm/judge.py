@@ -85,6 +85,13 @@ class LLMJudge:
             estimated_cost_usd=result.estimated_cost_usd,
         )
 
+    async def aclose(self) -> None:
+        """Close the underlying provider when it owns a network client."""
+
+        close = getattr(self._provider, "aclose", None)
+        if close is not None:
+            await close()
+
     @staticmethod
     def _validate_cited_ids(parsed: JudgeLLMOutput, request: JudgeRequest) -> None:
         known = {item.evidence_id for item in request.evidence}

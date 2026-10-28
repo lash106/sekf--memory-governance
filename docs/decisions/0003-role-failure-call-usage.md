@@ -1,6 +1,6 @@
 # ADR 0003: Keep call usage on failed roles
 
-- Status: proposed (additive fields on `RoleFailure`; defaults are zero)
+- Status: accepted
 - Date: 2026-10-27
 - Owner: Sai Chetan Muppalla (providers / Judge); Shailen Sutradhar consumes them in policy and orchestration
 - Contract version: v1, additive. Existing constructors and JSON without the new fields still validate.
@@ -21,3 +21,7 @@
 - A repair that ends in R1 still shows its LLM calls in the decision cost.
 - Regenerated `contracts/v1/RoleFailure.json` includes the new optional fields.
 - Experiments that compare cost must use the same `COST_RATE_VERSION` or explicit `SEKF_LLM_*_COST_PER_MTOK` overrides.
+
+## Acknowledgment
+
+Accepted 2026-10-27. The fields are additive (default zero) and already consumed by policy and the API on main. No further change to these fields is proposed. Shailen (policy and API), Krishna (persisted audit), and Mahalakshmi (role-failure traces) are the affected owners; the shape is the one already merged, and a follow-up only happens if one of them objects to that shape.

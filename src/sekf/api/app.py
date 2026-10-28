@@ -2,7 +2,13 @@
 
 Only `/health` and `/v1/decide` exist in the skeleton. Baseline and experiment endpoints
 (SPEC.md section 10.3) are added in later sprints.
+
+The lifespan closes the Judge's provider on shutdown. `OpenAICompatibleProvider`
+owns an `httpx.AsyncClient`; leaving it open leaks sockets across reloads and tests.
 """
+
+from collections.abc import AsyncIterator
+from contextlib import asynccontextmanager
 
 from fastapi import Depends, FastAPI, Request
 
@@ -38,8 +44,20 @@ def get_governance(request: Request) -> Governance:
     return governance
 
 
+@asynccontextmanager
+async def _lifespan(app: FastAPI) -> AsyncIterator[None]:
+    """Yield the app, then close a Judge that owns a live HTTP client."""
+
+    yield
+    governance = getattr(app.state, "governance", None)
+    judge = getattr(governance, "_judge", None)
+    close = getattr(judge, "aclose", None)
+    if close is not None:
+        await close()
+
+
 def create_app(governance: Governance | None = None) -> FastAPI:
-    app = FastAPI(title="SEKF", version=__version__)
+    app = FastAPI(title="SEKF", version=__version__, lifespan=_lifespan)
     app.state.governance = governance or build_default_governance()
 
     @app.get("/health")

@@ -41,4 +41,11 @@ class FakeProvider:
                 parsed = response_model.model_validate(raw)
         except ValidationError as exc:
             raise RoleOutputInvalid(f"fake output failed validation: {exc}") from exc
-        return LLMResult(parsed=parsed, model=self._model_name, provider="fake", llm_calls=0)
+        return LLMResult(
+            parsed=parsed,
+            model=self._model_name,
+            provider="fake",
+            llm_calls=0,
+            temperature=temperature,
+            seed=seed,
+        )

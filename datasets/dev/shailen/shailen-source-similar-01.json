@@ -1,0 +1,77 @@
+{
+  "case_id": "shailen-source-similar-01",
+  "category": "conflicting_sources_similar_reliability",
+  "split": "dev",
+  "annotators": [
+    "Shailen Sutradhar"
+  ],
+  "annotation_notes": "Two official offices published conflicting prices on the same day and neither outranks the other. No basis to replace or reject: quarantine and let a human decide. Existing claim stays ACTIVE.",
+  "initial_memory": [
+    {
+      "claim_id": "50e6d035-1630-5945-aa82-815a7269b5f8",
+      "claim_text": "An annual parking permit costs $120.",
+      "subject_key": "parking",
+      "predicate_key": "annual_permit_price",
+      "object_text": "$120",
+      "status": "ACTIVE",
+      "version": 1,
+      "valid_from": "2026-01-01T00:00:00Z",
+      "valid_to": null,
+      "confidence": 0.9,
+      "created_at": "2026-06-01T00:00:00Z",
+      "updated_at": "2026-06-01T00:00:00Z",
+      "supersedes_claim_id": null,
+      "evidence_ids": []
+    }
+  ],
+  "candidate": {
+    "claim_id": "82cf7fec-a114-5563-871e-6625312472fb",
+    "claim_text": "An annual parking permit costs $150.",
+    "subject_key": "parking",
+    "predicate_key": "annual_permit_price",
+    "object_text": "$150",
+    "source_id": "student-chat",
+    "observed_at": "2026-09-02T12:00:00Z",
+    "valid_from": "2026-09-01T00:00:00Z",
+    "valid_to": null,
+    "extractor_confidence": 0.9,
+    "metadata": {}
+  },
+  "evidence": [
+    {
+      "evidence_id": "fea68ae5-00d1-58f1-b6cc-f08863dd56b6",
+      "content": "Transportation Services fee schedule: annual parking permit $150.",
+      "source_id": "transportation-services",
+      "source_type": "official_document",
+      "published_at": "2026-08-30T00:00:00Z",
+      "retrieved_at": "2026-09-02T12:00:00Z",
+      "reliability": 0.8,
+      "metadata": {}
+    },
+    {
+      "evidence_id": "db20c231-f808-590f-8afa-2e912db659ef",
+      "content": "Campus Police permit page: annual parking permit $120.",
+      "source_id": "campus-police",
+      "source_type": "official_document",
+      "published_at": "2026-08-30T00:00:00Z",
+      "retrieved_at": "2026-09-02T12:00:00Z",
+      "reliability": 0.8,
+      "metadata": {}
+    }
+  ],
+  "gold": {
+    "judge_label": "MIXED_EVIDENCE",
+    "temporal_relation": "OVERLAPPING_VALIDITY",
+    "conflict_type": "SOURCE_CONFLICT",
+    "final_action": "QUARANTINE",
+    "expected_memory_delta": {
+      "superseded_claim_ids": [],
+      "new_active_claim_ids": [],
+      "quarantined_claim_ids": [
+        "82cf7fec-a114-5563-871e-6625312472fb"
+      ],
+      "rejected_claim_ids": [],
+      "attached_evidence_ids": []
+    }
+  }
+}

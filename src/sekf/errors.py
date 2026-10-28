@@ -24,6 +24,10 @@ class SekfError(Exception):
         self.usage = usage
 
 
+class ConfigurationError(SekfError):
+    """An environment setting names something that does not exist. There is no silent fallback."""
+
+
 class ProviderUnavailable(SekfError):
     """The LLM provider could not be reached or is not configured."""
 

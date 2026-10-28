@@ -1,0 +1,50 @@
+{
+  "case_id": "shailen-refuted-01",
+  "category": "refuted_claim",
+  "split": "dev",
+  "annotators": [
+    "Shailen Sutradhar"
+  ],
+  "annotation_notes": "The facilities page directly contradicts the claim (closes at 22:00, no overnight access). Nothing active to conflict with; the claim itself is wrong and is kept as REJECTED for audit.",
+  "initial_memory": [],
+  "candidate": {
+    "claim_id": "5c952701-b1c2-51b4-8247-46564d0bf4be",
+    "claim_text": "The Computer Science building is open 24 hours on weekdays.",
+    "subject_key": "cs-building",
+    "predicate_key": "weekday_access_hours",
+    "object_text": "24 hours",
+    "source_id": "student-chat",
+    "observed_at": "2026-09-03T21:00:00Z",
+    "valid_from": null,
+    "valid_to": null,
+    "extractor_confidence": 0.9,
+    "metadata": {}
+  },
+  "evidence": [
+    {
+      "evidence_id": "5ebe30cf-e4b2-52c8-85f1-ba6e7130ec7a",
+      "content": "Facilities: the CS building closes at 22:00 Monday through Friday. There is no overnight access.",
+      "source_id": "facilities-page",
+      "source_type": "official_document",
+      "published_at": "2026-08-25T00:00:00Z",
+      "retrieved_at": "2026-09-03T21:00:00Z",
+      "reliability": 0.9,
+      "metadata": {}
+    }
+  ],
+  "gold": {
+    "judge_label": "REFUTED",
+    "temporal_relation": "NO_RELATED_CLAIM",
+    "conflict_type": "NONE",
+    "final_action": "REJECT",
+    "expected_memory_delta": {
+      "superseded_claim_ids": [],
+      "new_active_claim_ids": [],
+      "quarantined_claim_ids": [],
+      "rejected_claim_ids": [
+        "5c952701-b1c2-51b4-8247-46564d0bf4be"
+      ],
+      "attached_evidence_ids": []
+    }
+  }
+}

@@ -23,6 +23,10 @@ class LLMResult(BaseModel):
     output_tokens: int = Field(default=0, ge=0)
     latency_ms: int = Field(default=0, ge=0)
     estimated_cost_usd: float = Field(default=0.0, ge=0.0)
+    # Settings this call actually used. Callers copy these into audit records.
+    # Defaults keep older test doubles valid; live and fake providers set both.
+    temperature: float = Field(default=0.0, ge=0.0)
+    seed: int | None = None
 
 
 class StructuredLLMProvider(Protocol):

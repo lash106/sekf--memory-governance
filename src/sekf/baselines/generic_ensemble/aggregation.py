@@ -21,3 +21,26 @@ def majority_judge_label(labels: list[JudgeLabel]) -> JudgeLabel:
     if len(winners) != 1:
         return TIE_LABEL
     return winners[0]
+
+
+def quorum_size(n_members: int) -> int:
+    """How many members must agree before a label can authorize an action.
+
+    This is a majority of the full panel, not of whoever happened to return.
+    A three-member ensemble therefore needs two agreeing votes.
+    """
+
+    if n_members < 1:
+        raise ValueError("n_members must be >= 1")
+    return n_members // 2 + 1
+
+
+def label_with_quorum(labels: list[JudgeLabel], n_members: int) -> JudgeLabel | None:
+    """Return the label shared by at least `quorum_size` members, if one exists."""
+
+    need = quorum_size(n_members)
+    counts = Counter(labels)
+    winners = [label for label, count in counts.items() if count >= need]
+    if len(winners) == 1:
+        return winners[0]
+    return None

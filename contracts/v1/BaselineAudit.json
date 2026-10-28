@@ -1,0 +1,141 @@
+{
+  "$defs": {
+    "FinalAction": {
+      "enum": [
+        "PROMOTE",
+        "ATTACH_EVIDENCE",
+        "KEEP_EPISODIC",
+        "QUARANTINE",
+        "REVISE",
+        "REJECT",
+        "ESCALATE_FOR_REVIEW"
+      ],
+      "title": "FinalAction",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "description": "Reproducibility record for a baseline that is not a council role.\n\nSPEC.md section 15. `model` and `provider` are the values the call actually\nused. `temperature` and `seed` are the values that call observed. `raw_output`\nis the validated structured payload. `RunConfig.model` is not a substitute:\n`fake/none` resolves to the provider's default model.",
+  "properties": {
+    "audit_id": {
+      "format": "uuid",
+      "title": "Audit Id",
+      "type": "string"
+    },
+    "baseline_name": {
+      "minLength": 1,
+      "title": "Baseline Name",
+      "type": "string"
+    },
+    "confidence": {
+      "maximum": 1.0,
+      "minimum": 0.0,
+      "title": "Confidence",
+      "type": "number"
+    },
+    "estimated_cost_usd": {
+      "default": 0.0,
+      "minimum": 0.0,
+      "title": "Estimated Cost Usd",
+      "type": "number"
+    },
+    "input_tokens": {
+      "default": 0,
+      "minimum": 0,
+      "title": "Input Tokens",
+      "type": "integer"
+    },
+    "latency_ms": {
+      "default": 0,
+      "minimum": 0,
+      "title": "Latency Ms",
+      "type": "integer"
+    },
+    "llm_calls": {
+      "minimum": 0,
+      "title": "Llm Calls",
+      "type": "integer"
+    },
+    "model": {
+      "title": "Model",
+      "type": "string"
+    },
+    "output_tokens": {
+      "default": 0,
+      "minimum": 0,
+      "title": "Output Tokens",
+      "type": "integer"
+    },
+    "prompt_hash": {
+      "minLength": 1,
+      "title": "Prompt Hash",
+      "type": "string"
+    },
+    "prompt_version": {
+      "title": "Prompt Version",
+      "type": "string"
+    },
+    "provider": {
+      "minLength": 1,
+      "title": "Provider",
+      "type": "string"
+    },
+    "rationale": {
+      "title": "Rationale",
+      "type": "string"
+    },
+    "raw_output": {
+      "additionalProperties": true,
+      "title": "Raw Output",
+      "type": "object"
+    },
+    "recommended_action": {
+      "$ref": "#/$defs/FinalAction"
+    },
+    "seed": {
+      "anyOf": [
+        {
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Seed"
+    },
+    "target_claim_id": {
+      "anyOf": [
+        {
+          "format": "uuid",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Target Claim Id"
+    },
+    "temperature": {
+      "minimum": 0.0,
+      "title": "Temperature",
+      "type": "number"
+    }
+  },
+  "required": [
+    "model",
+    "prompt_version",
+    "provider",
+    "temperature",
+    "prompt_hash",
+    "llm_calls",
+    "audit_id",
+    "baseline_name",
+    "recommended_action",
+    "confidence",
+    "rationale"
+  ],
+  "title": "BaselineAudit",
+  "type": "object"
+}

@@ -35,6 +35,7 @@ from sekf.contracts import (
     JudgeLabel,
     RunConfig,
 )
+from sekf.errors import ProviderUnavailable
 from sekf.historian.deterministic import DeterministicHistorian
 from sekf.judge.fake import FakeJudge
 from sekf.judge.interface import Judge
@@ -226,6 +227,35 @@ async def run_ensemble(
     return _row(response.decision.final_action.value, response, wall, response.judge)
 
 
+async def with_retries(op, *, attempts: int = 6, label: str = "") -> dict[str, Any]:
+    """Retry live calls on HTTP 429. Do not retry other failures."""
+
+    delay = 5.0
+    last_error: Exception | None = None
+    for attempt in range(1, attempts + 1):
+        try:
+            result = await op()
+        except ProviderUnavailable as exc:
+            last_error = exc
+            if "rate limited" not in str(exc).lower() or attempt == attempts:
+                raise
+            print(f"{label} 429, retry {attempt}/{attempts} in {delay:.0f}s", flush=True)
+            await asyncio.sleep(delay)
+            delay = min(delay * 2, 60.0)
+            continue
+        if result.get("error") == "ProviderUnavailable":
+            if attempt == attempts:
+                return result
+            print(f"{label} provider unavailable, retry {attempt}/{attempts} in {delay:.0f}s", flush=True)
+            await asyncio.sleep(delay)
+            delay = min(delay * 2, 60.0)
+            continue
+        return result
+    if last_error is not None:
+        raise last_error
+    raise ProviderUnavailable(f"{label} failed after retries")
+
+
 async def run_single_judge(
     request: DecideRequest, memory: list[ExistingClaim], provider: OpenAICompatibleProvider
 ) -> dict[str, Any]:
@@ -390,8 +420,16 @@ async def main() -> None:
         }
         if live and provider is not None and live_judge is not None:
             live_request, live_memory = request_for(case, live_cfg)
-            runs["proposed_council"] = await run_council(live_request, live_memory, live_judge)
-            runs["single_judge"] = await run_single_judge(live_request, live_memory, provider)
+            print(f"live {case['case_id']}", flush=True)
+            runs["proposed_council"] = await with_retries(
+                lambda: run_council(live_request, live_memory, live_judge),
+                label=f"{case['case_id']} council",
+            )
+            runs["single_judge"] = await with_retries(
+                lambda: run_single_judge(live_request, live_memory, provider),
+                label=f"{case['case_id']} single_judge",
+            )
+            await asyncio.sleep(0.8)
         else:
             runs["proposed_council"] = await run_council(fake_request, memory, FakeJudge())
         for name, result in runs.items():

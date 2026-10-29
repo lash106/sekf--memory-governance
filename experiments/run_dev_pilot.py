@@ -67,18 +67,16 @@ def parse_env_file(path: Path) -> dict[str, str]:
 
 
 def load_env() -> list[str]:
-    """`.env.example` first, then `.env`. Variables already in the process win."""
+    """`.env.example`, then `.env`, then `huggingface.env`. Process env wins."""
 
     loaded: list[str] = []
     merged: dict[str, str] = {}
-    example = ROOT / ".env.example"
-    dotenv = ROOT / ".env"
-    if example.is_file():
-        merged.update(parse_env_file(example))
-        loaded.append(str(example.relative_to(ROOT)))
-    if dotenv.is_file():
-        merged.update(parse_env_file(dotenv))
-        loaded.append(str(dotenv.relative_to(ROOT)))
+    for name in (".env.example", ".env", "huggingface.env"):
+        path = ROOT / name
+        if not path.is_file():
+            continue
+        merged.update(parse_env_file(path))
+        loaded.append(name)
     for key, value in merged.items():
         if key not in os.environ:
             os.environ[key] = value

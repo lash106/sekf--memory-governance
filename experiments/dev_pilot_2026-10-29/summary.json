@@ -1,9 +1,14 @@
 {
-  "generated_at": "2026-10-29T07:04:32.803251+00:00",
-  "git_sha": "56689bf4fa987658885c64591f548db551befe82",
+  "generated_at": "2026-10-29T07:19:01.536296+00:00",
+  "git_sha": "d660a7ffae72101eb6082864c2f7bebe51eb03e2",
   "split": "dev",
   "n_cases": 35,
-  "judge": "FakeJudge",
+  "env_files": [
+    ".env.example"
+  ],
+  "live": false,
+  "provider": "fake",
+  "model": "fake/none",
   "historian": "DeterministicHistorian",
   "synthesizer": "DeterministicSynthesizer",
   "policy": "policy-v1",
@@ -22,7 +27,8 @@
       "estimated_cost_usd": 0.0,
       "predicted_actions": {
         "PROMOTE": 35
-      }
+      },
+      "errors": 0
     },
     "latest_write_wins": {
       "n": 35,
@@ -38,9 +44,25 @@
       "predicted_actions": {
         "REVISE": 22,
         "PROMOTE": 13
-      }
+      },
+      "errors": 0
     },
-    "static_rag": null,
+    "static_rag": {
+      "n": 35,
+      "final_action_macro_f1": 0.0357,
+      "promotion_precision": null,
+      "promotion_recall": 0.0,
+      "revision_accuracy": 0.0,
+      "contradiction_f1_refuted": null,
+      "median_latency_ms": 0,
+      "llm_calls": 0,
+      "tokens": 0,
+      "estimated_cost_usd": 0.0,
+      "predicted_actions": {
+        "KEEP_EPISODIC": 35
+      },
+      "errors": 0
+    },
     "single_judge": null,
     "generic_ensemble": {
       "n": 35,
@@ -56,7 +78,8 @@
       "predicted_actions": {
         "PROMOTE": 24,
         "KEEP_EPISODIC": 11
-      }
+      },
+      "errors": 0
     },
     "proposed_council": {
       "n": 35,
@@ -75,7 +98,8 @@
         "REVISE": 9,
         "PROMOTE": 9,
         "QUARANTINE": 4
-      }
+      },
+      "errors": 0
     }
   }
 }

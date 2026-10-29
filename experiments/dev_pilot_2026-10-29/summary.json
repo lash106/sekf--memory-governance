@@ -1,0 +1,81 @@
+{
+  "generated_at": "2026-10-29T07:04:32.803251+00:00",
+  "git_sha": "56689bf4fa987658885c64591f548db551befe82",
+  "split": "dev",
+  "n_cases": 35,
+  "judge": "FakeJudge",
+  "historian": "DeterministicHistorian",
+  "synthesizer": "DeterministicSynthesizer",
+  "policy": "policy-v1",
+  "mode": "dry_run",
+  "systems": {
+    "direct_storage": {
+      "n": 35,
+      "final_action_macro_f1": 0.0418,
+      "promotion_precision": 0.1714,
+      "promotion_recall": 1.0,
+      "revision_accuracy": 0.0,
+      "contradiction_f1_refuted": null,
+      "median_latency_ms": 0,
+      "llm_calls": 0,
+      "tokens": 0,
+      "estimated_cost_usd": 0.0,
+      "predicted_actions": {
+        "PROMOTE": 35
+      }
+    },
+    "latest_write_wins": {
+      "n": 35,
+      "final_action_macro_f1": 0.1442,
+      "promotion_precision": 0.3846,
+      "promotion_recall": 0.8333,
+      "revision_accuracy": 1.0,
+      "contradiction_f1_refuted": null,
+      "median_latency_ms": 0,
+      "llm_calls": 0,
+      "tokens": 0,
+      "estimated_cost_usd": 0.0,
+      "predicted_actions": {
+        "REVISE": 22,
+        "PROMOTE": 13
+      }
+    },
+    "static_rag": null,
+    "single_judge": null,
+    "generic_ensemble": {
+      "n": 35,
+      "final_action_macro_f1": 0.1464,
+      "promotion_precision": 0.25,
+      "promotion_recall": 1.0,
+      "revision_accuracy": 0.0,
+      "contradiction_f1_refuted": 0.0,
+      "median_latency_ms": 0,
+      "llm_calls": 0,
+      "tokens": 0,
+      "estimated_cost_usd": 0.0,
+      "predicted_actions": {
+        "PROMOTE": 24,
+        "KEEP_EPISODIC": 11
+      }
+    },
+    "proposed_council": {
+      "n": 35,
+      "final_action_macro_f1": 0.5129,
+      "promotion_precision": 0.6667,
+      "promotion_recall": 1.0,
+      "revision_accuracy": 0.8571,
+      "contradiction_f1_refuted": 0.0,
+      "median_latency_ms": 0,
+      "llm_calls": 0,
+      "tokens": 0,
+      "estimated_cost_usd": 0.0,
+      "predicted_actions": {
+        "ATTACH_EVIDENCE": 2,
+        "KEEP_EPISODIC": 11,
+        "REVISE": 9,
+        "PROMOTE": 9,
+        "QUARANTINE": 4
+      }
+    }
+  }
+}

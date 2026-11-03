@@ -4,11 +4,13 @@ Only `/health` and `/v1/decide` exist so far. Baseline and experiment endpoints
 (SPEC.md section 10.3) are added in later sprints.
 
 Which implementation each role uses is chosen from the environment (or `.env`):
-`SEKF_MEMORY` (`sql` default, or `memory`), `SEKF_HISTORIAN` (`deterministic` default, or
-`fake`), `SEKF_PROVIDER` (`fake` default, or `openai`; this selects the Judge). The Synthesizer
-is still the fake until its real implementation lands. Unknown memory/Historian values raise
-`ConfigurationError`; an unknown `SEKF_PROVIDER` raises `ProviderUnavailable` (raised by the
-Judge's own composition code). Nothing silently falls back.
+`SEKF_MEMORY` (`sql` default, or `memory`), `SEKF_HISTORIAN` and `SEKF_SYNTHESIZER`
+(`deterministic` default, `fake`, or `llm`), `SEKF_PROVIDER` (`fake` default, or `openai`; this
+selects the Judge and is the model provider the `llm` roles use). `llm` means the rule-based
+role plus a model check, and it needs `SEKF_PROVIDER=openai` and a key. Unknown memory/role
+values, and `llm` without a live provider, raise `ConfigurationError`; an unknown
+`SEKF_PROVIDER` raises `ProviderUnavailable` (from the Judge's own composition code). Nothing
+silently falls back.
 
 `sql` is the real store: decisions change claim state and survive restarts (SQLite at
 `SEKF_DB_URL`). `memory` is a test double that records decisions but applies no state
@@ -29,11 +31,17 @@ from sekf import __version__
 from sekf.api.orchestrator import Governance
 from sekf.contracts import CONTRACT_VERSION, DecideRequest, DecideResponse
 from sekf.errors import ConfigurationError
-from sekf.historian import DeterministicHistorian, FakeHistorian, Historian
+from sekf.historian import DeterministicHistorian, FakeHistorian, Historian, LLMHistorian
 from sekf.judge.compose import build_judge_from_env, load_project_env
 from sekf.memory import InMemoryRepository, MemoryRepository, build_memory_repository
 from sekf.policy import PolicyEngine
-from sekf.synthesizer import FakeSynthesizer
+from sekf.providers import create_provider_from_env
+from sekf.synthesizer import (
+    DeterministicSynthesizer,
+    FakeSynthesizer,
+    LLMSynthesizer,
+    Synthesizer,
+)
 
 
 def _env_choice(name: str, default: str, allowed: set[str]) -> str:
@@ -53,25 +61,56 @@ def build_memory_from_env() -> MemoryRepository:
     return build_memory_repository()
 
 
+def _require_live_provider(role: str) -> None:
+    """An `llm` role needs a real model and a key; fail at startup, not on every request."""
+    if (os.getenv("SEKF_PROVIDER") or "fake").strip().lower() not in {
+        "openai",
+        "openai_compatible",
+    }:
+        raise ConfigurationError(
+            f"SEKF_{role}=llm needs SEKF_PROVIDER=openai (and SEKF_LLM_API_KEY); "
+            "no stand-in model is used"
+        )
+    if not os.getenv("SEKF_LLM_API_KEY"):
+        raise ConfigurationError(
+            f"SEKF_{role}=llm needs SEKF_LLM_API_KEY, which is not set; every request would fail"
+        )
+
+
 def build_historian_from_env() -> Historian:
-    """`SEKF_HISTORIAN=deterministic` (default, the rule-based Historian) or `fake`."""
-    if _env_choice("SEKF_HISTORIAN", "deterministic", {"deterministic", "fake"}) == "fake":
+    """`SEKF_HISTORIAN`: `deterministic` (default, rule-based), `fake`, or `llm` (rules + model)."""
+    choice = _env_choice("SEKF_HISTORIAN", "deterministic", {"deterministic", "fake", "llm"})
+    if choice == "fake":
         return FakeHistorian()
+    if choice == "llm":
+        _require_live_provider("HISTORIAN")
+        return LLMHistorian(create_provider_from_env())
     return DeterministicHistorian()
+
+
+def build_synthesizer_from_env() -> Synthesizer:
+    """`SEKF_SYNTHESIZER`: `deterministic` (default), `fake`, or `llm` (rules + model)."""
+    choice = _env_choice("SEKF_SYNTHESIZER", "deterministic", {"deterministic", "fake", "llm"})
+    if choice == "fake":
+        return FakeSynthesizer()
+    if choice == "llm":
+        _require_live_provider("SYNTHESIZER")
+        return LLMSynthesizer(create_provider_from_env())
+    return DeterministicSynthesizer()
 
 
 def build_default_governance() -> Governance:
     """Wire the application from the environment (see the module docstring).
 
-    The defaults need no network and no key: SQLite store, deterministic Historian, fake Judge,
-    fake Synthesizer, deterministic policy.
+    The defaults need no network and no key: SQLite store, rule-based Historian and Synthesizer,
+    fake Judge, deterministic policy.
     """
 
     return Governance(
         memory=build_memory_from_env(),
         historian=build_historian_from_env(),
         judge=build_judge_from_env(),
-        synthesizer=FakeSynthesizer(),
+        synthesizer=build_synthesizer_from_env(),
         policy=PolicyEngine(),
     )
 

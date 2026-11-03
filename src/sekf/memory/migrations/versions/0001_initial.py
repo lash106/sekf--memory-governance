@@ -1,4 +1,4 @@
-"""Initial memory schema (ADR 0004). Never edit after merge; add a new revision instead.
+"""Initial memory schema (ADR 0005). Never edit after merge; add a new revision instead.
 
 Revision ID: 0001_initial
 Revises: (none)

@@ -3,9 +3,10 @@
   "category": "non_overlapping_temporal_validity",
   "split": "dev",
   "annotators": [
-    "Sai Chetan Muppalla"
+    "Sai Chetan Muppalla",
+    "Shailen Sutradhar (relabel)"
   ],
-  "annotation_notes": "Sai Chetan evidence/governance case (non_overlapping_temporal_validity).",
+  "annotation_notes": "Sai Chetan evidence/governance case (non_overlapping_temporal_validity). Relabeled: The old claim's period already ended (valid_to 2026-06-01), so the new claim does not replace it: both are true in their own periods. Promote, no revision (guide rule B1).",
   "initial_memory": [
     {
       "claim_id": "98b9083d-b7d3-5f6a-acee-6373cc2ca1cc",
@@ -52,12 +53,10 @@
   "gold": {
     "judge_label": "SUPPORTED",
     "temporal_relation": "NON_OVERLAPPING_VALIDITY",
-    "conflict_type": "TEMPORAL_UPDATE",
-    "final_action": "REVISE",
+    "conflict_type": "NONE",
+    "final_action": "PROMOTE",
     "expected_memory_delta": {
-      "superseded_claim_ids": [
-        "98b9083d-b7d3-5f6a-acee-6373cc2ca1cc"
-      ],
+      "superseded_claim_ids": [],
       "new_active_claim_ids": [
         "38c991bb-c5b7-5ef0-a039-b56ef6b5fe2f"
       ],

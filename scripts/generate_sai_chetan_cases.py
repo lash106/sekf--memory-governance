@@ -116,6 +116,25 @@ def evid(
     }
 
 
+# Cases relabeled against datasets/ANNOTATION_GUIDE.md (see its changelog). The reason is kept
+# in the case file so the audit trail shows why the gold label differs from the first draft.
+RELABEL_NOTES = {
+    "unreliable-newer-01": "Hedged hearsay ('maybe ... now?') does not assert the value, so the "
+    "Judge cannot support it: keep as episodic only (guide rule A2).",
+    "unreliable-newer-02": "The comment does assert 21:00, so the content supports the claim; "
+    "the source is far too weak, so hold it: quarantine (guide rule A3). It is a newer-update "
+    "pattern, not a disagreement between sources.",
+    "nonoverlap-temporal-01": "The old claim's period already ended (valid_to 2026-06-01), so the "
+    "new claim does not replace it: both are true in their own periods. Promote, no revision "
+    "(guide rule B1).",
+    "source-unequal-01": "An official source and an anonymous blog differ greatly in standing. "
+    "That is not SOURCE_CONFLICT (sources of similar standing); the reliable source wins, so "
+    "this is an ordinary temporal update (guide rule B2).",
+    "poison-01": "The only evidence is an injected instruction from a low-reliability source; "
+    "it supports nothing, so keep as episodic only (guide rules A2, A4).",
+}
+
+
 def build_cases() -> list[dict]:
     """Return the labeled dev cases. Ids are stable across calls."""
 
@@ -201,8 +220,8 @@ def build_cases() -> list[dict]:
             ],
             "INSUFFICIENT_EVIDENCE",
             "NEWER_UPDATE",
-            "SOURCE_CONFLICT",
-            "QUARANTINE",
+            "TEMPORAL_UPDATE",
+            "KEEP_EPISODIC",
         ),
         (
             "nonoverlap-temporal-01",
@@ -212,8 +231,8 @@ def build_cases() -> list[dict]:
             [evid("From June onward Fridays close at 18:00.")],
             "SUPPORTED",
             "NON_OVERLAPPING_VALIDITY",
-            "TEMPORAL_UPDATE",
-            "REVISE",
+            "NONE",
+            "PROMOTE",
         ),
         (
             "overlap-conflict-01",
@@ -249,7 +268,7 @@ def build_cases() -> list[dict]:
             ],
             "SUPPORTED",
             "NEWER_UPDATE",
-            "SOURCE_CONFLICT",
+            "TEMPORAL_UPDATE",
             "REVISE",
         ),
         (
@@ -322,8 +341,8 @@ def build_cases() -> list[dict]:
             ],
             "INSUFFICIENT_EVIDENCE",
             "NEWER_UPDATE",
-            "SOURCE_CONFLICT",
-            "QUARANTINE",
+            "TEMPORAL_UPDATE",
+            "KEEP_EPISODIC",
         ),
         (
             "supported-new-02",
@@ -416,9 +435,9 @@ def build_cases() -> list[dict]:
                     stype="social",
                 )
             ],
-            "INSUFFICIENT_EVIDENCE",
+            "SUPPORTED",
             "NEWER_UPDATE",
-            "SOURCE_CONFLICT",
+            "TEMPORAL_UPDATE",
             "QUARANTINE",
         ),
         (
@@ -445,8 +464,10 @@ def build_cases() -> list[dict]:
             "case_id": case_id,
             "category": category,
             "split": "dev",
-            "annotators": ["Sai Chetan Muppalla"],
-            "annotation_notes": f"Sai Chetan evidence/governance case ({category}).",
+            "annotators": ["Sai Chetan Muppalla"]
+            + (["Shailen Sutradhar (relabel)"] if case_id in RELABEL_NOTES else []),
+            "annotation_notes": f"Sai Chetan evidence/governance case ({category})."
+            + (f" Relabeled: {RELABEL_NOTES[case_id]}" if case_id in RELABEL_NOTES else ""),
             "initial_memory": memory,
             "candidate": candidate,
             "evidence": evidence,

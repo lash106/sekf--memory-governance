@@ -72,7 +72,7 @@ def test_cases_parse_and_cover_categories() -> None:
     labels: set[str] = set()
     for path in sorted(DEV.glob("*.json")):
         data = json.loads(path.read_text(encoding="utf-8"))
-        assert data["annotators"] == ["Sai Chetan Muppalla"]
+        assert data["annotators"][0] == "Sai Chetan Muppalla"  # relabels append a second name
         assert data["split"] == "dev"
         categories.add(data["category"])
         labels.add(data["gold"]["judge_label"])

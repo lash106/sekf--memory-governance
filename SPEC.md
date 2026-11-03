@@ -442,7 +442,9 @@ Optional stretch: Self-RAG official implementation, or a clearly labeled adapted
 
 ### 12.3 Fairness controls
 
-Same base model (unless model is the variable), same evidence, same candidate and memory state, temperature 0, recorded token limits, comparable total token budgets or explicit cost-normalized analysis, identical held-out cases.
+Same base model (unless model is the variable), same evidence, same candidate and memory state, temperature 0, recorded token limits, comparable total token budgets or explicit cost-normalized analysis, identical held-out cases. `baselines.matched_settings` also requires the same seed and the same `timeout_s` (a system given less time escalates more for reasons unrelated to its design).
+
+**Known design risk for RQ2.** At temperature 0 the three members of `generic_ensemble` may answer identically, so the ensemble degenerates into one vote counted three times at three times the cost. Members therefore get seeds `seed`, `seed+1`, `seed+2` when a seed is set, which helps only for providers that honor seeds at temperature 0. If the pilot shows the three votes are identical, either report that finding (it is a result) or run the ensemble at a documented non-zero temperature as a separate, clearly labeled condition; do not silently change the matched temperature.
 
 ---
 
@@ -454,7 +456,7 @@ Same base model (unless model is the variable), same evidence, same candidate an
 
 ### 13.2 Label independence (important)
 
-Gold final actions are assigned by annotators following the **annotation guide** (`datasets/ANNOTATION_GUIDE.md`, owned by Mahalakshmi), which defines each action in plain language ("should this belong in long-term knowledge, given this evidence and memory?"). Annotators must **not** derive gold actions by running or reading the policy rules. Role-level gold labels are scored separately from final actions, so role errors and policy errors can be separated.
+Gold final actions are assigned by annotators following the **annotation guide** (`datasets/ANNOTATION_GUIDE.md`, owned by Mahalakshmi), which defines each action in plain language ("should this belong in long-term knowledge, given this evidence and memory?"). Annotators must **not** derive gold actions by running or reading the policy rules. The guide exists at `datasets/ANNOTATION_GUIDE.md` (v1, 2026-10-28) and `tests/unit/test_dataset_consistency.py` checks every dev case against it. Role-level gold labels are scored separately from final actions, so role errors and policy errors can be separated.
 
 ### 13.3 Required categories
 

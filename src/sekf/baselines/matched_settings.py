@@ -20,9 +20,17 @@ class MatchedSettingsViolation:
 
 
 def compare_run_configs(
-    council: RunConfig, baseline: RunConfig, *, require_same_seed: bool = True
+    council: RunConfig,
+    baseline: RunConfig,
+    *,
+    require_same_seed: bool = True,
+    require_same_timeout: bool = True,
 ) -> list[MatchedSettingsViolation]:
-    """Return mismatches that would unfairly advantage one system."""
+    """Return mismatches that would unfairly advantage one system.
+
+    The timeout counts: a role that times out becomes an escalation, so a system given less
+    time can look worse for reasons unrelated to its design.
+    """
 
     violations: list[MatchedSettingsViolation] = []
     if council.model != baseline.model:
@@ -33,6 +41,10 @@ def compare_run_configs(
         )
     if require_same_seed and council.seed != baseline.seed:
         violations.append(MatchedSettingsViolation("seed", council.seed, baseline.seed))
+    if require_same_timeout and council.timeout_s != baseline.timeout_s:
+        violations.append(
+            MatchedSettingsViolation("timeout_s", council.timeout_s, baseline.timeout_s)
+        )
     return violations
 
 
@@ -61,10 +73,16 @@ def assert_matched_settings(
     council_thresholds: Thresholds | None = None,
     baseline_thresholds: Thresholds | None = None,
     require_same_seed: bool = True,
+    require_same_timeout: bool = True,
 ) -> None:
     """Raise ValueError listing mismatches; used by experiment runners before a pilot cell."""
 
-    violations = compare_run_configs(council, baseline, require_same_seed=require_same_seed)
+    violations = compare_run_configs(
+        council,
+        baseline,
+        require_same_seed=require_same_seed,
+        require_same_timeout=require_same_timeout,
+    )
     if council_thresholds is not None and baseline_thresholds is not None:
         violations.extend(compare_thresholds(council_thresholds, baseline_thresholds))
     if violations:

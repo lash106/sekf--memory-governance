@@ -1,6 +1,6 @@
-# ADR 0004: Memory store schema (claims, versions, relationships)
+# ADR 0005: Memory store schema (claims, versions, relationships)
 
-- Status: proposed (to be accepted by Shailen, as API/integration owner, and Mahalakshmi as reviewer)
+- Status: accepted
 - Date: 2026-10-27
 - Owner: Krishna Panjiyar (memory)
 - Affected owners: Shailen (orchestrator wiring), Mahalakshmi (Historian reads related claims)

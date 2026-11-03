@@ -3,9 +3,10 @@
   "category": "unreliable_newer_contradiction",
   "split": "dev",
   "annotators": [
-    "Sai Chetan Muppalla"
+    "Sai Chetan Muppalla",
+    "Shailen Sutradhar (relabel)"
   ],
-  "annotation_notes": "Sai Chetan evidence/governance case (unreliable_newer_contradiction).",
+  "annotation_notes": "Sai Chetan evidence/governance case (unreliable_newer_contradiction). Relabeled: Hedged hearsay ('maybe ... now?') does not assert the value, so the Judge cannot support it: keep as episodic only (guide rule A2).",
   "initial_memory": [
     {
       "claim_id": "069b242c-3051-5d00-8078-f55b8d5f5a93",
@@ -52,14 +53,12 @@
   "gold": {
     "judge_label": "INSUFFICIENT_EVIDENCE",
     "temporal_relation": "NEWER_UPDATE",
-    "conflict_type": "SOURCE_CONFLICT",
-    "final_action": "QUARANTINE",
+    "conflict_type": "TEMPORAL_UPDATE",
+    "final_action": "KEEP_EPISODIC",
     "expected_memory_delta": {
       "superseded_claim_ids": [],
       "new_active_claim_ids": [],
-      "quarantined_claim_ids": [
-        "fd921738-9064-5fe3-a102-7879ec58e512"
-      ],
+      "quarantined_claim_ids": [],
       "rejected_claim_ids": [],
       "attached_evidence_ids": []
     }

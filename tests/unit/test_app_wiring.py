@@ -5,11 +5,11 @@ import pytest
 from sekf.api import Governance
 from sekf.api import app as app_module
 from sekf.errors import ConfigurationError
-from sekf.historian import DeterministicHistorian, FakeHistorian
+from sekf.historian import DeterministicHistorian, FakeHistorian, LLMHistorian
 from sekf.judge import FakeJudge
 from sekf.memory import InMemoryRepository, SqlMemoryRepository
 from sekf.policy import PolicyEngine
-from sekf.synthesizer import FakeSynthesizer
+from sekf.synthesizer import DeterministicSynthesizer, FakeSynthesizer, LLMSynthesizer
 
 
 @pytest.fixture(autouse=True)
@@ -18,7 +18,7 @@ def isolated_env(monkeypatch: pytest.MonkeyPatch) -> None:
     from sekf.judge import compose
 
     monkeypatch.setattr(compose, "_ENV_LOADED", True)
-    for name in ("SEKF_MEMORY", "SEKF_HISTORIAN", "SEKF_PROVIDER"):
+    for name in ("SEKF_MEMORY", "SEKF_HISTORIAN", "SEKF_SYNTHESIZER", "SEKF_PROVIDER"):
         monkeypatch.delenv(name, raising=False)
     monkeypatch.setenv("SEKF_DB_URL", "sqlite://")  # the default store, in RAM for tests
 
@@ -28,7 +28,7 @@ def test_defaults_need_no_network_and_no_key() -> None:
     assert isinstance(gov._memory, SqlMemoryRepository)  # the real store, not the test double
     assert isinstance(gov._historian, DeterministicHistorian)
     assert isinstance(gov._judge, FakeJudge)
-    assert isinstance(gov._synthesizer, FakeSynthesizer)
+    assert isinstance(gov._synthesizer, DeterministicSynthesizer)
     assert isinstance(gov._policy, PolicyEngine)
 
 
@@ -37,12 +37,14 @@ def test_test_double_memory_and_fake_historian_can_be_selected(
 ) -> None:
     monkeypatch.setenv("SEKF_MEMORY", "MEMORY")  # case-insensitive
     monkeypatch.setenv("SEKF_HISTORIAN", "fake")
+    monkeypatch.setenv("SEKF_SYNTHESIZER", "fake")
     gov = app_module.build_default_governance()
     assert isinstance(gov._memory, InMemoryRepository)
     assert isinstance(gov._historian, FakeHistorian)
+    assert isinstance(gov._synthesizer, FakeSynthesizer)
 
 
-@pytest.mark.parametrize("name", ["SEKF_MEMORY", "SEKF_HISTORIAN"])
+@pytest.mark.parametrize("name", ["SEKF_MEMORY", "SEKF_HISTORIAN", "SEKF_SYNTHESIZER"])
 def test_unknown_values_fail_loudly(name: str, monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setenv(name, "postgres-or-something")
     with pytest.raises(ConfigurationError, match=name):
@@ -105,3 +107,36 @@ def test_a_failing_close_does_not_stop_the_others_and_is_reported() -> None:
     with pytest.raises(RuntimeError, match="boom"):
         asyncio.run(gov.aclose())
     assert broken.closed and memory.closed and judge.closed
+
+
+@pytest.mark.parametrize("name", ["SEKF_HISTORIAN", "SEKF_SYNTHESIZER"])
+def test_llm_roles_refuse_to_run_without_a_live_provider(
+    name: str, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.setenv(name, "llm")  # SEKF_PROVIDER is unset, i.e. "fake"
+    with pytest.raises(ConfigurationError, match="SEKF_PROVIDER=openai"):
+        app_module.build_default_governance()
+
+
+def test_llm_roles_are_built_when_a_live_provider_is_configured(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setenv("SEKF_PROVIDER", "openai")
+    monkeypatch.setenv("SEKF_LLM_API_KEY", "test-key-not-used")  # no request is made
+    monkeypatch.setenv("SEKF_HISTORIAN", "llm")
+    monkeypatch.setenv("SEKF_SYNTHESIZER", "llm")
+    gov = app_module.build_default_governance()
+    assert isinstance(gov._historian, LLMHistorian)
+    assert isinstance(gov._synthesizer, LLMSynthesizer)
+
+
+@pytest.mark.parametrize("name", ["SEKF_HISTORIAN", "SEKF_SYNTHESIZER"])
+def test_llm_roles_refuse_to_start_without_an_api_key(
+    name: str, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Without this, the app would start and then fail every single request."""
+    monkeypatch.setenv("SEKF_PROVIDER", "openai")
+    monkeypatch.delenv("SEKF_LLM_API_KEY", raising=False)
+    monkeypatch.setenv(name, "llm")
+    with pytest.raises(ConfigurationError, match="SEKF_LLM_API_KEY"):
+        app_module.build_default_governance()

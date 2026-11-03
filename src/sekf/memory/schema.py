@@ -1,6 +1,6 @@
 """SQLAlchemy models for the persistent memory store. Owner: Krishna.
 
-Design and rationale: docs/decisions/0004-memory-store-schema.md. Schema changes need a new
+Design and rationale: docs/decisions/0005-memory-store-schema.md. Schema changes need a new
 Alembic revision in `sekf/memory/migrations/versions/`; a test checks the two agree.
 
 UUIDs are stored as 36-character strings and timestamps as timezone-aware UTC values so the

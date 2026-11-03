@@ -21,7 +21,7 @@ from sekf.contracts import (
     JudgeRequest,
 )
 from sekf.errors import CallUsage, CommitRejected, RoleOutputInvalid, RoleTimeout
-from sekf.judge import LLMJudge
+from sekf.judge import FakeJudge, LLMJudge
 from sekf.memory import InMemoryRepository
 from sekf.providers import FakeProvider
 
@@ -282,3 +282,22 @@ async def test_overall_timeout_keeps_completed_usage(decide_request: DecideReque
     assert isinstance(usage, CallUsage)
     assert usage.llm_calls == 2
     assert usage.input_tokens == 9
+
+
+async def test_each_member_gets_its_own_seed(decide_request: DecideRequest) -> None:
+    seen: list[int | None] = []
+
+    class _Recorder:
+        async def evaluate(self, request: JudgeRequest) -> JudgeAssessment:
+            seen.append(request.run_config.seed)
+            return await FakeJudge().evaluate(request)
+
+    seeded = decide_request.model_copy(
+        update={"run_config": decide_request.run_config.model_copy(update={"seed": 10})}
+    )
+    await GenericEnsembleBaseline(_Recorder()).decide(seeded)
+    assert sorted(s for s in seen if s is not None) == [10, 11, 12]
+
+    seen.clear()
+    await GenericEnsembleBaseline(_Recorder()).decide(decide_request)  # seed None stays None
+    assert seen == [None, None, None]

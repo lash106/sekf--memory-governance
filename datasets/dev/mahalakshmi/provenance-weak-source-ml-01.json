@@ -1,0 +1,50 @@
+{
+  "case_id": "provenance-weak-source-ml-01",
+  "category": "supported_by_weak_source",
+  "split": "dev",
+  "annotators": [
+    "Shailen Sutradhar (on behalf of Mahalakshmi Rajkumar's Sprint 0 set)"
+  ],
+  "annotation_notes": "Nothing conflicts with this claim, and the message does assert it, so the Judge supports it. But the only source is an informal chat (reliability 0.4, below the 0.6 line): do not accept it as knowledge yet, and do not lose it either. Quarantine (guide rule A3). Provenance case: the weakness is the source, not a conflict.",
+  "initial_memory": [],
+  "candidate": {
+    "claim_id": "137c09eb-f048-52e2-820e-e93dd80518ae",
+    "claim_text": "The robotics lab is open to all students on weekends.",
+    "subject_key": "robotics_lab",
+    "predicate_key": "weekend_access",
+    "object_text": "open to all students",
+    "source_id": "club-group-chat",
+    "observed_at": "2026-10-12T14:00:00Z",
+    "valid_from": null,
+    "valid_to": null,
+    "extractor_confidence": 0.9,
+    "metadata": {}
+  },
+  "evidence": [
+    {
+      "evidence_id": "55edce98-1e9d-569a-ad0a-d23b5470ae47",
+      "content": "Club group chat message: the robotics lab is open to all students on weekends.",
+      "source_id": "club-group-chat",
+      "source_type": "chat",
+      "published_at": "2026-10-12T13:55:00Z",
+      "retrieved_at": "2026-10-12T14:00:00Z",
+      "reliability": 0.4,
+      "metadata": {}
+    }
+  ],
+  "gold": {
+    "judge_label": "SUPPORTED",
+    "temporal_relation": "NO_RELATED_CLAIM",
+    "conflict_type": "NONE",
+    "final_action": "QUARANTINE",
+    "expected_memory_delta": {
+      "superseded_claim_ids": [],
+      "new_active_claim_ids": [],
+      "quarantined_claim_ids": [
+        "137c09eb-f048-52e2-820e-e93dd80518ae"
+      ],
+      "rejected_claim_ids": [],
+      "attached_evidence_ids": []
+    }
+  }
+}

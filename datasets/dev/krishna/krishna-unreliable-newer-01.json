@@ -3,9 +3,10 @@
   "category": "unreliable_newer_contradiction",
   "split": "dev",
   "annotators": [
-    "Krishna Panjiyar"
+    "Krishna Panjiyar",
+    "Shailen Sutradhar (relabel)"
   ],
-  "annotation_notes": "Newer, but the only source is an anonymous post that the gym schedule does not confirm. It should not replace knowledge yet. Storage check: candidate stored as QUARANTINED; the ACTIVE 06:00 claim is unchanged.",
+  "annotation_notes": "Newer, but the only source is an anonymous post that hedges ('9 now??') and the gym schedule does not confirm it. The content does not assert the new opening time, so the Judge cannot support it: keep as episodic only; the ACTIVE 06:00 claim is unchanged and nothing is stored as a claim. Relabeled from QUARANTINE per datasets/ANNOTATION_GUIDE.md rule A2 (hedged hearsay).",
   "initial_memory": [
     {
       "claim_id": "bb25ee63-eb90-5185-86e7-83687b8c6d8d",
@@ -52,14 +53,12 @@
   "gold": {
     "judge_label": "INSUFFICIENT_EVIDENCE",
     "temporal_relation": "NEWER_UPDATE",
-    "conflict_type": "VALUE_CONFLICT",
-    "final_action": "QUARANTINE",
+    "conflict_type": "TEMPORAL_UPDATE",
+    "final_action": "KEEP_EPISODIC",
     "expected_memory_delta": {
       "superseded_claim_ids": [],
       "new_active_claim_ids": [],
-      "quarantined_claim_ids": [
-        "77d223f3-6614-57e8-9813-45972a26c819"
-      ],
+      "quarantined_claim_ids": [],
       "rejected_claim_ids": [],
       "attached_evidence_ids": []
     }

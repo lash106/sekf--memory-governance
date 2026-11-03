@@ -62,6 +62,7 @@ Always use the project venv (`.venv`): run tools through `make`, or `source .ven
 
 ## Git workflow
 
+- Set your git identity once (`git config user.name "Your Name"`, `git config user.email you@example.com`) so commits carry your own name, including commits an AI tool makes for you.
 - Never commit to `main`. Branch from latest `main` as `<name>/<short-task>`; keep branches to 1-3 days.
 - Rebase on `origin/main` daily. Open a draft PR early; one approval from a different teammate plus green CI to merge; squash-merge; name the `SPEC.md` section 18 task in the PR description.
 - Keep PRs small and focused on one task. Do not reformat unrelated files.

@@ -69,6 +69,21 @@ class GenericEnsembleJudge:
     def n_members(self) -> int:
         return self._n_members
 
+    @staticmethod
+    def _member_request(request: JudgeRequest, index: int) -> JudgeRequest:
+        """Give member `index` its own seed so a fixed seed does not make every vote identical.
+
+        Only applies when a seed is set; the offset is deterministic, so a run stays
+        reproducible. At temperature 0 a model may still answer identically however it is
+        seeded, in which case the ensemble degenerates to one vote counted three times.
+        """
+        seed = request.run_config.seed
+        if seed is None:
+            return request
+        return request.model_copy(
+            update={"run_config": request.run_config.model_copy(update={"seed": seed + index})}
+        )
+
     async def _vote(self, request: JudgeRequest) -> JudgeAssessment | SekfError:
         try:
             return await self._member.evaluate(request)
@@ -83,7 +98,10 @@ class GenericEnsembleJudge:
         """Vote concurrently under one overall timeout of `run_config.timeout_s`."""
 
         started = time.perf_counter()
-        tasks = [asyncio.create_task(self._vote(request)) for _ in range(self._n_members)]
+        tasks = [
+            asyncio.create_task(self._vote(self._member_request(request, i)))
+            for i in range(self._n_members)
+        ]
         _, pending = await asyncio.wait(tasks, timeout=request.run_config.timeout_s)
         for task in pending:
             task.cancel()

@@ -3,9 +3,10 @@
   "category": "unreliable_newer_contradiction",
   "split": "dev",
   "annotators": [
-    "Sai Chetan Muppalla"
+    "Sai Chetan Muppalla",
+    "Shailen Sutradhar (relabel)"
   ],
-  "annotation_notes": "Sai Chetan evidence/governance case (unreliable_newer_contradiction).",
+  "annotation_notes": "Sai Chetan evidence/governance case (unreliable_newer_contradiction). Relabeled: The comment does assert 21:00, so the content supports the claim; the source is far too weak, so hold it: quarantine (guide rule A3). It is a newer-update pattern, not a disagreement between sources.",
   "initial_memory": [
     {
       "claim_id": "89743aab-901b-5516-ac2d-42a6fd3be391",
@@ -50,9 +51,9 @@
     }
   ],
   "gold": {
-    "judge_label": "INSUFFICIENT_EVIDENCE",
+    "judge_label": "SUPPORTED",
     "temporal_relation": "NEWER_UPDATE",
-    "conflict_type": "SOURCE_CONFLICT",
+    "conflict_type": "TEMPORAL_UPDATE",
     "final_action": "QUARANTINE",
     "expected_memory_delta": {
       "superseded_claim_ids": [],

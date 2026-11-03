@@ -53,15 +53,18 @@ make run        # API on http://localhost:8000  (GET /health, POST /v1/decide)
 
 ### Configuration
 
-`make setup` copies `.env.example` to `.env` (git-ignored). The defaults need no network and no key. They run the real rule-based Historian, the real policy and the real SQLite memory store (`./data/sekf.sqlite3`, git-ignored), with a fake Judge and a fake Synthesizer.
+`make setup` copies `.env.example` to `.env` (git-ignored). The defaults need no network and no key. They run the real rule-based Historian, the real policy and the real SQLite memory store (`./data/sekf.sqlite3`, git-ignored), the real rule-based Synthesizer, and a fake Judge.
 
 | Variable | Values | Meaning |
 |---|---|---|
 | `SEKF_MEMORY` | `sql` (default), `memory` | `sql` persists to SQLite at `SEKF_DB_URL`; `memory` is a test double that applies no claim changes |
-| `SEKF_HISTORIAN` | `deterministic` (default), `fake` | rule-based Historian or the canned fake |
-| `SEKF_PROVIDER` | `fake` (default), `openai` | fake Judge, or the LLM Judge (needs `SEKF_LLM_*`) |
+| `SEKF_HISTORIAN` | `deterministic` (default), `fake`, `llm` | rule-based Historian, the canned fake, or the rules plus a model check (finds source conflicts) |
+| `SEKF_SYNTHESIZER` | `deterministic` (default), `fake`, `llm` | same three choices for the Synthesizer |
+| `SEKF_PROVIDER` | `fake` (default), `openai` | fake Judge, or the LLM Judge (needs `SEKF_LLM_*`). The `llm` roles need `openai` |
 
-An unknown value stops the app with an error (`ConfigurationError`, or `ProviderUnavailable` for `SEKF_PROVIDER`); nothing falls back silently.
+An unknown value, or an `llm` role without `SEKF_PROVIDER=openai`, stops the app with an error (`ConfigurationError`, or `ProviderUnavailable` for `SEKF_PROVIDER`); nothing falls back silently.
+
+Once you have a key, check the live wiring and cost with `.venv/bin/python scripts/smoke_llm.py --max-cost 0.05` (dry-run only, with a call and dollar limit checked before every provider call; a final request can overshoot by at most its 3 provider calls).
 
 Send the worked-example request (`SPEC.md` section 4) to a running server. The first call promotes the claim and a repeat is answered from storage as a replay; the REVISE outcome needs the older 17:00 claim in memory first (see `tests/integration/test_sprint1_milestone.py`):
 

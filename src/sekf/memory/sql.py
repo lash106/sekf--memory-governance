@@ -1,4 +1,4 @@
-"""Persistent SQLAlchemy memory store (SPEC.md section 10.1, ADR 0001, ADR 0004). Owner: Krishna.
+"""Persistent SQLAlchemy memory store (SPEC.md section 10.1, ADR 0001, ADR 0005). Owner: Krishna.
 
 `SqlMemoryRepository.apply_decision` is the only write. One bundle is one database
 transaction: the idempotency check, the stale-snapshot check, the claim state transitions,
@@ -156,6 +156,14 @@ class SqlMemoryRepository:
     @property
     def engine(self) -> Engine:
         return self._engine
+
+    def close(self) -> None:
+        """Release the connection pool. Safe to call more than once.
+
+        `Governance.aclose()` calls this on application shutdown. A closed repository can be
+        used again: the engine opens fresh connections on demand.
+        """
+        self._engine.dispose()
 
     # ------------------------------------------------------------------ sessions
 

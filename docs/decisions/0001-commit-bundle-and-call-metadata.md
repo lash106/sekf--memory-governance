@@ -1,6 +1,6 @@
 # ADR 0001: Atomic commit bundle and reproducibility metadata
 
-- Status: proposed (becomes accepted when Krishna, Mahalakshmi, and Sai Chetan approve the skeleton PR)
+- Status: accepted
 - Date: 2026-10-23
 - Affected owners: Krishna (memory), Mahalakshmi (Historian/Synthesizer), Sai Chetan (Judge/providers), Shailen (policy/API)
 - Contract version: v1, kept. These changes are NOT backward compatible with the first skeleton draft: several `CallMetadata` fields became required, `AuditTrace.decisions` became `AuditTrace.bundles`, `DecisionRecord` gained a required `request_hash`, and the memory write method changed. Nothing has been merged or released against v1 yet, so there are no consumers to break and we treat this as a pre-release change. After the first merge to `main`, breaking changes require a version bump.

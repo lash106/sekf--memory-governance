@@ -3,9 +3,10 @@
   "category": "conflicting_sources_unequal_reliability",
   "split": "dev",
   "annotators": [
-    "Sai Chetan Muppalla"
+    "Sai Chetan Muppalla",
+    "Shailen Sutradhar (relabel)"
   ],
-  "annotation_notes": "Sai Chetan evidence/governance case (conflicting_sources_unequal_reliability).",
+  "annotation_notes": "Sai Chetan evidence/governance case (conflicting_sources_unequal_reliability). Relabeled: An official source and an anonymous blog differ greatly in standing. That is not SOURCE_CONFLICT (sources of similar standing); the reliable source wins, so this is an ordinary temporal update (guide rule B2).",
   "initial_memory": [
     {
       "claim_id": "372077b5-aeda-5797-ad71-682cffec1493",
@@ -62,7 +63,7 @@
   "gold": {
     "judge_label": "SUPPORTED",
     "temporal_relation": "NEWER_UPDATE",
-    "conflict_type": "SOURCE_CONFLICT",
+    "conflict_type": "TEMPORAL_UPDATE",
     "final_action": "REVISE",
     "expected_memory_delta": {
       "superseded_claim_ids": [

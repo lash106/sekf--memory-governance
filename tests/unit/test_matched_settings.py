@@ -23,3 +23,12 @@ def test_assert_matched_settings_raises() -> None:
     right = RunConfig(model="a", temperature=0.2, seed=1)
     with pytest.raises(ValueError, match="temperature"):
         assert_matched_settings(left, right)
+
+
+def test_different_timeouts_are_a_violation_unless_waived() -> None:
+    left = RunConfig(model="a", temperature=0.0, seed=1, timeout_s=30)
+    right = RunConfig(model="a", temperature=0.0, seed=1, timeout_s=5)
+    assert [v.field for v in compare_run_configs(left, right)] == ["timeout_s"]
+    assert compare_run_configs(left, right, require_same_timeout=False) == []
+    with pytest.raises(ValueError, match="timeout_s"):
+        assert_matched_settings(left, right)

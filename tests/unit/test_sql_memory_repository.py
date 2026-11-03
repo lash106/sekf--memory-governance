@@ -1,4 +1,4 @@
-"""SqlMemoryRepository: state transitions, idempotency, staleness, rollback (ADR 0001, 0004)."""
+"""SqlMemoryRepository: state transitions, idempotency, staleness, rollback (ADR 0001, 0005)."""
 
 from __future__ import annotations
 

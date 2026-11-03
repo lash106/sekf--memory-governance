@@ -1,10 +1,9 @@
 """Sprint 1 milestone (SPEC.md section 18): five governed decisions end to end.
 
-Real: the HTTP layer, orchestration, the deterministic Historian, the LLMJudge's parsing and
-validation, the deterministic policy, and the SQLite memory store. Scripted: the language
-model's output (a FakeProvider) and the Synthesizer (the fake one, until its real
-implementation lands). Source conflicts (cases 6 and 7) additionally use a scripted Historian,
-because the rule-based Historian cannot detect them yet (it is a documented v1 limitation).
+Real: the HTTP layer, orchestration, the rule-based Historian and Synthesizer, the LLMJudge's
+parsing and validation, the deterministic policy, and the SQLite memory store. Scripted: only
+the language model's output (a FakeProvider). Source conflicts (cases 6 and 7) go through the
+LLMHistorian layer, because the rules alone cannot see that two sources disagree.
 Every case commits, then checks the resulting memory state, the audit trail, and the cost.
 """
 
@@ -26,20 +25,18 @@ from sekf.contracts import (
     DecideResponse,
     ExistingClaim,
     FinalAction,
-    HistorianAssessment,
-    HistorianRequest,
     JudgeAssessment,
     JudgeRequest,
-    TemporalRelation,
 )
-from sekf.historian import DeterministicHistorian
+from sekf.historian import DeterministicHistorian, LLMHistorian
 from sekf.judge import FakeJudge, LLMJudge
 from sekf.memory import SqlMemoryRepository
 from sekf.policy import PolicyEngine
 from sekf.providers import FakeProvider
-from sekf.synthesizer import FakeSynthesizer
+from sekf.synthesizer import DeterministicSynthesizer
 
 EVIDENCE_ID = "33333333-3333-4333-8333-333333333333"
+EVIDENCE_ID_B = "55555555-5555-4555-8555-555555555555"
 NEW_CLAIM_ID = "44444444-4444-4444-8444-444444444444"
 OLD_CLAIM_ID = UUID("11111111-1111-4111-8111-111111111111")
 
@@ -74,7 +71,7 @@ class Stack:
             memory=self.repo,
             historian=historian or DeterministicHistorian(),
             judge=judge,
-            synthesizer=FakeSynthesizer(),
+            synthesizer=DeterministicSynthesizer(),
             policy=PolicyEngine(),
             clock=lambda: NOW,
         )
@@ -125,21 +122,21 @@ def request_for(
     }
 
 
-class SourceConflictHistorian(DeterministicHistorian):
-    """Stands in for the LLM Historian layer that will detect SOURCE_CONFLICT."""
+def historian_finding_source_conflict(evidence_ids: list[str]) -> LLMHistorian:
+    """The rule-based Historian plus a (scripted) model that notices the sources disagree."""
 
-    async def analyze(self, request: HistorianRequest) -> HistorianAssessment:
-        out = await super().analyze(request)
-        return out.model_copy(
-            update={
-                "temporal_relation": TemporalRelation.OVERLAPPING_VALIDITY,
-                "conflict_type": ConflictType.SOURCE_CONFLICT,
-                "supersedes_claim_id": None,
-                "confidence": 0.85,
-                "provider": "scripted",
-                "rationale": "Two sources of similar standing give different values.",
-            }
-        )
+    def respond(_messages: Any, _model: Any) -> dict[str, Any]:
+        return {
+            "temporal_relation": "OVERLAPPING_VALIDITY",
+            "conflict_type": "SOURCE_CONFLICT",
+            "supersedes_claim_id": None,
+            "related_claim_ids": [],
+            "conflicting_evidence_ids": evidence_ids,
+            "confidence": 0.85,
+            "rationale": "scripted: two sources of similar standing give different values",
+        }
+
+    return LLMHistorian(FakeProvider(respond))
 
 
 def assert_audit_complete(stack: Stack, resp: DecideResponse, *, applied: bool) -> None:
@@ -148,7 +145,7 @@ def assert_audit_complete(stack: Stack, resp: DecideResponse, *, applied: bool) 
     assert entry.bundle.decision == resp.decision
     assert entry.bundle.historian is not None and entry.bundle.judge is not None
     assert entry.bundle.synthesizer is not None
-    assert entry.bundle.historian.provider in {"deterministic", "scripted"}
+    assert entry.bundle.historian.provider in {"deterministic", "fake"}  # rules, or rules + model
     assert entry.memory_delta is not None and entry.memory_delta.applied is applied
     assert resp.decision.cost.llm_calls == 0  # nothing here touched a real model
 
@@ -245,7 +242,7 @@ def test_historian_and_judge_run_concurrently() -> None:
         memory=SqlMemoryRepository.from_url("sqlite://", clock=lambda: NOW),
         historian=SlowHistorian(),
         judge=SlowJudge(),
-        synthesizer=FakeSynthesizer(),
+        synthesizer=DeterministicSynthesizer(),
         policy=PolicyEngine(),
         clock=lambda: NOW,
     )
@@ -290,7 +287,7 @@ def costed_governance() -> Callable[[], Governance]:
             memory=SqlMemoryRepository.from_url("sqlite://", clock=lambda: NOW),
             historian=Costly(DeterministicHistorian(), "analyze", 1, 100, 0.01),
             judge=Costly(FakeJudge(), "evaluate", 2, 200, 0.02),  # e.g. one repair attempt
-            synthesizer=Costly(FakeSynthesizer(), "synthesize", 1, 50, 0.005),
+            synthesizer=Costly(DeterministicSynthesizer(), "synthesize", 1, 50, 0.005),
             policy=PolicyEngine(),
             clock=lambda: NOW,
         )
@@ -319,18 +316,42 @@ def test_case_6_source_conflict_is_quarantined_by_the_historians_conflict_type()
     stack = Stack(
         judge_saying("SUPPORTED", supporting=True),
         seed_old_claim=True,
-        historian=SourceConflictHistorian(),
+        historian=historian_finding_source_conflict([EVIDENCE_ID, EVIDENCE_ID_B]),
     )
-    resp = stack.commit(request_for(evidence_text="Beginning October 1, closing time is 18:00."))
+    request = request_for(reliability=0.8, evidence_text="Schedule A: closing time is 18:00.")
+    request["evidence"].append(
+        {
+            **request["evidence"][0],
+            "evidence_id": EVIDENCE_ID_B,
+            "content": "Schedule B: closing time is 17:00.",
+            "source_id": "schedule-b",
+        }
+    )
+    resp = stack.commit(request)
     assert resp.historian is not None
     assert resp.historian.conflict_type is ConflictType.SOURCE_CONFLICT
+    assert resp.historian.prompt_version == "historian/v1"  # found by the model layer
     assert resp.decision.final_action is FinalAction.QUARANTINE
-    assert resp.decision.rule_ids_fired == ["R9"]
+    assert resp.decision.rule_ids_fired == ["R9"]  # driven by the Historian, not the Judge
     old = stack.repo.get_claim(OLD_CLAIM_ID)
     assert old is not None and old.status is ClaimStatus.ACTIVE  # not replaced
     claim = stack.repo.get_claim(UUID(NEW_CLAIM_ID))
     assert claim is not None and claim.status is ClaimStatus.QUARANTINED
     assert_audit_complete(stack, resp, applied=True)
+
+
+def test_case_6b_an_invented_source_conflict_cannot_force_a_quarantine() -> None:
+    """The same model claim with only ONE evidence record is not believed: it escalates."""
+    stack = Stack(
+        judge_saying("SUPPORTED", supporting=True),
+        seed_old_claim=True,
+        historian=historian_finding_source_conflict([EVIDENCE_ID, EVIDENCE_ID_B]),
+    )
+    resp = stack.commit(request_for(evidence_text="Beginning October 1, closing time is 18:00."))
+    assert resp.historian is not None
+    assert resp.historian.conflict_type is not ConflictType.SOURCE_CONFLICT
+    assert resp.decision.final_action is FinalAction.ESCALATE_FOR_REVIEW
+    assert resp.decision.rule_ids_fired == ["R6"]
 
 
 def test_case_7_dataset_source_conflict_case_runs_end_to_end() -> None:
@@ -354,12 +375,17 @@ def test_case_7_dataset_source_conflict_case_runs_end_to_end() -> None:
             "rationale": "scripted: one office says $150, the other $120",
         }
 
-    stack = Stack(LLMJudge(FakeProvider(mixed)), historian=SourceConflictHistorian())
+    stack = Stack(
+        LLMJudge(FakeProvider(mixed)),
+        historian=historian_finding_source_conflict(evidence_ids),
+    )
     stack.repo.seed_claims([ExistingClaim.model_validate(c) for c in case["initial_memory"]])
     candidate_id = UUID(case["candidate"]["claim_id"])
     resp = stack.commit({"candidate": case["candidate"], "evidence": case["evidence"]})
 
     gold = case["gold"]
+    assert resp.historian is not None  # the Historian found it, not only the Judge's MIXED label
+    assert resp.historian.conflict_type.value == gold["conflict_type"]  # SOURCE_CONFLICT
     assert resp.judge is not None and resp.judge.label.value == gold["judge_label"]
     assert resp.decision.final_action.value == gold["final_action"]  # QUARANTINE
     claim = stack.repo.get_claim(candidate_id)

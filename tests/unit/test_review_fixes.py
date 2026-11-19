@@ -146,6 +146,7 @@ def test_leave_one_author_out_refuses_one_group_and_scores_two() -> None:
         leave_one_author_out([_cached("krishna")], default_grid())
     report = leave_one_author_out([_cached("krishna"), _cached("shailen")], default_grid())
     assert report["method"] == "leave_one_author_out"
+    assert report["metric_label"] == "leave-one-author-out dev CV"
     assert "best" not in report
     assert {fold["held_out_author"] for fold in report["folds"]} == {"krishna", "shailen"}
 

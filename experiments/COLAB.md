@@ -2,6 +2,8 @@
 
 The runnable notebook is `experiments/sekf_colab.ipynb`. It checks the frozen prompt hashes, captures predictions, sweeps thresholds with leave-one-author-out, and writes the paired-bootstrap table plus the markdown vault.
 
+The sweep's headline number is leave-one-author-out dev CV. `datasets/test/` is not frozen, so that number is not a test score. The full-split block in the same file is descriptive only.
+
 The provider is already OpenAI-compatible (`SEKF_PROVIDER=openai`, `SEKF_LLM_BASE_URL`, `SEKF_LLM_MODEL`, `SEKF_LLM_API_KEY`). Point the base URL at Gemini, Groq, or OpenRouter. Do not commit the key.
 
 | Backend | `SEKF_LLM_BASE_URL` |

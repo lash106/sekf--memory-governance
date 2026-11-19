@@ -258,6 +258,9 @@ async def run_dev_cases(cases: list[dict[str, Any]]) -> dict[str, Any]:
     )
     return {
         "n_cases": len(cases),
+        "metric_label": (
+            "descriptive full dev split; not leave-one-author-out dev CV and not a test score"
+        ),
         "episodic_ttl_days": EPISODIC_TTL_DAYS,
         "systems": summaries,
         "policy_v2_per_case": per_case,

@@ -345,11 +345,24 @@ All fired rule IDs, the pre-veto `rule_action`, and the thresholds are stored in
 
 ### 9.5 Optional policy v2
 
-`policy-v1` above stays the default. `SEKF_POLICY=v2` selects `PolicyEngineV2` (`policy-v2`). It runs the same R1–R11 rules with three additions, recorded in the decision explanation rather than in new contract fields:
+`policy-v1` above stays the default. `SEKF_POLICY=v2` selects `PolicyEngineV2` (`policy-v2`). It runs the same R1–R11 rules. `SEKF_POLICY=v1` does not fill the fields below; they stay at their defaults.
 
-- Risk tiers `LOW_RISK`, `MEDIUM_RISK`, and `HIGH_RISK` replace the flat support, refute, and source-reliability thresholds. `HIGH_RISK` also raises the Historian confidence bar. An explicit `candidate.metadata.risk_tier` wins; otherwise the tier is read from the predicate and claim text.
+`DecisionRecord` has four optional fields. They are in `contracts/v1/DecisionRecord.json` and, because that record is nested, in `AuditEntry.json`, `AuditTrace.json`, `CommitBundle.json`, and `DecideResponse.json`. Unknown fields are still rejected. Defaults keep an older payload valid:
+
+- `risk_tier`: `LOW_RISK`, `MEDIUM_RISK`, or `HIGH_RISK` on a policy-v2 decision; null on policy-v1.
+- `needs_verification`: true for `R_SYN_SOFT`; otherwise false.
+- `compliance_outcome`: the `R_COMPLIANCE` clause, or null when the candidate has no compliance metadata. This field does not change `final_action`.
+- `next_evidence_required`: set for `QUARANTINE` and `ESCALATE_FOR_REVIEW`; otherwise null. The markdown projection copies it into `L2_QUARANTINE.md`.
+
+The same facts are also written into `explanation` and `rule_ids_fired`.
+
+- Risk tiers `LOW_RISK`, `MEDIUM_RISK`, and `HIGH_RISK` replace the flat support, refute, and source-reliability thresholds. `HIGH_RISK` also raises the Historian confidence bar. An explicit `candidate.metadata.risk_tier` wins; otherwise the tier is read from the predicate and claim text. The chosen tier is stored on `DecisionRecord.risk_tier`.
 - Source reliability for R8/R9 comes from a fixed channel table (`billing_ledger` 0.98, `order_ledger` 0.98, `verified_portal` 0.92, `official_document` 0.95, `authenticated_email` 0.80, `live_chat` 0.65, `verbal` 0.50). An unmapped `source_type` does not borrow another channel; the decision says the Historian score was used.
-- A Synthesizer disagreement between two mutating actions is `R_SYN_SOFT` (`needs_verification=true`, and `ATTACH_EVIDENCE` when an ACTIVE related claim exists). A disagreement that recommends a non-mutating action stays `R_SYN_VETO` → `QUARANTINE`, and the explanation names the evidence that would clear it. `R_COMPLIANCE` records return-window, damage-exclusion, and payout-cap checks and does not change `final_action`.
+- A Synthesizer disagreement between two mutating actions is `R_SYN_SOFT` (`needs_verification=true`, and `ATTACH_EVIDENCE` when an ACTIVE related claim exists). A disagreement that recommends a non-mutating action stays `R_SYN_VETO` → `QUARANTINE`, and `next_evidence_required` names the evidence that would clear it. `R_COMPLIANCE` records return-window, damage-exclusion, and payout-cap checks in `compliance_outcome` and does not change `final_action`.
+
+A Judge temperature fitted on cached confidences is applied before R2 and R5. Temperature 1.0 leaves the raw confidence and the version string `policy-v2` unchanged.
+
+Until `datasets/test/` exists, threshold selection is leave-one-author-out dev CV on the author folders in `datasets/dev`. `scripts/capture_live_predictions.py` writes one `predictions.jsonl`; `scripts/run_offline_experiment.py`, `scripts/sweep_policy_thresholds.py`, and `scripts/analyze_judge_evidence.py` replay that file. Quote those scores as leave-one-author-out dev CV, not as a test result.
 
 Episodic TTL is 30 days. Customer briefs omit `CANDIDATE` rows older than that. Nothing is deleted. See `docs/decisions/0006-policy-v2-and-projections.md`.
 
@@ -492,7 +505,9 @@ Supported new claim; unsupported claim; refuted claim; duplicate/paraphrase; rel
 
 **Efficiency:** median and p95 latency; LLM calls, tokens, and cost per case; storage growth per accepted claim.
 
-**Analysis rules:** raw counts alongside percentages; 95% paired-bootstrap confidence intervals; per-case outputs preserved; consistency is not a synonym for correctness; errors are categorized as extraction, retrieval, role, policy, or storage errors.
+**Analysis rules:** raw counts alongside percentages; 95% paired-bootstrap confidence intervals; per-case outputs preserved; consistency is not a synonym for correctness; errors are categorized as extraction, retrieval, role, policy, or storage errors. A retrieval miss is a retrieval error, not a role or policy error.
+
+Until `datasets/test/` is frozen, dev numbers from the cached sweep are **leave-one-author-out dev CV**. Do not report a threshold that was chosen on the same rows, and do not label that CV as a test score.
 
 ---
 

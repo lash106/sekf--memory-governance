@@ -22,6 +22,9 @@ from sekf.judge.calibration import fit_temperature
 from sekf.memory.markdown_projection import project_bundle
 from sekf.policy import PolicyEngine, PolicyEngineV2
 
+# Use this wording in slides and the paper until datasets/test/ is frozen.
+DEV_CV_LABEL = "leave-one-author-out dev CV"
+
 
 def default_grid() -> list[Thresholds]:
     """Small policy-v1 grid. policy-v2 replaces support and refute from the risk tier."""
@@ -118,9 +121,10 @@ def leave_one_author_out(cases: list[CachedCase], grid: list[Thresholds]) -> dic
     v2_scores = [float(fold["held_out_policy_v2_macro_f1"]) for fold in folds]
     return {
         "method": "leave_one_author_out",
+        "metric_label": DEV_CV_LABEL,
         "note": (
             "Thresholds and Judge temperature are fit on the other authors only. "
-            "datasets/test is not frozen here."
+            "This is leave-one-author-out dev CV. datasets/test is not frozen here."
         ),
         "folds": folds,
         "mean_held_out_policy_v1_macro_f1": sum(v1_scores) / len(v1_scores),
@@ -152,12 +156,14 @@ def summarize_cached(cases: list[CachedCase], grid: list[Thresholds]) -> dict[st
     ]
     return {
         "n_cases": len(cases),
+        "metric_label": DEV_CV_LABEL,
         "headline": "leave_one_author_out",
         "leave_one_author_out": held_out,
         "descriptive_full_split": {
+            "metric_label": "descriptive full dev split; not leave-one-author-out dev CV",
             "note": (
                 "Default thresholds on the cached file. This is not a threshold "
-                "selected on these same rows."
+                "selected on these same rows and is not a test score."
             ),
             "policy_v1_macro_f1": macro_f1(gold, v1_predicted),
             "policy_v2_macro_f1": interval.point,

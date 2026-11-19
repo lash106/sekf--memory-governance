@@ -27,6 +27,10 @@ def test_high_risk_requires_more_support_than_policy_v1() -> None:
     v2 = PolicyEngineV2().decide(context)
     assert v1.final_action is A.PROMOTE
     assert v1.policy_version == "policy-v1"
+    assert v1.risk_tier is None
+    assert v1.needs_verification is False
+    assert v1.compliance_outcome is None
+    assert v1.next_evidence_required is None
     assert v2.final_action is A.KEEP_EPISODIC
     assert v2.policy_version == "policy-v2"
     assert "HIGH_RISK" in v2.explanation

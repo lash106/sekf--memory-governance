@@ -7,6 +7,7 @@ commit contract: the bundle is validated first, then written all-or-nothing, ide
 `decision_id`.
 """
 
+from pathlib import Path
 from uuid import UUID
 
 from sekf.contracts import (
@@ -20,7 +21,8 @@ from sekf.contracts import (
     MemoryDelta,
     check_bundle_consistency,
 )
-from sekf.errors import CommitRejected
+from sekf.errors import CommitRejected, ProjectionFailed
+from sekf.memory.markdown_projection import project_bundle
 
 
 class InMemoryRepository:
@@ -33,10 +35,18 @@ class InMemoryRepository:
         self._evidence: dict[UUID, EvidenceRecord] = {}
         self._bundles: dict[UUID, CommitBundle] = {}
         self._deltas: dict[UUID, MemoryDelta] = {}
+        self.markdown_root: Path | None = None
 
     def seed_claim(self, claim: ExistingClaim) -> None:
         """Test helper: place an existing claim into memory (stored as a copy)."""
         self._claims[claim.claim_id] = claim.model_copy(deep=True)
+
+    def claims_for_subject(self, subject_key: str) -> list[ExistingClaim]:
+        return [
+            claim.model_copy(deep=True)
+            for claim in self._claims.values()
+            if claim.subject_key == subject_key
+        ]
 
     def search_related_claims(self, claim: CandidateClaim) -> list[ExistingClaim]:
         return [
@@ -116,7 +126,28 @@ class InMemoryRepository:
             self._evidence[ev.evidence_id] = ev
         self._bundles[decision.decision_id] = stored_bundle
         self._deltas[decision.decision_id] = delta.model_copy(deep=True)
+        try:
+            self._project(stored_bundle)
+        except ProjectionFailed as exc:
+            self._bundles.pop(decision.decision_id, None)
+            self._deltas.pop(decision.decision_id, None)
+            self._candidates.pop(stored_bundle.candidate.claim_id, None)
+            if stored_bundle.episode is not None:
+                self._episodes.pop(stored_bundle.episode.episode_id, None)
+            for item in stored_bundle.evidence:
+                self._evidence.pop(item.evidence_id, None)
+            raise CommitRejected(
+                "markdown projection failed; the in-memory bundle was not kept"
+            ) from exc
         return delta
+
+    def _project(self, bundle: CommitBundle) -> None:
+        if self.markdown_root is None:
+            return
+        try:
+            project_bundle(self.markdown_root, bundle)
+        except OSError as exc:
+            raise ProjectionFailed(str(exc)) from exc
 
     def get_audit_trace(self, candidate_claim_id: UUID) -> AuditTrace:
         return AuditTrace(

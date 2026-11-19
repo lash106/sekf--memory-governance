@@ -36,6 +36,13 @@ class CommitRejected(SekfError):
     """A commit bundle was inconsistent and nothing was written."""
 
 
+class ProjectionFailed(SekfError):
+    """The decision is already committed. The Markdown projection did not finish.
+
+    Retrying the same decision replays the commit and attempts the projection again.
+    """
+
+
 class RoleTimeout(SekfError):
     """A role (Historian, Judge, Synthesizer) exceeded its time limit."""
 

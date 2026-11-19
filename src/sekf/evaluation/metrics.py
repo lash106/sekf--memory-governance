@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import math
 import random
+from collections import Counter
 from collections.abc import Callable, Sequence
 from dataclasses import dataclass
 
@@ -194,3 +195,42 @@ def paired_bootstrap_interval(
     low = stats[int(0.025 * (n_resamples - 1))]
     high = stats[int(0.975 * (n_resamples - 1))]
     return Interval(point, low, high)
+
+
+@dataclass(frozen=True)
+class ScoredCase:
+    """One case, with retrieval and latency kept beside the action."""
+
+    gold_action: str
+    predicted_action: str
+    gold_judge: str | None = None
+    predicted_judge: str | None = None
+    retrieval_recall: float | None = None
+    latency_ms: float = 0.0
+
+
+def error_category(case: ScoredCase) -> str:
+    """SPEC.md section 14 bucket. A retrieval miss is not a role or policy error."""
+
+    if case.retrieval_recall is not None and case.retrieval_recall < 1.0:
+        return "retrieval"
+    if case.gold_judge and case.predicted_judge and case.gold_judge != case.predicted_judge:
+        return "role"
+    if case.gold_action != case.predicted_action:
+        return "policy"
+    return "none"
+
+
+def efficiency_report(cases: Sequence[ScoredCase]) -> dict[str, object]:
+    """Mean Retrieval Recall@K, p95 latency, and error-category counts."""
+
+    recalls = [case.retrieval_recall for case in cases if case.retrieval_recall is not None]
+    latencies = [case.latency_ms for case in cases]
+    counts = Counter(error_category(case) for case in cases)
+    return {
+        "retrieval_recall_at_k": (sum(recalls) / len(recalls)) if recalls else None,
+        "p95_latency_ms": percentile(latencies, 95) if latencies else 0.0,
+        "error_categories": {
+            name: counts.get(name, 0) for name in ("retrieval", "role", "policy", "none")
+        },
+    }

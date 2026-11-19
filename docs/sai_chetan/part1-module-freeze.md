@@ -8,8 +8,10 @@ Owner: Sai Chetan Muppalla. SPEC.md Sprints 3–5 for the modules he owns. Semes
 
 | File | Version id | sha256 |
 |---|---|---|
-| `prompts/judge/v1.txt` | `judge/v1` | `6695b6071e8c004aaeaf5cc7fa5311b55f3f2229e888cee174b1990b8e5270d1` |
-| `prompts/baselines/single_judge/v1.txt` | `baselines/single_judge/v1` | `39e28d9870a37df8b9dba4ddb2023560059336b41e2b8d227fd154c0d68495f4` |
+| `prompts/judge/v1.txt` | `judge/v1` | `da2bfe3727e347098f0c57745028995eeb2ec8eda71e5f74914df5fd24b7dac3` |
+| `prompts/baselines/single_judge/v1.txt` | `baselines/single_judge/v1` | `df160414eb3d1e3de4c08c38e07b3828c295f4a7b979abd88ed6ce400bd3e9cb` |
+
+The earlier hashes were for the prompts before commit `30fb350` added the instruction-boundary lines. This branch pins the text that is in the tree now. The prompt files themselves are unchanged by this update.
 
 `generic_ensemble` has no separate prompt. It calls the Judge it is given. A prompt edit that should become the official version needs a new file, a new hash in `src/sekf/judge/freeze.py`, and a test change in the same commit. The code does not switch files on its own.
 

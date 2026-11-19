@@ -47,19 +47,35 @@ def project_bundle(root: Path, bundle: CommitBundle) -> None:
             root / _EVIDENCE,
             f"- {item.evidence_id} ({item.source_type}): {item.content}\n",
         )
-    target = _QUARANTINE if decision.final_action is FinalAction.QUARANTINE else _CLAIMS
-    if decision.final_action in {
+    claim_line = (
+        f"- {bundle.candidate.claim_id} {decision.final_action.value}: "
+        f"{bundle.candidate.claim_text}\n"
+    )
+    held = decision.final_action in {FinalAction.QUARANTINE, FinalAction.ESCALATE_FOR_REVIEW}
+    if held:
+        clause = decision.compliance_outcome or "no R_COMPLIANCE clause fired"
+        needed = decision.next_evidence_required or (
+            "Evidence that clears the quarantine reason in this decision."
+        )
+        rules = ", ".join(decision.rule_ids_fired) or "none"
+        _append(
+            root / _QUARANTINE,
+            (
+                f"{claim_line}"
+                f"  - failing_clause: {clause} (rules: {rules})\n"
+                f"  - next_evidence_required: {needed}\n"
+            ),
+        )
+    elif decision.final_action in {
         FinalAction.PROMOTE,
         FinalAction.REVISE,
         FinalAction.ATTACH_EVIDENCE,
-        FinalAction.QUARANTINE,
         FinalAction.REJECT,
     }:
-        _append(
-            root / target,
-            f"- {bundle.candidate.claim_id} {decision.final_action.value}: "
-            f"{bundle.candidate.claim_text}\n",
-        )
+        extra = ""
+        if decision.compliance_outcome:
+            extra = f"  - compliance_clause: {decision.compliance_outcome}\n"
+        _append(root / _CLAIMS, claim_line + extra)
 
 
 def _append(path: Path, text: str) -> None:

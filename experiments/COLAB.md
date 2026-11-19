@@ -1,5 +1,7 @@
 # Real-LLM loop in Google Colab
 
+The runnable notebook is `experiments/sekf_colab.ipynb`. It checks the frozen prompt hashes, captures predictions, sweeps thresholds with leave-one-author-out, and writes the paired-bootstrap table plus the markdown vault.
+
 The provider is already OpenAI-compatible (`SEKF_PROVIDER=openai`, `SEKF_LLM_BASE_URL`, `SEKF_LLM_MODEL`, `SEKF_LLM_API_KEY`). Point the base URL at Gemini, Groq, or OpenRouter. Do not commit the key.
 
 | Backend | `SEKF_LLM_BASE_URL` |
@@ -41,13 +43,14 @@ os.environ["SEKF_POLICY"] = "v1"  # set v2 only when you mean to
 !python scripts/smoke_llm.py --max-calls 5
 ```
 
-4. Threshold sweep with no extra model calls. Export cached `PolicyContext` rows to JSONL (`context` plus `gold_action`), then:
+4. Capture once, then sweep with no extra model calls. The sweep holds out one author at a time.
 
 ```python
-!python scripts/sweep_policy_thresholds.py cached_contexts.jsonl
+!python scripts/capture_live_predictions.py --live --out experiments/runs/live/predictions.jsonl
+!python scripts/sweep_policy_thresholds.py experiments/runs/live/predictions.jsonl
 ```
 
-That sweep uses policy-v1. policy-v2 replaces support, refute, and source reliability from the risk tier, so sweeping those three on v2 would not change them.
+policy-v2 replaces support, refute, and source reliability from the risk tier. The sweep selects policy-v1 thresholds on the other authors and fits Judge temperature for policy-v2 on those same authors.
 
 5. Offline score and calibration. This does not call a model:
 

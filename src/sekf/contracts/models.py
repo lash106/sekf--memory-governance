@@ -261,6 +261,18 @@ class DecisionRecord(Contract):
     explanation: str
     created_at: AwareDatetime
     cost: CostSummary = Field(default_factory=CostSummary)
+    # Optional governance outputs. Defaults keep older payloads valid under extra=forbid.
+    risk_tier: str | None = None
+    needs_verification: bool = False
+    compliance_outcome: str | None = None
+    next_evidence_required: str | None = None
+
+    @model_validator(mode="after")
+    def _known_risk_tier(self) -> Self:
+        allowed = {"LOW_RISK", "MEDIUM_RISK", "HIGH_RISK"}
+        if self.risk_tier is not None and self.risk_tier not in allowed:
+            raise ValueError("risk_tier must be LOW_RISK, MEDIUM_RISK, or HIGH_RISK")
+        return self
 
 
 class StatusChange(Contract):

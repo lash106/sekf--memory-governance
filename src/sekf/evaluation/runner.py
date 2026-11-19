@@ -7,6 +7,7 @@ policy-v1, and policy-v2. single_judge is reported as not_run: it needs a live p
 from __future__ import annotations
 
 import json
+import time
 from pathlib import Path
 from typing import Any
 from uuid import uuid4
@@ -20,6 +21,8 @@ from sekf.contracts import (
     ExistingClaim,
 )
 from sekf.evaluation.metrics import (
+    ScoredCase,
+    efficiency_report,
     executive_accuracy,
     executive_action,
     false_promotion_rate,
@@ -75,7 +78,7 @@ def _memory(data: dict[str, Any]) -> InMemoryRepository:
 
 async def _council_action(
     data: dict[str, Any], policy: PolicyEngine
-) -> tuple[str, int, int, float]:
+) -> tuple[str, int, int, float, float, str | None]:
     request = _request(data)
     governance = Governance(
         memory=_memory(data),
@@ -84,13 +87,18 @@ async def _council_action(
         synthesizer=DeterministicSynthesizer(),
         policy=policy,
     )
+    started = time.perf_counter()
     response = await governance.decide(request)
+    latency_ms = (time.perf_counter() - started) * 1000
     cost = response.decision.cost
+    judge_label = response.judge.label.value if response.judge is not None else None
     return (
         response.decision.final_action.value,
         cost.input_tokens + cost.output_tokens,
         cost.llm_calls,
         cost.estimated_cost_usd,
+        latency_ms,
+        judge_label,
     )
 
 
@@ -149,6 +157,19 @@ def _summarize(name: str, rows: list[dict[str, Any]]) -> dict[str, Any]:
         if executives
         else None,
         "p95_latency_ms": percentile([float(row["latency_ms"]) for row in rows], 95),
+        "efficiency": efficiency_report(
+            [
+                ScoredCase(
+                    gold_action=row["gold_action"],
+                    predicted_action=row["predicted_action"],
+                    gold_judge=row.get("gold_judge"),
+                    predicted_judge=row.get("predicted_judge"),
+                    retrieval_recall=row.get("retrieval_recall"),
+                    latency_ms=float(row["latency_ms"]),
+                )
+                for row in rows
+            ]
+        ),
         "tokens": sum(row["tokens"] for row in rows),
         "llm_calls": sum(row["llm_calls"] for row in rows),
         "estimated_cost_usd": sum(row["cost"] for row in rows),
@@ -177,33 +198,37 @@ async def run_dev_cases(cases: list[dict[str, Any]]) -> dict[str, Any]:
         request = _request(data)
         memory = _memory(data)
         related = memory.search_related_claims(request.candidate)
-        actions = {
-            "direct_storage": direct_storage_action().value,
-            "latest_write_wins": latest_write_wins_action(request, related).value,
-            "static_rag": static_rag_action().value,
-            "policy-v1": (await _council_action(data, PolicyEngine()))[0],
-            "policy-v2": (await _council_action(data, PolicyEngineV2()))[0],
+        v1 = await _council_action(data, PolicyEngine())
+        v2 = await _council_action(data, PolicyEngineV2())
+        details = {
+            "direct_storage": (direct_storage_action().value, 0, 0, 0.0, 0.0, None),
+            "latest_write_wins": (
+                latest_write_wins_action(request, related).value,
+                0,
+                0,
+                0.0,
+                0.0,
+                None,
+            ),
+            "static_rag": (static_rag_action().value, 0, 0, 0.0, 0.0, None),
+            "policy-v1": v1,
+            "policy-v2": v2,
         }
-        v1_detail = await _council_action(data, PolicyEngine())
         recall = _recall(data)
         compliance = compliance_outcome(request.candidate)
-        for name, action in actions.items():
-            if name == "policy-v1":
-                action, tokens, calls, cost = v1_detail
-            elif name == "policy-v2":
-                action, tokens, calls, cost = await _council_action(data, PolicyEngineV2())
-            else:
-                tokens, calls, cost = 0, 0, 0.0
+        for name, detail in details.items():
+            action, tokens, calls, cost, latency_ms, predicted_judge = detail
             row = {
                 "case_id": data.get("case_id", data.get("_path")),
                 "gold_action": gold_action,
                 "predicted_action": action,
                 "gold_judge": gold.get("judge_label"),
+                "predicted_judge": predicted_judge,
                 "gold_conflict": gold.get("conflict_type"),
                 "gold_executive": gold.get("executive_action"),
                 "predicted_executive": executive_action(action, compliance),
                 "retrieval_recall": recall,
-                "latency_ms": 0,
+                "latency_ms": latency_ms,
                 "tokens": tokens,
                 "llm_calls": calls,
                 "cost": cost,

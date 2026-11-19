@@ -35,7 +35,7 @@ from sekf.contracts import (
     JudgeLabel,
     RunConfig,
 )
-from sekf.errors import ProviderUnavailable
+from sekf.evaluation.retry import with_retries
 from sekf.historian.deterministic import DeterministicHistorian
 from sekf.judge.fake import FakeJudge
 from sekf.judge.interface import Judge
@@ -85,9 +85,7 @@ def load_env() -> list[str]:
 
 def git_sha() -> str:
     try:
-        return subprocess.check_output(
-            ["git", "rev-parse", "HEAD"], cwd=ROOT, text=True
-        ).strip()
+        return subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=ROOT, text=True).strip()
     except (OSError, subprocess.CalledProcessError):
         return "unknown"
 
@@ -116,9 +114,7 @@ def load_cases() -> list[dict[str, Any]]:
     return cases
 
 
-def request_for(
-    case: dict[str, Any], run: RunConfig
-) -> tuple[DecideRequest, list[ExistingClaim]]:
+def request_for(case: dict[str, Any], run: RunConfig) -> tuple[DecideRequest, list[ExistingClaim]]:
     memory = [ExistingClaim.model_validate(item) for item in case["initial_memory"]]
     request = DecideRequest(
         candidate=CandidateClaim.model_validate(case["candidate"]),
@@ -223,35 +219,6 @@ async def run_ensemble(
     response = await baseline.decide(request)
     wall = int((time.perf_counter() - started) * 1000)
     return _row(response.decision.final_action.value, response, wall, response.judge)
-
-
-async def with_retries(op, *, attempts: int = 6, label: str = "") -> dict[str, Any]:
-    """Retry live calls on HTTP 429. Do not retry other failures."""
-
-    delay = 5.0
-    last_error: Exception | None = None
-    for attempt in range(1, attempts + 1):
-        try:
-            result = await op()
-        except ProviderUnavailable as exc:
-            last_error = exc
-            if "rate limited" not in str(exc).lower() or attempt == attempts:
-                raise
-            print(f"{label} 429, retry {attempt}/{attempts} in {delay:.0f}s", flush=True)
-            await asyncio.sleep(delay)
-            delay = min(delay * 2, 60.0)
-            continue
-        if result.get("error") == "ProviderUnavailable":
-            if attempt == attempts:
-                return result
-            print(f"{label} provider unavailable, retry {attempt}/{attempts} in {delay:.0f}s", flush=True)
-            await asyncio.sleep(delay)
-            delay = min(delay * 2, 60.0)
-            continue
-        return result
-    if last_error is not None:
-        raise last_error
-    raise ProviderUnavailable(f"{label} failed after retries")
 
 
 async def run_single_judge(
@@ -489,7 +456,9 @@ async def main() -> None:
         for row in per_case:
             handle.write(json.dumps(row) + "\n")
     write_readme(summary, len(cases), summary["git_sha"], notes)
-    print(json.dumps({"live": live, "env_files": env_files, "systems": summary["systems"]}, indent=2))
+    print(
+        json.dumps({"live": live, "env_files": env_files, "systems": summary["systems"]}, indent=2)
+    )
     print(f"cases {len(cases)}")
     print(f"wrote {OUT}")
 

@@ -7,6 +7,7 @@ Owner: Sai Chetan. No network and no LLM. Each line is one case:
      "supporting_evidence_ids": [], "refuting_evidence_ids": ["..."],
      "provided_evidence_ids": ["..."]}
 
+The same reader accepts `predictions.jsonl` from `scripts/capture_live_predictions.py`.
 The report is JSON on stdout. Policy, storage, retrieval, and extraction errors
 are out of scope; pass only Judge outputs.
 """
@@ -45,8 +46,34 @@ def load_observations(path: Path) -> list[JudgeObservation]:
             raise ValueError(f"line {line_no}: invalid JSON") from exc
         if not isinstance(payload, dict):
             raise ValueError(f"line {line_no}: observation must be an object")
-        observations.append(observation_from_mapping(payload, line_no=line_no))
+        observations.append(_observation(payload, line_no))
     return observations
+
+
+def _observation(payload: dict[str, Any], line_no: int) -> JudgeObservation:
+    """Accept a Judge observation or one line of predictions.jsonl."""
+
+    if "gold_label" in payload and "predicted_label" in payload:
+        return observation_from_mapping(payload, line_no=line_no)
+    context = payload.get("context")
+    judge = context.get("judge") if isinstance(context, dict) else None
+    if not isinstance(judge, dict):
+        raise ValueError(f"line {line_no}: prediction has no judge output")
+    evidence = context.get("evidence") if isinstance(context, dict) else None
+    provided = []
+    if isinstance(evidence, list):
+        provided = [str(item.get("evidence_id")) for item in evidence if isinstance(item, dict)]
+    mapped = {
+        "case_id": payload.get("case_id"),
+        "category": payload.get("category") or "uncategorized",
+        "gold_label": payload.get("gold_judge", payload.get("gold_label")),
+        "predicted_label": judge.get("label"),
+        "confidence": judge.get("confidence"),
+        "supporting_evidence_ids": judge.get("supporting_evidence_ids") or [],
+        "refuting_evidence_ids": judge.get("refuting_evidence_ids") or [],
+        "provided_evidence_ids": provided,
+    }
+    return observation_from_mapping(mapped, line_no=line_no)
 
 
 def main(argv: list[str] | None = None) -> int:

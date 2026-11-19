@@ -125,8 +125,25 @@ def build_policy_from_env() -> PolicyEngine:
 
     choice = _env_choice("SEKF_POLICY", "v1", {"v1", "policy-v1", "v2", "policy-v2"})
     if choice in {"v2", "policy-v2"}:
-        return PolicyEngineV2()
+        return PolicyEngineV2(judge_temperature=_judge_temperature())
     return PolicyEngine()
+
+
+def _judge_temperature() -> float:
+    """Fitted Judge temperature. Unset means 1.0, which leaves confidence unchanged."""
+
+    raw = os.getenv("SEKF_JUDGE_TEMPERATURE")
+    if raw is None or not raw.strip():
+        return 1.0
+    try:
+        value = float(raw)
+    except ValueError as exc:
+        raise ConfigurationError(
+            "SEKF_JUDGE_TEMPERATURE must be a number > 0; no silent fallback"
+        ) from exc
+    if value <= 0:
+        raise ConfigurationError("SEKF_JUDGE_TEMPERATURE must be > 0; no silent fallback")
+    return value
 
 
 def get_governance(request: Request) -> Governance:

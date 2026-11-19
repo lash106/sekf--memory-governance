@@ -26,6 +26,7 @@ from sekf.contracts import (
     compute_decision_id,
     compute_request_hash,
 )
+from sekf.judge.calibration import apply_temperature
 from sekf.policy.engine import _EXPLANATIONS, _MUTATING, PolicyEngine
 
 POLICY_VERSION_V2 = "policy-v2"
@@ -157,19 +158,37 @@ def _required_evidence(fired: list[str]) -> str:
 
 
 class PolicyEngineV2(PolicyEngine):
-    """policy-v1 rules with tiered thresholds, channel priors, and a compliance note."""
+    """policy-v1 rules with tiered thresholds, channel priors, and a compliance note.
+
+    `judge_temperature` rescales Judge confidence before rules R2 and R5. 1.0 leaves
+    the raw confidence unchanged. Fit it on cached dev confidences held out from the
+    cases being scored; this engine does not read gold labels.
+    """
+
+    def __init__(self, *, judge_temperature: float = 1.0) -> None:
+        if judge_temperature <= 0:
+            raise ValueError("judge_temperature must be > 0")
+        self.judge_temperature = float(judge_temperature)
+
+    def version_label(self) -> str:
+        """Identity used in the request hash. A non-default temperature is part of it."""
+
+        if self.judge_temperature == 1.0:
+            return POLICY_VERSION_V2
+        return f"{POLICY_VERSION_V2}@t{self.judge_temperature:.4f}"
 
     def identify(self, context: PolicyContext) -> tuple[UUID, str]:
         adjusted = self._adjust(context)
+        version = self.version_label()
         digest = compute_request_hash(
-            policy_version=POLICY_VERSION_V2,
+            policy_version=version,
             candidate=adjusted.candidate,
             evidence=adjusted.evidence,
             thresholds=adjusted.thresholds,
             run_config=adjusted.run_config,
             idempotency_key=adjusted.idempotency_key,
         )
-        return compute_decision_id(POLICY_VERSION_V2, digest), digest
+        return compute_decision_id(version, digest), digest
 
     def decide(self, context: PolicyContext) -> DecisionRecord:
         adjusted, tier, channel_note = self._prepare(context)
@@ -217,23 +236,27 @@ class PolicyEngineV2(PolicyEngine):
             + sum(err.estimated_cost_usd for err in failed),
         )
         decision_id, digest = self.identify(context)
+        compliance = compliance_outcome(adjusted.candidate)
         explanation = self._explanation(
             fired,
             action,
             tier=tier,
             channel_note=channel_note,
             needs_verification=needs_verification,
-            compliance=compliance_outcome(adjusted.candidate),
+            compliance=compliance,
             judge_label=j.label if j is not None else None,
         )
-        if compliance_outcome(adjusted.candidate) is not None:
+        if self.judge_temperature != 1.0:
+            explanation += f" Judge confidence temperature: {self.judge_temperature:.4f}."
+        if compliance is not None:
             fired = [*fired, "R_COMPLIANCE"]
+        held = action in {FinalAction.QUARANTINE, FinalAction.ESCALATE_FOR_REVIEW}
         return DecisionRecord(
             decision_id=decision_id,
             candidate_claim_id=adjusted.candidate.claim_id,
             final_action=action,
             rule_action=rule_action,
-            policy_version=POLICY_VERSION_V2,
+            policy_version=self.version_label(),
             request_hash=digest,
             thresholds=adjusted.thresholds,
             rule_ids_fired=fired,
@@ -245,6 +268,10 @@ class PolicyEngineV2(PolicyEngine):
             explanation=explanation,
             created_at=adjusted.now,
             cost=cost,
+            risk_tier=tier,
+            needs_verification=needs_verification,
+            compliance_outcome=compliance,
+            next_evidence_required=_required_evidence(fired) if held else None,
         )
 
     def _adjust(self, context: PolicyContext) -> PolicyContext:
@@ -265,7 +292,16 @@ class PolicyEngineV2(PolicyEngine):
             note = f"Channel reliability prior: {score:.2f} from {source_type}."
             if historian is not None:
                 historian = historian.model_copy(update={"source_reliability_score": score})
-        adjusted = context.model_copy(update={"thresholds": thresholds, "historian": historian})
+        judge = context.judge
+        if judge is not None and self.judge_temperature != 1.0:
+            judge = judge.model_copy(
+                update={
+                    "confidence": apply_temperature(judge.confidence, self.judge_temperature),
+                }
+            )
+        adjusted = context.model_copy(
+            update={"thresholds": thresholds, "historian": historian, "judge": judge}
+        )
         return adjusted, tier, note
 
     def _explanation(

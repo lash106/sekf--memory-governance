@@ -10,10 +10,11 @@ from __future__ import annotations
 from sekf.providers.prompts import load_prompt
 
 # sha256 of the UTF-8 text, matching `LoadedPrompt.prompt_hash`.
+# These pin the prompts after 30fb350 added the instruction-boundary lines.
 FROZEN_PROMPT_HASHES: dict[str, str] = {
-    "judge/v1.txt": "6695b6071e8c004aaeaf5cc7fa5311b55f3f2229e888cee174b1990b8e5270d1",
+    "judge/v1.txt": "da2bfe3727e347098f0c57745028995eeb2ec8eda71e5f74914df5fd24b7dac3",
     "baselines/single_judge/v1.txt": (
-        "39e28d9870a37df8b9dba4ddb2023560059336b41e2b8d227fd154c0d68495f4"
+        "df160414eb3d1e3de4c08c38e07b3828c295f4a7b979abd88ed6ce400bd3e9cb"
     ),
 }
 

@@ -25,3 +25,7 @@ Pydantic in this repository is already v2 (`model_validate`, `ConfigDict`). Ther
 - Section 14 numbers from this runner are an offline dev score, not a held-out test result.
 - A second annotator is still required before any `test` split is frozen.
 - LoRA fine-tuning is not part of this change. `sekf.judge.calibration.fit_temperature` only rescales cached confidences.
+
+## Amendment (2026-11-19)
+
+`DecisionRecord` now has optional `risk_tier`, `needs_verification`, `compliance_outcome`, and `next_evidence_required`. They default so an older payload still validates, and unknown fields stay rejected. policy-v2 fills them. `R_COMPLIANCE` still does not change `final_action`. A fitted Judge temperature is applied inside `PolicyEngineV2` before rules R2 and R5; temperature 1.0 leaves the raw confidence unchanged and keeps the version string `policy-v2`. Threshold selection uses leave-one-author-out on `datasets/dev` because `datasets/test` is not frozen.

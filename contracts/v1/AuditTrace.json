@@ -280,6 +280,18 @@
           "title": "Candidate Claim Id",
           "type": "string"
         },
+        "compliance_outcome": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Compliance Outcome"
+        },
         "cost": {
           "$ref": "#/$defs/CostSummary"
         },
@@ -326,6 +338,23 @@
           "default": null,
           "title": "Judge Assessment Id"
         },
+        "needs_verification": {
+          "default": false,
+          "title": "Needs Verification",
+          "type": "boolean"
+        },
+        "next_evidence_required": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Next Evidence Required"
+        },
         "policy_version": {
           "title": "Policy Version",
           "type": "string"
@@ -356,6 +385,18 @@
           ],
           "default": null,
           "title": "Resulting Claim Id"
+        },
+        "risk_tier": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Risk Tier"
         },
         "rule_action": {
           "$ref": "#/$defs/FinalAction"

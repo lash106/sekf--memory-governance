@@ -343,6 +343,16 @@ Step B, **Synthesizer veto** (rule `R_SYN_VETO`): if `rule_action` is `PROMOTE`,
 
 All fired rule IDs, the pre-veto `rule_action`, and the thresholds are stored in the DecisionRecord.
 
+### 9.5 Optional policy v2
+
+`policy-v1` above stays the default. `SEKF_POLICY=v2` selects `PolicyEngineV2` (`policy-v2`). It runs the same R1–R11 rules with three additions, recorded in the decision explanation rather than in new contract fields:
+
+- Risk tiers `LOW_RISK`, `MEDIUM_RISK`, and `HIGH_RISK` replace the flat support, refute, and source-reliability thresholds. `HIGH_RISK` also raises the Historian confidence bar. An explicit `candidate.metadata.risk_tier` wins; otherwise the tier is read from the predicate and claim text.
+- Source reliability for R8/R9 comes from a fixed channel table (`billing_ledger` 0.98, `order_ledger` 0.98, `verified_portal` 0.92, `official_document` 0.95, `authenticated_email` 0.80, `live_chat` 0.65, `verbal` 0.50). An unmapped `source_type` does not borrow another channel; the decision says the Historian score was used.
+- A Synthesizer disagreement between two mutating actions is `R_SYN_SOFT` (`needs_verification=true`, and `ATTACH_EVIDENCE` when an ACTIVE related claim exists). A disagreement that recommends a non-mutating action stays `R_SYN_VETO` → `QUARANTINE`, and the explanation names the evidence that would clear it. `R_COMPLIANCE` records return-window, damage-exclusion, and payout-cap checks and does not change `final_action`.
+
+Episodic TTL is 30 days. Customer briefs omit `CANDIDATE` rows older than that. Nothing is deleted. See `docs/decisions/0006-policy-v2-and-projections.md`.
+
 ---
 
 ## 10. Module and API Interfaces

@@ -94,9 +94,18 @@ class LLMJudge:
 
     @staticmethod
     def _validate_cited_ids(parsed: JudgeLLMOutput, request: JudgeRequest) -> None:
+        supporting = parsed.supporting_evidence_ids
+        refuting = parsed.refuting_evidence_ids
+        if len(supporting) != len(set(supporting)) or len(refuting) != len(set(refuting)):
+            raise RoleOutputInvalid("judge cited the same evidence id more than once")
+        both = set(supporting) & set(refuting)
+        if both:
+            raise RoleOutputInvalid(
+                "judge cited the same evidence id as both supporting and refuting: "
+                + ", ".join(sorted(str(item) for item in both))
+            )
         known = {item.evidence_id for item in request.evidence}
-        cited = set(parsed.supporting_evidence_ids) | set(parsed.refuting_evidence_ids)
-        unknown = cited - known
+        unknown = (set(supporting) | set(refuting)) - known
         if unknown:
             raise RoleOutputInvalid(
                 "judge cited evidence ids that are not in the request: "

@@ -25,8 +25,8 @@ from sekf.contracts import CandidateClaim, EvidenceRecord, ExistingClaim, Histor
 from sekf.evaluation.historian_metrics import (
     Score,
     accuracy_by_category,
-    confusion_counts,
     conflict_type_accuracy,
+    confusion_counts,
     joint_historian_accuracy,
     temporal_relation_accuracy,
 )
@@ -110,7 +110,8 @@ async def main() -> None:
     print(f"Historian (deterministic) on {len(rows)} cases from {args.root}")
     print(f"  temporal-reasoning accuracy: {fmt(temporal_relation_accuracy(g_rel, p_rel))}")
     print(f"  conflict-type accuracy:      {fmt(conflict_type_accuracy(g_con, p_con))}")
-    print(f"  both right:                  {fmt(joint_historian_accuracy(g_rel, p_rel, g_con, p_con))}")
+    joint = joint_historian_accuracy(g_rel, p_rel, g_con, p_con)
+    print(f"  both right:                  {fmt(joint)}")
     print(f"  Historian errors raised:     {sum(1 for row in rows if row['error'])}")
 
     categories = [row["category"] for row in rows]

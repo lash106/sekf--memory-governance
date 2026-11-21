@@ -1,12 +1,14 @@
 """Unit tests for the Historian metrics (no LLM, no contracts)."""
 
+from typing import Any
+
 import pytest
 
 from sekf.evaluation.historian_metrics import (
     Score,
     accuracy_by_category,
-    confusion_counts,
     conflict_type_accuracy,
+    confusion_counts,
     joint_historian_accuracy,
     label_accuracy,
     provenance_checks,
@@ -36,7 +38,7 @@ def response(action: str, **overrides: object) -> dict:
         "supersedes_claim_id": OLD_CLAIM if action == "REVISE" else None,
     }
     judge = {"supporting_evidence_ids": [EVIDENCE]}
-    data = {"decision": decision, "historian": historian, "judge": judge}
+    data: dict[str, Any] = {"decision": decision, "historian": historian, "judge": judge}
     for key, value in overrides.items():
         part, _, name = key.partition("__")
         if name:
@@ -141,9 +143,7 @@ def test_history_link_does_not_apply_to_new_claims() -> None:
         ({"decision__rule_ids_fired": []}, CANDIDATE, "rules_recorded"),
     ],
 )
-def test_provenance_checks_catch_each_gap(
-    overrides: dict, candidate: dict, failed: str
-) -> None:
+def test_provenance_checks_catch_each_gap(overrides: dict, candidate: dict, failed: str) -> None:
     checks = provenance_checks(response("REVISE", **overrides), candidate)
     assert checks[failed] is False
     assert all(value for name, value in checks.items() if name != failed)

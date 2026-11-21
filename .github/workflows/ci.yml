@@ -18,3 +18,25 @@ jobs:
       - run: make lint
       - run: make typecheck
       - run: make test
+
+  docker:
+    # The image must build and serve, since the reproducibility guide tells people to use it.
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: docker build -t sekf:ci .
+      - name: Start the container and wait until it is healthy
+        run: |
+          docker run -d --name sekf-ci -p 8000:8000 sekf:ci
+          for i in $(seq 1 30); do
+            curl -fs http://localhost:8000/health && break
+            sleep 1
+          done
+          curl -fs http://localhost:8000/health
+      - name: One governed decision through the container
+        run: |
+          python3 -c "import json;r=json.load(open('tests/fixtures/lab_closing_revise.json'))['request'];r['mode']='commit';print(json.dumps(r))" > /tmp/req.json
+          curl -fs http://localhost:8000/v1/decide -H 'content-type: application/json' -d @/tmp/req.json | tee /tmp/resp.json
+          python3 -c "import json;r=json.load(open('/tmp/resp.json'));assert r['decision']['final_action']=='PROMOTE' and r['memory_delta']['applied'], r"
+      - if: always()
+        run: docker logs sekf-ci || true

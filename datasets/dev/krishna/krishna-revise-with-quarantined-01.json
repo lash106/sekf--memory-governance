@@ -1,0 +1,85 @@
+{
+  "case_id": "krishna-revise-with-quarantined-01",
+  "category": "state_transition_revise",
+  "split": "dev",
+  "annotators": [
+    "Krishna Panjiyar"
+  ],
+  "annotation_notes": "One ACTIVE and one QUARANTINED claim. The reliable newer value revises only the ACTIVE one. Storage check: the QUARANTINED claim keeps its status.",
+  "initial_memory": [
+    {
+      "claim_id": "f54ffb74-a81e-5350-b2f9-671be1b6ebfd",
+      "claim_text": "The shuttle's last departure is 21:00.",
+      "subject_key": "shuttle",
+      "predicate_key": "last_departure",
+      "object_text": "21:00",
+      "status": "ACTIVE",
+      "version": 1,
+      "valid_from": "2026-01-01T00:00:00Z",
+      "valid_to": null,
+      "confidence": 0.9,
+      "created_at": "2026-01-05T00:00:00Z",
+      "updated_at": "2026-01-05T00:00:00Z",
+      "supersedes_claim_id": null,
+      "evidence_ids": []
+    },
+    {
+      "claim_id": "6f84c1bc-6749-5531-b80f-daf3dd1ccfde",
+      "claim_text": "The shuttle's last departure is 23:30.",
+      "subject_key": "shuttle",
+      "predicate_key": "last_departure",
+      "object_text": "23:30",
+      "status": "QUARANTINED",
+      "version": 1,
+      "valid_from": null,
+      "valid_to": null,
+      "confidence": 0.9,
+      "created_at": "2026-08-02T00:00:00Z",
+      "updated_at": "2026-08-02T00:00:00Z",
+      "supersedes_claim_id": null,
+      "evidence_ids": []
+    }
+  ],
+  "candidate": {
+    "claim_id": "e6f176a7-1093-50dd-970a-4a6b12ce71c9",
+    "claim_text": "The shuttle's last departure is 22:00.",
+    "subject_key": "shuttle",
+    "predicate_key": "last_departure",
+    "object_text": "22:00",
+    "source_id": "transport-office",
+    "observed_at": "2026-10-10T09:00:00Z",
+    "valid_from": "2026-10-15T00:00:00Z",
+    "valid_to": null,
+    "extractor_confidence": 0.9,
+    "metadata": {}
+  },
+  "evidence": [
+    {
+      "evidence_id": "3948523f-61ad-5e5f-a5bf-1bbf9d6cfa7e",
+      "content": "From 15 October the last shuttle departs at 22:00.",
+      "source_id": "transport-notice",
+      "source_type": "official_document",
+      "published_at": "2026-10-09T00:00:00Z",
+      "retrieved_at": "2026-10-10T09:00:00Z",
+      "reliability": 0.92,
+      "metadata": {}
+    }
+  ],
+  "gold": {
+    "judge_label": "SUPPORTED",
+    "temporal_relation": "NEWER_UPDATE",
+    "conflict_type": "TEMPORAL_UPDATE",
+    "final_action": "REVISE",
+    "expected_memory_delta": {
+      "superseded_claim_ids": [
+        "f54ffb74-a81e-5350-b2f9-671be1b6ebfd"
+      ],
+      "new_active_claim_ids": [
+        "e6f176a7-1093-50dd-970a-4a6b12ce71c9"
+      ],
+      "quarantined_claim_ids": [],
+      "rejected_claim_ids": [],
+      "attached_evidence_ids": []
+    }
+  }
+}

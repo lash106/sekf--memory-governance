@@ -1,0 +1,101 @@
+{
+  "case_id": "krishna-revise-chain-01",
+  "category": "state_transition_revise",
+  "split": "dev",
+  "annotators": [
+    "Krishna Panjiyar"
+  ],
+  "annotation_notes": "Version chain v1 -> v2 -> v3 already in memory. A reliable newer value must supersede only the ACTIVE v3 and create v4. Storage check: older SUPERSEDED versions are not touched and the new claim's version is 4.",
+  "initial_memory": [
+    {
+      "claim_id": "70bb0837-11f2-5889-b7d9-f66227edd199",
+      "claim_text": "Room 305 holds 20 students.",
+      "subject_key": "room_305",
+      "predicate_key": "capacity",
+      "object_text": "20",
+      "status": "SUPERSEDED",
+      "version": 1,
+      "valid_from": "2025-09-01T00:00:00Z",
+      "valid_to": "2026-01-01T00:00:00Z",
+      "confidence": 0.9,
+      "created_at": "2026-01-02T00:00:00Z",
+      "updated_at": "2026-01-02T00:00:00Z",
+      "supersedes_claim_id": null,
+      "evidence_ids": []
+    },
+    {
+      "claim_id": "6f5343d7-4ab4-53f0-bab5-928e2ddb1169",
+      "claim_text": "Room 305 holds 26 students.",
+      "subject_key": "room_305",
+      "predicate_key": "capacity",
+      "object_text": "26",
+      "status": "SUPERSEDED",
+      "version": 2,
+      "valid_from": "2026-01-01T00:00:00Z",
+      "valid_to": "2026-06-01T00:00:00Z",
+      "confidence": 0.9,
+      "created_at": "2026-06-02T00:00:00Z",
+      "updated_at": "2026-06-02T00:00:00Z",
+      "supersedes_claim_id": "70bb0837-11f2-5889-b7d9-f66227edd199",
+      "evidence_ids": []
+    },
+    {
+      "claim_id": "7fecfc09-bb24-5632-8950-116246a8acdc",
+      "claim_text": "Room 305 holds 32 students.",
+      "subject_key": "room_305",
+      "predicate_key": "capacity",
+      "object_text": "32",
+      "status": "ACTIVE",
+      "version": 3,
+      "valid_from": "2026-06-01T00:00:00Z",
+      "valid_to": null,
+      "confidence": 0.9,
+      "created_at": "2026-06-02T00:00:00Z",
+      "updated_at": "2026-06-02T00:00:00Z",
+      "supersedes_claim_id": "6f5343d7-4ab4-53f0-bab5-928e2ddb1169",
+      "evidence_ids": []
+    }
+  ],
+  "candidate": {
+    "claim_id": "71cb26ea-55f7-5d23-b728-538e86dbab71",
+    "claim_text": "Room 305 holds 36 students.",
+    "subject_key": "room_305",
+    "predicate_key": "capacity",
+    "object_text": "36",
+    "source_id": "facilities-office",
+    "observed_at": "2026-10-09T10:00:00Z",
+    "valid_from": "2026-10-01T00:00:00Z",
+    "valid_to": null,
+    "extractor_confidence": 0.9,
+    "metadata": {}
+  },
+  "evidence": [
+    {
+      "evidence_id": "b9d36cc4-6e67-5a2d-9eda-1e384ba9ac69",
+      "content": "Room 305 was refitted in October; seating capacity is now 36.",
+      "source_id": "facilities-notice",
+      "source_type": "official_document",
+      "published_at": "2026-10-02T00:00:00Z",
+      "retrieved_at": "2026-10-09T10:00:00Z",
+      "reliability": 0.95,
+      "metadata": {}
+    }
+  ],
+  "gold": {
+    "judge_label": "SUPPORTED",
+    "temporal_relation": "NEWER_UPDATE",
+    "conflict_type": "TEMPORAL_UPDATE",
+    "final_action": "REVISE",
+    "expected_memory_delta": {
+      "superseded_claim_ids": [
+        "7fecfc09-bb24-5632-8950-116246a8acdc"
+      ],
+      "new_active_claim_ids": [
+        "71cb26ea-55f7-5d23-b728-538e86dbab71"
+      ],
+      "quarantined_claim_ids": [],
+      "rejected_claim_ids": [],
+      "attached_evidence_ids": []
+    }
+  }
+}

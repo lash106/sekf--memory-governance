@@ -1,0 +1,60 @@
+{
+  "case_id": "krishna-quarantine-source-conflict-01",
+  "category": "state_transition_quarantine",
+  "split": "dev",
+  "annotators": [
+    "Krishna Panjiyar"
+  ],
+  "annotation_notes": "Two sources of the same standing (0.75) give different closing times: SOURCE_CONFLICT, MIXED_EVIDENCE, QUARANTINE. Nothing is in memory, so the store creates one QUARANTINED claim and no ACTIVE claim.",
+  "initial_memory": [],
+  "candidate": {
+    "claim_id": "f6587b59-4f85-5e39-9d84-9b87f01481ba",
+    "claim_text": "The cafeteria closes at 20:00.",
+    "subject_key": "cafeteria",
+    "predicate_key": "closing_time",
+    "object_text": "20:00",
+    "source_id": "student-chat",
+    "observed_at": "2026-10-12T13:00:00Z",
+    "valid_from": null,
+    "valid_to": null,
+    "extractor_confidence": 0.9,
+    "metadata": {}
+  },
+  "evidence": [
+    {
+      "evidence_id": "b49a6603-257f-5763-ab68-13f53038561e",
+      "content": "Dining services: the cafeteria closes at 20:00.",
+      "source_id": "dining-services",
+      "source_type": "official_document",
+      "published_at": "2026-09-20T00:00:00Z",
+      "retrieved_at": "2026-10-12T13:00:00Z",
+      "reliability": 0.75,
+      "metadata": {}
+    },
+    {
+      "evidence_id": "aca2e430-2a42-5d58-a051-c8d867e2aec2",
+      "content": "Student union page: the cafeteria closes at 19:00.",
+      "source_id": "student-union",
+      "source_type": "official_document",
+      "published_at": "2026-09-22T00:00:00Z",
+      "retrieved_at": "2026-10-12T13:00:00Z",
+      "reliability": 0.75,
+      "metadata": {}
+    }
+  ],
+  "gold": {
+    "judge_label": "MIXED_EVIDENCE",
+    "temporal_relation": "NO_RELATED_CLAIM",
+    "conflict_type": "SOURCE_CONFLICT",
+    "final_action": "QUARANTINE",
+    "expected_memory_delta": {
+      "superseded_claim_ids": [],
+      "new_active_claim_ids": [],
+      "quarantined_claim_ids": [
+        "f6587b59-4f85-5e39-9d84-9b87f01481ba"
+      ],
+      "rejected_claim_ids": [],
+      "attached_evidence_ids": []
+    }
+  }
+}

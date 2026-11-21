@@ -1,0 +1,48 @@
+{
+  "case_id": "krishna-escalate-invalid-input-01",
+  "category": "state_transition_escalate",
+  "split": "dev",
+  "annotators": [
+    "Krishna Panjiyar"
+  ],
+  "annotation_notes": "The claim text is a lone full stop: malformed (B5), INVALID_INPUT, ESCALATE_FOR_REVIEW. Governed memory is unchanged; the store leaves a CANDIDATE claim and a review-queue row, which the delta comparison reports separately.",
+  "initial_memory": [],
+  "candidate": {
+    "claim_id": "83deded8-d85e-50db-9450-61a2870e55e3",
+    "claim_text": ".",
+    "subject_key": "unknown",
+    "predicate_key": "unknown",
+    "object_text": "n/a",
+    "source_id": "web-scrape",
+    "observed_at": "2026-10-14T09:00:00Z",
+    "valid_from": null,
+    "valid_to": null,
+    "extractor_confidence": 0.9,
+    "metadata": {}
+  },
+  "evidence": [
+    {
+      "evidence_id": "65eed7ab-f643-50dd-aa0e-88bc6ddb8683",
+      "content": "Page not found.",
+      "source_id": "web-scrape",
+      "source_type": "web_page",
+      "published_at": null,
+      "retrieved_at": "2026-10-14T09:00:00Z",
+      "reliability": 0.2,
+      "metadata": {}
+    }
+  ],
+  "gold": {
+    "judge_label": "INVALID_INPUT",
+    "temporal_relation": "NO_RELATED_CLAIM",
+    "conflict_type": "NONE",
+    "final_action": "ESCALATE_FOR_REVIEW",
+    "expected_memory_delta": {
+      "superseded_claim_ids": [],
+      "new_active_claim_ids": [],
+      "quarantined_claim_ids": [],
+      "rejected_claim_ids": [],
+      "attached_evidence_ids": []
+    }
+  }
+}

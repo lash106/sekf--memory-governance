@@ -1,0 +1,67 @@
+{
+  "case_id": "krishna-reject-active-intact-01",
+  "category": "state_transition_reject",
+  "split": "dev",
+  "annotators": [
+    "Krishna Panjiyar"
+  ],
+  "annotation_notes": "The official calendar contradicts the candidate: REFUTED, REJECT (A1). Storage check: a REJECTED claim row is kept for audit and the ACTIVE claim is unchanged.",
+  "initial_memory": [
+    {
+      "claim_id": "0e00fc56-f7e9-558f-b596-3730f4972678",
+      "claim_text": "The add/drop deadline is 15 September.",
+      "subject_key": "registrar",
+      "predicate_key": "add_drop_deadline",
+      "object_text": "2026-09-15",
+      "status": "ACTIVE",
+      "version": 1,
+      "valid_from": null,
+      "valid_to": null,
+      "confidence": 0.9,
+      "created_at": "2026-08-01T00:00:00Z",
+      "updated_at": "2026-08-01T00:00:00Z",
+      "supersedes_claim_id": null,
+      "evidence_ids": []
+    }
+  ],
+  "candidate": {
+    "claim_id": "5d8ce060-9101-54a3-b00f-9e9cf3aff087",
+    "claim_text": "The add/drop deadline is 15 October.",
+    "subject_key": "registrar",
+    "predicate_key": "add_drop_deadline",
+    "object_text": "2026-10-15",
+    "source_id": "student-chat",
+    "observed_at": "2026-10-05T16:00:00Z",
+    "valid_from": null,
+    "valid_to": null,
+    "extractor_confidence": 0.9,
+    "metadata": {}
+  },
+  "evidence": [
+    {
+      "evidence_id": "02196a9d-b668-5bea-ab2e-3cab8c7e52c1",
+      "content": "Registrar calendar: the add/drop deadline is 15 September; no extension has been announced.",
+      "source_id": "registrar-website",
+      "source_type": "official_document",
+      "published_at": "2026-08-01T00:00:00Z",
+      "retrieved_at": "2026-10-05T16:00:00Z",
+      "reliability": 0.97,
+      "metadata": {}
+    }
+  ],
+  "gold": {
+    "judge_label": "REFUTED",
+    "temporal_relation": "SAME_PERIOD",
+    "conflict_type": "VALUE_CONFLICT",
+    "final_action": "REJECT",
+    "expected_memory_delta": {
+      "superseded_claim_ids": [],
+      "new_active_claim_ids": [],
+      "quarantined_claim_ids": [],
+      "rejected_claim_ids": [
+        "5d8ce060-9101-54a3-b00f-9e9cf3aff087"
+      ],
+      "attached_evidence_ids": []
+    }
+  }
+}

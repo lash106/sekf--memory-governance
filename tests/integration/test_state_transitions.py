@@ -4,6 +4,10 @@ An "oracle" system commits each case's GOLD action. If the store implements the 
 machine the way the annotation guide describes it, the resulting memory delta equals the gold
 `expected_memory_delta` for every case. That checks the store against the labels, independent
 of any model. The storage baselines are then run on the same cases to show where they differ.
+
+`test_gold_action_produces_the_gold_delta` and `test_every_baseline_commits_every_case` walk
+every JSON file under `datasets/dev/`, including cases owned by other teammates. A wrong gold
+delta anywhere in that tree fails this suite.
 """
 
 from __future__ import annotations
@@ -12,12 +16,21 @@ import asyncio
 from collections.abc import Callable
 from datetime import UTC, datetime
 from pathlib import Path
+from uuid import UUID, uuid4
 
 import pytest
 
 from sekf.baselines import DirectStorageBaseline, LatestWriteWinsBaseline, StaticRagBaseline
 from sekf.baselines.storage_common import StorageBaseline, StorageChoice, active_related
-from sekf.contracts import ClaimStatus, DecideMode, DecideRequest, ExistingClaim, FinalAction
+from sekf.contracts import (
+    CandidateClaim,
+    ClaimStatus,
+    DecideMode,
+    DecideRequest,
+    ExistingClaim,
+    FinalAction,
+)
+from sekf.errors import RoleOutputInvalid
 from sekf.evaluation.memory_delta import CaseOutcome, evaluate_case
 from sekf.memory import MemoryRepository
 from sekf.memory.fixtures import MemoryCase, build_seeded_store, case_paths, load_case
@@ -25,6 +38,38 @@ from sekf.memory.fixtures import MemoryCase, build_seeded_store, case_paths, loa
 ALL = case_paths("dev")
 KRISHNA = case_paths("dev", "krishna")
 Clock = Callable[[], datetime]
+
+
+def _oracle_target(
+    action: FinalAction, case: MemoryCase, related: list[ExistingClaim]
+) -> UUID | None:
+    """Pick the claim the gold action must touch.
+
+    For REVISE, prefer the id named in `expected_memory_delta.superseded_claim_ids` so two
+    ACTIVE related claims do not silently supersede the wrong one. For ATTACH_EVIDENCE the gold
+    delta only lists evidence ids, so require exactly one ACTIVE related claim.
+    """
+
+    if action is FinalAction.REVISE:
+        superseded = case.expected_delta.get("superseded_claim_ids") or []
+        if superseded:
+            return UUID(superseded[0])
+        active = active_related(related)
+        if len(active) == 1:
+            return active[0].claim_id
+        raise RoleOutputInvalid(
+            "oracle REVISE needs superseded_claim_ids in the gold delta, or exactly one "
+            f"ACTIVE related claim (found {len(active)})"
+        )
+    if action is FinalAction.ATTACH_EVIDENCE:
+        active = active_related(related)
+        if len(active) != 1:
+            raise RoleOutputInvalid(
+                "oracle ATTACH_EVIDENCE needs exactly one ACTIVE related claim "
+                f"(found {len(active)})"
+            )
+        return active[0].claim_id
+    return None
 
 
 class OracleSystem(StorageBaseline):
@@ -39,19 +84,74 @@ class OracleSystem(StorageBaseline):
 
     def choose(self, request: DecideRequest, related: list[ExistingClaim]) -> StorageChoice:
         action = self._case.gold_action
-        active = active_related(related)
-        target = (
-            active[0].claim_id
-            if action in (FinalAction.REVISE, FinalAction.ATTACH_EVIDENCE)
-            else None
+        return StorageChoice(
+            action, "ORACLE", "gold action", _oracle_target(action, self._case, related)
         )
-        return StorageChoice(action, "ORACLE", "gold action", target)
 
 
 def _outcome(
     factory: Callable[[MemoryRepository, Clock], StorageBaseline], path: Path
 ) -> CaseOutcome:
     return asyncio.run(evaluate_case(factory, load_case(path)))
+
+
+def test_oracle_revises_the_gold_superseded_claim_when_two_are_active() -> None:
+    """Do not pick related[0]: the gold delta names which ACTIVE claim to supersede."""
+
+    now = datetime(2026, 10, 21, tzinfo=UTC)
+    wrong_first = ExistingClaim(
+        claim_id=uuid4(),
+        claim_text="Building A opens at 07:00.",
+        subject_key="building_a",
+        predicate_key="open_time",
+        object_text="07:00",
+        status=ClaimStatus.ACTIVE,
+        version=1,
+        confidence=0.9,
+        created_at=now,
+        updated_at=now,
+    )
+    gold_target = ExistingClaim(
+        claim_id=uuid4(),
+        claim_text="Building A opens at 08:00.",
+        subject_key="building_a",
+        predicate_key="open_time",
+        object_text="08:00",
+        status=ClaimStatus.ACTIVE,
+        version=1,
+        confidence=0.9,
+        created_at=now,
+        updated_at=now,
+    )
+    candidate = CandidateClaim(
+        claim_id=uuid4(),
+        claim_text="Building A opens at 09:00.",
+        subject_key="building_a",
+        predicate_key="open_time",
+        object_text="09:00",
+        source_id="facilities",
+        observed_at=now,
+    )
+    case = MemoryCase(
+        case_id="oracle-two-active-revise",
+        category="review_check",
+        candidate=candidate,
+        evidence=[],
+        initial_memory=[wrong_first, gold_target],
+        gold_action=FinalAction.REVISE,
+        expected_delta={
+            "superseded_claim_ids": [str(gold_target.claim_id)],
+            "new_active_claim_ids": [str(candidate.claim_id)],
+            "quarantined_claim_ids": [],
+            "rejected_claim_ids": [],
+            "attached_evidence_ids": [],
+        },
+    )
+    related = [wrong_first, gold_target]
+    assert _oracle_target(FinalAction.REVISE, case, related) == gold_target.claim_id
+    outcome = asyncio.run(evaluate_case(lambda repo, clock: OracleSystem(repo, clock, case), case))
+    assert outcome.comparison.exact_match
+    assert outcome.response.decision.previous_claim_ids == [gold_target.claim_id]
 
 
 @pytest.mark.parametrize("path", ALL, ids=lambda p: p.stem)

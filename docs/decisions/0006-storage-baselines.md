@@ -50,8 +50,9 @@ seeded with its `initial_memory`. Only `SqlMemoryRepository` changes claim state
 - `scripts/run_state_transition_eval.py` scores all three baselines plus an offline council
   stand-in on any split. The council row uses `FakeJudge` and is a wiring check, not a result.
 - `tests/integration/test_state_transitions.py` commits every case's gold action through the
-  store and requires the delta to equal the gold delta. This tests the store against the labels
-  without any model.
+  store and requires the delta to equal the gold delta. Those checks run on every file under
+  `datasets/dev/` (not only `datasets/dev/krishna/`), so a bad gold delta from any owner fails
+  this suite. This tests the store against the labels without any model.
 - Known limits: `latest_write_wins` compares only against the most recently updated ACTIVE
   claim and supersedes one claim; `static_rag` retrieval is lexical, not embedding-based, so it
   is a floor for retrieval baselines, not a tuned one. `direct_storage` allows several ACTIVE

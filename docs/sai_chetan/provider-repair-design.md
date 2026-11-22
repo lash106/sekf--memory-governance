@@ -30,7 +30,7 @@ Prices live in `MODEL_USD_PER_MTOK`, version `COST_RATE_VERSION` (`openai-public
 
 - Timeouts at the role/`asyncio.wait_for` layer (`RoleTimeout`).
 - Missing API key / misconfiguration (`ProviderUnavailable`).
-- Hallucinated evidence IDs (Judge post-check raises `RoleOutputInvalid` without another LLM call).
+- Hallucinated evidence IDs, duplicate citations, and an id listed as both supporting and refuting (Judge post-check raises `RoleOutputInvalid` without another LLM call). Empty citation lists are scored later by error analysis; they are not a repair.
 
 ## Offline testing
 

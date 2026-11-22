@@ -7,6 +7,8 @@
 .env
 .env.*
 !.env.example
+huggingface.env
+!huggingface.env.example
 *.pem
 *.key
 

@@ -68,6 +68,29 @@ async def test_llm_judge_rejects_hallucinated_evidence_id(
         await judge.evaluate(_judge_request(decide_request))
 
 
+def _duplicate_payload(_messages: Any, _model: Any) -> dict[str, Any]:
+    payload = _supported_payload(_messages, _model)
+    payload["supporting_evidence_ids"] = [str(EVIDENCE_ID), str(EVIDENCE_ID)]
+    return payload
+
+
+def _both_sides_payload(_messages: Any, _model: Any) -> dict[str, Any]:
+    payload = _supported_payload(_messages, _model)
+    payload["refuting_evidence_ids"] = [str(EVIDENCE_ID)]
+    return payload
+
+
+async def test_llm_judge_rejects_duplicate_and_dual_citations(
+    decide_request: DecideRequest,
+) -> None:
+    judge = LLMJudge(FakeProvider(_duplicate_payload))
+    with pytest.raises(RoleOutputInvalid, match="more than once"):
+        await judge.evaluate(_judge_request(decide_request))
+    judge = LLMJudge(FakeProvider(_both_sides_payload))
+    with pytest.raises(RoleOutputInvalid, match="both supporting and refuting"):
+        await judge.evaluate(_judge_request(decide_request))
+
+
 async def test_governance_with_llm_judge_revises_lab_fixture(
     repo: InMemoryRepository, decide_request: DecideRequest
 ) -> None:

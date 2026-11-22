@@ -164,6 +164,24 @@ def test_no_validity_dates_falls_back_to_observation_time(
     assert (a.temporal_relation, a.conflict_type) == (relation, conflict)
 
 
+def test_undated_candidate_against_dated_claim_uses_observation_time() -> None:
+    """Error analysis group A: the prior claim has a validity window, the candidate has none.
+
+    Before the fix this fell through to OVERLAPPING_VALIDITY / VALUE_CONFLICT
+    (krishna-unreliable-newer-01: "opens at 06:00" valid from Jan 1 vs "09:00" seen Oct 8).
+    """
+    old = existing("06:00", valid_from=d(1), updated=d(1, 2))
+    newer = analyze(candidate("09:00", observed=d(10)), [old])
+    assert newer.temporal_relation is TemporalRelation.NEWER_UPDATE
+    assert newer.conflict_type is ConflictType.TEMPORAL_UPDATE
+    assert newer.supersedes_claim_id == old.claim_id
+
+    older = analyze(
+        candidate("09:00", observed=d(1, 1)), [existing("06:00", valid_from=d(1), updated=d(3))]
+    )
+    assert older.temporal_relation is TemporalRelation.OLDER_INFORMATION
+
+
 def test_older_observation_without_dates() -> None:
     old = existing("17:00", updated=d(10))
     a = analyze(candidate("18:00", observed=d(2)), [old])

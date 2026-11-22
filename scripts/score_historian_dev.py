@@ -11,6 +11,8 @@ only; final actions are scored by the experiment runner.
 Usage:
     python scripts/score_historian_dev.py                 # print a summary
     python scripts/score_historian_dev.py --json out.json # also save per-case rows
+    python scripts/score_historian_dev.py --ablate temporal  # Historian without time fields
+    python scripts/score_historian_dev.py --ablate provenance  # ... without source fields
 """
 
 from __future__ import annotations
@@ -30,7 +32,7 @@ from sekf.evaluation.historian_metrics import (
     joint_historian_accuracy,
     temporal_relation_accuracy,
 )
-from sekf.historian import DeterministicHistorian
+from sekf.historian import ABLATIONS, AblatedHistorian, DeterministicHistorian, Historian
 from sekf.memory.in_memory import InMemoryRepository
 
 DEV = Path(__file__).resolve().parents[1] / "datasets" / "dev"
@@ -47,7 +49,7 @@ def load_cases(root: Path) -> list[dict[str, Any]]:
     return cases
 
 
-async def predict(case: dict[str, Any]) -> dict[str, Any]:
+async def predict(case: dict[str, Any], historian: Historian) -> dict[str, Any]:
     """Run the Historian on one case. A failure is recorded, not raised."""
 
     candidate = CandidateClaim.model_validate(case["candidate"])
@@ -60,7 +62,7 @@ async def predict(case: dict[str, Any]) -> dict[str, Any]:
         evidence=[EvidenceRecord.model_validate(item) for item in case.get("evidence", [])],
     )
     try:
-        assessment = await DeterministicHistorian().analyze(request)
+        assessment = await historian.analyze(request)
     except Exception as error:  # noqa: BLE001 - recorded per case for error analysis
         return {"temporal_relation": None, "conflict_type": None, "error": repr(error)}
     return {
@@ -81,13 +83,20 @@ async def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--root", type=Path, default=DEV, help="folder of case files")
     parser.add_argument("--json", type=Path, help="write per-case rows to this file")
+    parser.add_argument(
+        "--ablate",
+        choices=ABLATIONS,
+        default="none",
+        help="hide provenance or temporal fields from the Historian (SPEC.md 12.2)",
+    )
     args = parser.parse_args()
+    historian = AblatedHistorian.from_name(DeterministicHistorian(), args.ablate)
 
     cases = load_cases(args.root)
     rows = []
     for case in cases:
         gold = case["gold"]
-        predicted = await predict(case)
+        predicted = await predict(case, historian)
         rows.append(
             {
                 "case_id": case.get("case_id", case["_path"]),
@@ -107,7 +116,9 @@ async def main() -> None:
     g_con = [row["gold_conflict_type"] for row in rows]
     p_con = [row["predicted_conflict_type"] for row in rows]
 
-    print(f"Historian (deterministic) on {len(rows)} cases from {args.root}")
+    print(
+        f"Historian (deterministic, ablation={args.ablate}) on {len(rows)} cases from {args.root}"
+    )
     print(f"  temporal-reasoning accuracy: {fmt(temporal_relation_accuracy(g_rel, p_rel))}")
     print(f"  conflict-type accuracy:      {fmt(conflict_type_accuracy(g_con, p_con))}")
     joint = joint_historian_accuracy(g_rel, p_rel, g_con, p_con)

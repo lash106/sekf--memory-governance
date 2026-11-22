@@ -1,0 +1,67 @@
+{
+  "case_id": "temporal-unreliable-newer-ml-02",
+  "category": "unreliable_newer_contradiction",
+  "split": "dev",
+  "annotators": [
+    "Mahalakshmi Rajkumar"
+  ],
+  "annotation_notes": "Newer and assertive ('closes at 21:00 now'), but the only source is an anonymous post (0.3). The conflict label stays TEMPORAL_UPDATE; the weak source changes the action to QUARANTINE, not the label (guide step 2, A3).",
+  "initial_memory": [
+    {
+      "claim_id": "3b69c7c9-9186-5b45-86a2-18be52f9f224",
+      "claim_text": "The dining hall closes at 20:00.",
+      "subject_key": "dining_hall",
+      "predicate_key": "closing_time",
+      "object_text": "20:00",
+      "status": "ACTIVE",
+      "version": 1,
+      "valid_from": "2026-01-01T00:00:00Z",
+      "valid_to": null,
+      "confidence": 0.9,
+      "created_at": "2026-01-02T00:00:00Z",
+      "updated_at": "2026-01-02T00:00:00Z",
+      "supersedes_claim_id": null,
+      "evidence_ids": []
+    }
+  ],
+  "candidate": {
+    "claim_id": "00d435f0-3605-5168-a83e-078f80d52d75",
+    "claim_text": "The dining hall closes at 21:00.",
+    "subject_key": "dining_hall",
+    "predicate_key": "closing_time",
+    "object_text": "21:00",
+    "source_id": "reddit-post",
+    "observed_at": "2026-11-16T22:00:00Z",
+    "valid_from": "2026-11-15T00:00:00Z",
+    "valid_to": null,
+    "extractor_confidence": 0.9,
+    "metadata": {}
+  },
+  "evidence": [
+    {
+      "evidence_id": "7ab2b8c6-b239-5efd-9955-1f1808ed783a",
+      "content": "PSA: dining hall closes at 9pm now, starting this week.",
+      "source_id": "reddit-post",
+      "source_type": "social_media",
+      "published_at": "2026-11-16T21:30:00Z",
+      "retrieved_at": "2026-11-16T22:00:00Z",
+      "reliability": 0.3,
+      "metadata": {}
+    }
+  ],
+  "gold": {
+    "judge_label": "SUPPORTED",
+    "temporal_relation": "NEWER_UPDATE",
+    "conflict_type": "TEMPORAL_UPDATE",
+    "final_action": "QUARANTINE",
+    "expected_memory_delta": {
+      "superseded_claim_ids": [],
+      "new_active_claim_ids": [],
+      "quarantined_claim_ids": [
+        "00d435f0-3605-5168-a83e-078f80d52d75"
+      ],
+      "rejected_claim_ids": [],
+      "attached_evidence_ids": []
+    }
+  }
+}

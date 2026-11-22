@@ -1,0 +1,85 @@
+{
+  "case_id": "temporal-revert-ml-01",
+  "category": "reliable_newer_correction",
+  "split": "dev",
+  "annotators": [
+    "Mahalakshmi Rajkumar"
+  ],
+  "annotation_notes": "The library went from 22:00 to 23:00 in December (old claim superseded) and now returns to 22:00 from January 2027. Compare with the ACTIVE 23:00 claim, not the superseded one: a reliable newer update, revise (A6). The superseded 22:00 claim stays as history.",
+  "initial_memory": [
+    {
+      "claim_id": "ac6870a5-2a09-5cf3-9ea6-bf624c6e244d",
+      "claim_text": "The science library closes at 22:00.",
+      "subject_key": "science_library",
+      "predicate_key": "closing_time",
+      "object_text": "22:00",
+      "status": "SUPERSEDED",
+      "version": 1,
+      "valid_from": "2026-01-01T00:00:00Z",
+      "valid_to": "2026-12-01T00:00:00Z",
+      "confidence": 0.9,
+      "created_at": "2026-01-02T00:00:00Z",
+      "updated_at": "2026-11-20T00:00:00Z",
+      "supersedes_claim_id": null,
+      "evidence_ids": []
+    },
+    {
+      "claim_id": "33b4d0a5-a659-530a-b70d-c209bf1be005",
+      "claim_text": "The science library closes at 23:00.",
+      "subject_key": "science_library",
+      "predicate_key": "closing_time",
+      "object_text": "23:00",
+      "status": "ACTIVE",
+      "version": 2,
+      "valid_from": "2026-12-01T00:00:00Z",
+      "valid_to": null,
+      "confidence": 0.9,
+      "created_at": "2026-11-20T00:00:00Z",
+      "updated_at": "2026-11-20T00:00:00Z",
+      "supersedes_claim_id": "ac6870a5-2a09-5cf3-9ea6-bf624c6e244d",
+      "evidence_ids": []
+    }
+  ],
+  "candidate": {
+    "claim_id": "503e1a45-fb26-5dda-9d7e-13ee112f0d98",
+    "claim_text": "The science library closes at 22:00 from January 4, 2027.",
+    "subject_key": "science_library",
+    "predicate_key": "closing_time",
+    "object_text": "22:00",
+    "source_id": "library-website",
+    "observed_at": "2026-12-15T10:00:00Z",
+    "valid_from": "2027-01-04T00:00:00Z",
+    "valid_to": null,
+    "extractor_confidence": 0.9,
+    "metadata": {}
+  },
+  "evidence": [
+    {
+      "evidence_id": "5fb02e13-dffe-52f8-a3e9-d9696623f7eb",
+      "content": "Extended December hours end January 3. From January 4, 2027 the science library closes at 22:00 again.",
+      "source_id": "library-website",
+      "source_type": "official_document",
+      "published_at": "2026-12-14T00:00:00Z",
+      "retrieved_at": "2026-12-15T10:00:00Z",
+      "reliability": 0.95,
+      "metadata": {}
+    }
+  ],
+  "gold": {
+    "judge_label": "SUPPORTED",
+    "temporal_relation": "NEWER_UPDATE",
+    "conflict_type": "TEMPORAL_UPDATE",
+    "final_action": "REVISE",
+    "expected_memory_delta": {
+      "superseded_claim_ids": [
+        "33b4d0a5-a659-530a-b70d-c209bf1be005"
+      ],
+      "new_active_claim_ids": [
+        "503e1a45-fb26-5dda-9d7e-13ee112f0d98"
+      ],
+      "quarantined_claim_ids": [],
+      "rejected_claim_ids": [],
+      "attached_evidence_ids": []
+    }
+  }
+}

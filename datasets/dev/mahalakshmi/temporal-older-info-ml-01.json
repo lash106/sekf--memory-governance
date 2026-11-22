@@ -1,0 +1,67 @@
+{
+  "case_id": "temporal-older-info-ml-01",
+  "category": "overlapping_temporal_conflict",
+  "split": "dev",
+  "annotators": [
+    "Mahalakshmi Rajkumar"
+  ],
+  "annotation_notes": "An old 2025 flyer says the advising office is in Room 210, open-ended. The active claim (Room 305) starts later, in 2026. The flyer is older information that conflicts with what memory holds for the current period; it must not overwrite it. Quarantine for review (A3). CHECK: could also be argued as REJECT if the flyer is clearly outdated.",
+  "initial_memory": [
+    {
+      "claim_id": "b95f5cbf-68fb-5d2d-ace1-22ded9291a5a",
+      "claim_text": "The advising office is in Room 305.",
+      "subject_key": "advising_office",
+      "predicate_key": "room",
+      "object_text": "Room 305",
+      "status": "ACTIVE",
+      "version": 1,
+      "valid_from": "2026-01-01T00:00:00Z",
+      "valid_to": null,
+      "confidence": 0.9,
+      "created_at": "2026-01-02T00:00:00Z",
+      "updated_at": "2026-01-02T00:00:00Z",
+      "supersedes_claim_id": null,
+      "evidence_ids": []
+    }
+  ],
+  "candidate": {
+    "claim_id": "cbc0d77e-68d5-541a-adc3-0da3361739a7",
+    "claim_text": "The advising office is in Room 210.",
+    "subject_key": "advising_office",
+    "predicate_key": "room",
+    "object_text": "Room 210",
+    "source_id": "old-flyer",
+    "observed_at": "2026-11-12T09:00:00Z",
+    "valid_from": "2025-01-01T00:00:00Z",
+    "valid_to": null,
+    "extractor_confidence": 0.9,
+    "metadata": {}
+  },
+  "evidence": [
+    {
+      "evidence_id": "4781347e-eef2-5017-92b9-f0731b27f602",
+      "content": "Flyer (2025): Visit the advising office in Room 210.",
+      "source_id": "old-flyer",
+      "source_type": "official_document",
+      "published_at": "2025-01-05T00:00:00Z",
+      "retrieved_at": "2026-11-12T09:00:00Z",
+      "reliability": 0.7,
+      "metadata": {}
+    }
+  ],
+  "gold": {
+    "judge_label": "SUPPORTED",
+    "temporal_relation": "OLDER_INFORMATION",
+    "conflict_type": "VALUE_CONFLICT",
+    "final_action": "QUARANTINE",
+    "expected_memory_delta": {
+      "superseded_claim_ids": [],
+      "new_active_claim_ids": [],
+      "quarantined_claim_ids": [
+        "cbc0d77e-68d5-541a-adc3-0da3361739a7"
+      ],
+      "rejected_claim_ids": [],
+      "attached_evidence_ids": []
+    }
+  }
+}

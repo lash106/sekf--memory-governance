@@ -1,0 +1,69 @@
+{
+  "case_id": "temporal-revise-undated-ml-01",
+  "category": "reliable_newer_correction",
+  "split": "dev",
+  "annotators": [
+    "Mahalakshmi Rajkumar"
+  ],
+  "annotation_notes": "The candidate states no start date, only that the price changed 'now'. It was observed long after the 0.10 claim, and the source is the official print services page, so it is a newer update (guide A6). Checks the undated-candidate fix (error analysis group A).",
+  "initial_memory": [
+    {
+      "claim_id": "2b0a64d3-df55-5172-99b0-aef1871cd9e6",
+      "claim_text": "Black-and-white printing costs $0.10 per page.",
+      "subject_key": "campus_printing",
+      "predicate_key": "bw_price_per_page",
+      "object_text": "$0.10",
+      "status": "ACTIVE",
+      "version": 1,
+      "valid_from": "2026-01-01T00:00:00Z",
+      "valid_to": null,
+      "confidence": 0.9,
+      "created_at": "2026-01-02T00:00:00Z",
+      "updated_at": "2026-01-02T00:00:00Z",
+      "supersedes_claim_id": null,
+      "evidence_ids": []
+    }
+  ],
+  "candidate": {
+    "claim_id": "fb7f7203-9d95-5e61-be08-435c15e97ede",
+    "claim_text": "Black-and-white printing now costs $0.15 per page.",
+    "subject_key": "campus_printing",
+    "predicate_key": "bw_price_per_page",
+    "object_text": "$0.15",
+    "source_id": "print-services",
+    "observed_at": "2026-11-10T12:00:00Z",
+    "valid_from": null,
+    "valid_to": null,
+    "extractor_confidence": 0.9,
+    "metadata": {}
+  },
+  "evidence": [
+    {
+      "evidence_id": "c36bc2eb-4139-5762-bc45-56cc68676e71",
+      "content": "Print Services: black-and-white printing is now $0.15 per page.",
+      "source_id": "print-services",
+      "source_type": "official_document",
+      "published_at": "2026-11-09T00:00:00Z",
+      "retrieved_at": "2026-11-10T12:00:00Z",
+      "reliability": 0.9,
+      "metadata": {}
+    }
+  ],
+  "gold": {
+    "judge_label": "SUPPORTED",
+    "temporal_relation": "NEWER_UPDATE",
+    "conflict_type": "TEMPORAL_UPDATE",
+    "final_action": "REVISE",
+    "expected_memory_delta": {
+      "superseded_claim_ids": [
+        "2b0a64d3-df55-5172-99b0-aef1871cd9e6"
+      ],
+      "new_active_claim_ids": [
+        "fb7f7203-9d95-5e61-be08-435c15e97ede"
+      ],
+      "quarantined_claim_ids": [],
+      "rejected_claim_ids": [],
+      "attached_evidence_ids": []
+    }
+  }
+}

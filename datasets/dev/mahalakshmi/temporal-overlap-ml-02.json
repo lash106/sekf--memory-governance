@@ -1,0 +1,67 @@
+{
+  "case_id": "temporal-overlap-ml-02",
+  "category": "overlapping_temporal_conflict",
+  "split": "dev",
+  "annotators": [
+    "Mahalakshmi Rajkumar"
+  ],
+  "annotation_notes": "Both claims cover the same final-exam period from the same start. The TA message (medium reliability) gives a different date, with no basis to prefer either: quarantine (A3), active claim unchanged.",
+  "initial_memory": [
+    {
+      "claim_id": "84f2bb2a-1695-5638-a365-94abc833458c",
+      "claim_text": "The CMPE 280 final exam is on December 10.",
+      "subject_key": "cmpe280_final_exam",
+      "predicate_key": "date",
+      "object_text": "December 10",
+      "status": "ACTIVE",
+      "version": 1,
+      "valid_from": "2026-08-20T00:00:00Z",
+      "valid_to": "2026-12-20T00:00:00Z",
+      "confidence": 0.9,
+      "created_at": "2026-08-21T00:00:00Z",
+      "updated_at": "2026-08-21T00:00:00Z",
+      "supersedes_claim_id": null,
+      "evidence_ids": []
+    }
+  ],
+  "candidate": {
+    "claim_id": "14d69e91-0d24-5a68-beaf-5d7071b6bd91",
+    "claim_text": "The CMPE 280 final exam is on December 12.",
+    "subject_key": "cmpe280_final_exam",
+    "predicate_key": "date",
+    "object_text": "December 12",
+    "source_id": "ta-slack",
+    "observed_at": "2026-11-15T18:00:00Z",
+    "valid_from": "2026-08-20T00:00:00Z",
+    "valid_to": "2026-12-20T00:00:00Z",
+    "extractor_confidence": 0.9,
+    "metadata": {}
+  },
+  "evidence": [
+    {
+      "evidence_id": "667705e5-ffa5-5d9e-870f-ba29c7f3b814",
+      "content": "TA in Slack: Reminder, the CMPE 280 final is on December 12.",
+      "source_id": "ta-slack",
+      "source_type": "chat",
+      "published_at": "2026-11-15T17:55:00Z",
+      "retrieved_at": "2026-11-15T18:00:00Z",
+      "reliability": 0.65,
+      "metadata": {}
+    }
+  ],
+  "gold": {
+    "judge_label": "SUPPORTED",
+    "temporal_relation": "OVERLAPPING_VALIDITY",
+    "conflict_type": "VALUE_CONFLICT",
+    "final_action": "QUARANTINE",
+    "expected_memory_delta": {
+      "superseded_claim_ids": [],
+      "new_active_claim_ids": [],
+      "quarantined_claim_ids": [
+        "14d69e91-0d24-5a68-beaf-5d7071b6bd91"
+      ],
+      "rejected_claim_ids": [],
+      "attached_evidence_ids": []
+    }
+  }
+}

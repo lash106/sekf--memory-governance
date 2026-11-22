@@ -1,0 +1,67 @@
+{
+  "case_id": "temporal-nonoverlap-ml-02",
+  "category": "non_overlapping_temporal_validity",
+  "split": "dev",
+  "annotators": [
+    "Mahalakshmi Rajkumar"
+  ],
+  "annotation_notes": "Summer hours ended on August 31; the fall claim covers a later period. Both are true in their own periods: promote the fall claim, nothing is replaced (guide B1).",
+  "initial_memory": [
+    {
+      "claim_id": "15960342-fe81-517c-ae79-f6af2be56e15",
+      "claim_text": "The gym opens at 08:00 during summer 2026.",
+      "subject_key": "campus_gym",
+      "predicate_key": "opening_time",
+      "object_text": "08:00",
+      "status": "ACTIVE",
+      "version": 1,
+      "valid_from": "2026-06-01T00:00:00Z",
+      "valid_to": "2026-08-31T00:00:00Z",
+      "confidence": 0.9,
+      "created_at": "2026-05-20T00:00:00Z",
+      "updated_at": "2026-05-20T00:00:00Z",
+      "supersedes_claim_id": null,
+      "evidence_ids": []
+    }
+  ],
+  "candidate": {
+    "claim_id": "0bb68b73-2f68-54a7-959d-50f2ea2fefba",
+    "claim_text": "The gym opens at 06:00 starting fall 2026.",
+    "subject_key": "campus_gym",
+    "predicate_key": "opening_time",
+    "object_text": "06:00",
+    "source_id": "recreation-office",
+    "observed_at": "2026-08-25T15:00:00Z",
+    "valid_from": "2026-09-01T00:00:00Z",
+    "valid_to": null,
+    "extractor_confidence": 0.9,
+    "metadata": {}
+  },
+  "evidence": [
+    {
+      "evidence_id": "3a4b0cc3-9e55-53a3-aed6-5c12ad0a09a9",
+      "content": "Fall 2026 hours (from September 1): the gym opens at 6:00 AM.",
+      "source_id": "recreation-office",
+      "source_type": "official_document",
+      "published_at": "2026-08-24T00:00:00Z",
+      "retrieved_at": "2026-08-25T15:00:00Z",
+      "reliability": 0.9,
+      "metadata": {}
+    }
+  ],
+  "gold": {
+    "judge_label": "SUPPORTED",
+    "temporal_relation": "NON_OVERLAPPING_VALIDITY",
+    "conflict_type": "NONE",
+    "final_action": "PROMOTE",
+    "expected_memory_delta": {
+      "superseded_claim_ids": [],
+      "new_active_claim_ids": [
+        "0bb68b73-2f68-54a7-959d-50f2ea2fefba"
+      ],
+      "quarantined_claim_ids": [],
+      "rejected_claim_ids": [],
+      "attached_evidence_ids": []
+    }
+  }
+}

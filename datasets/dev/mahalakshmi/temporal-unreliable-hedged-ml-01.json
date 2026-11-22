@@ -1,0 +1,65 @@
+{
+  "case_id": "temporal-unreliable-hedged-ml-01",
+  "category": "unreliable_newer_contradiction",
+  "split": "dev",
+  "annotators": [
+    "Mahalakshmi Rajkumar"
+  ],
+  "annotation_notes": "Hedged hearsay ('pretty sure... not 100%') from a group chat does not assert the claim: INSUFFICIENT_EVIDENCE, keep as episodic only (guide A2). Historian labels follow time: newer, different value.",
+  "initial_memory": [
+    {
+      "claim_id": "592c86ac-3b55-565f-8623-a0f106bdfb16",
+      "claim_text": "The campus shuttle stops at Lot 2.",
+      "subject_key": "campus_shuttle",
+      "predicate_key": "stop_location",
+      "object_text": "Lot 2",
+      "status": "ACTIVE",
+      "version": 1,
+      "valid_from": "2026-01-01T00:00:00Z",
+      "valid_to": null,
+      "confidence": 0.9,
+      "created_at": "2026-01-02T00:00:00Z",
+      "updated_at": "2026-01-02T00:00:00Z",
+      "supersedes_claim_id": null,
+      "evidence_ids": []
+    }
+  ],
+  "candidate": {
+    "claim_id": "a30f37d8-f615-5f05-9572-74f2f2b88a3a",
+    "claim_text": "The campus shuttle stops at Lot 4.",
+    "subject_key": "campus_shuttle",
+    "predicate_key": "stop_location",
+    "object_text": "Lot 4",
+    "source_id": "group-chat",
+    "observed_at": "2026-11-14T20:00:00Z",
+    "valid_from": null,
+    "valid_to": null,
+    "extractor_confidence": 0.9,
+    "metadata": {}
+  },
+  "evidence": [
+    {
+      "evidence_id": "85d9f8d8-6cc3-573b-b0ab-3c154948fb94",
+      "content": "pretty sure the shuttle stops at lot 4 now? not 100% tho",
+      "source_id": "group-chat",
+      "source_type": "chat",
+      "published_at": "2026-11-14T19:58:00Z",
+      "retrieved_at": "2026-11-14T20:00:00Z",
+      "reliability": 0.2,
+      "metadata": {}
+    }
+  ],
+  "gold": {
+    "judge_label": "INSUFFICIENT_EVIDENCE",
+    "temporal_relation": "NEWER_UPDATE",
+    "conflict_type": "TEMPORAL_UPDATE",
+    "final_action": "KEEP_EPISODIC",
+    "expected_memory_delta": {
+      "superseded_claim_ids": [],
+      "new_active_claim_ids": [],
+      "quarantined_claim_ids": [],
+      "rejected_claim_ids": [],
+      "attached_evidence_ids": []
+    }
+  }
+}

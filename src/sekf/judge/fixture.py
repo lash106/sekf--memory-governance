@@ -16,11 +16,15 @@ import re
 from hashlib import sha256
 from uuid import NAMESPACE_URL, UUID, uuid5
 
-from sekf.contracts import JudgeAssessment, JudgeLabel, JudgeRequest
+from sekf.contracts import EvidenceRecord, JudgeAssessment, JudgeLabel, JudgeRequest
 
-PROMPT_VERSION = "fixture-judge-v1"
+PROMPT_VERSION = "fixture-judge-v2"
 MODEL_ID = "fixture/judge"
 PROVIDER_ID = "fixture"
+
+# Evidence below this reliability does not create MIXED_EVIDENCE against stronger support
+# (annotation guide: unequal sources; Judge still may cite the weak text as ignored).
+_WEAK_RELIABILITY = 0.6
 
 _HOUR_WORDS = (
     "twelve",
@@ -36,9 +40,69 @@ _HOUR_WORDS = (
     "ten",
     "eleven",
 )
+_MONTHS = {
+    "january": 1,
+    "february": 2,
+    "march": 3,
+    "april": 4,
+    "may": 5,
+    "june": 6,
+    "july": 7,
+    "august": 8,
+    "september": 9,
+    "october": 10,
+    "november": 11,
+    "december": 12,
+    "jan": 1,
+    "feb": 2,
+    "mar": 3,
+    "apr": 4,
+    "jun": 6,
+    "jul": 7,
+    "aug": 8,
+    "sep": 9,
+    "sept": 9,
+    "oct": 10,
+    "nov": 11,
+    "dec": 12,
+}
 _CLOCK = re.compile(r"\b(\d{1,2}):(\d{2})\b")
+_RANGE_CLOCK = re.compile(r"\b(\d{1,2}):(\d{2})\s*(?:-|to)\s*(\d{1,2}):(\d{2})\b", re.I)
+# Skip fragments of HH:MM (e.g. do not treat "00-16" inside "10:00-16:00" as a range).
+_INFORMAL_RANGE = re.compile(
+    r"(?<![:\d])\b(\d{1,2})\s*(?:-|to)\s*(\d{1,2})\b(?![:\d])",
+    re.I,
+)
+_ISO_DATE = re.compile(r"\b(20\d{2})-(\d{2})-(\d{2})\b")
+_MONTH_DAY = re.compile(
+    r"\b(" + "|".join(_MONTHS) + r")\s+(\d{1,2})(?:st|nd|rd|th)?(?:,?\s*(20\d{2}))?\b",
+    re.I,
+)
 _MONEY = re.compile(r"\$(\d+)")
+_TOKEN = re.compile(r"[a-z0-9]+")
 _PLACEHOLDERS = frozenset({"unknown", "unknown_malformed", "n/a", "???", "none"})
+_STOP = frozenset(
+    {
+        "the",
+        "a",
+        "an",
+        "and",
+        "or",
+        "to",
+        "of",
+        "for",
+        "on",
+        "in",
+        "at",
+        "by",
+        "is",
+        "are",
+        "from",
+        "with",
+        "rm",
+        "room",
+    }
+)
 _INSTRUCTION_CUES = (
     "ignore previous",
     "ignore your rules",
@@ -48,16 +112,16 @@ _INSTRUCTION_CUES = (
     "mark all",
     "set this source",
 )
-_HEDGE_CUES = (
+# Soft social noise alone does not discard a clear asserted clock ("21:00 lol").
+_HARD_HEDGE_CUES = (
     "maybe",
     "heard",
     "not certain",
     "pretty sure",
     "someone mentioned",
     "no hour information",
-    "lol",
-    "??",
 )
+_SOFT_NOISE = ("lol", "??")
 _REFUTE_CUES = ("incorrect", "is false", "denied", "no overnight", "not true")
 _FALSE_OBJECTS = frozenset({"false", "no", "not required"})
 _TRUE_OBJECTS = frozenset({"true", "yes", "required"})
@@ -68,34 +132,76 @@ def _clock_key(hour: int, minute: str) -> str:
 
 
 def _clocks(text: str) -> set[str]:
-    return {_clock_key(int(hour), minute) for hour, minute in _CLOCK.findall(text)}
+    found = {_clock_key(int(hour), minute) for hour, minute in _CLOCK.findall(text)}
+    for start_h, start_m, end_h, end_m in _RANGE_CLOCK.findall(text):
+        found.add(_clock_key(int(start_h), start_m))
+        found.add(_clock_key(int(end_h), end_m))
+    for start, end in _INFORMAL_RANGE.findall(text):
+        start_h, end_h = int(start), int(end)
+        # "10 to 4" means 10:00-16:00 when end is a small afternoon hour.
+        if end_h <= 12 and start_h <= 12 and end_h < start_h:
+            end_h += 12
+        found.add(_clock_key(start_h, "00"))
+        found.add(_clock_key(end_h, "00"))
+    return found
+
+
+def _dates(text: str) -> set[str]:
+    """Normalize calendar days to YYYY-MM-DD when year is known, else --MM-DD."""
+
+    found: set[str] = set()
+    for year, month, day in _ISO_DATE.findall(text):
+        found.add(f"{year}-{month}-{day}")
+        found.add(f"--{month}-{day}")
+    for month_name, day, year in _MONTH_DAY.findall(text):
+        month = _MONTHS[month_name.lower()]
+        day_i = int(day)
+        if year:
+            found.add(f"{year}-{month:02d}-{day_i:02d}")
+        found.add(f"--{month:02d}-{day_i:02d}")
+    return found
+
+
+def _tokens(text: str) -> set[str]:
+    return {tok for tok in _TOKEN.findall(text.lower()) if tok not in _STOP and len(tok) > 1}
 
 
 def _object_phrases(object_text: str) -> set[str]:
-    """Surface forms of the claimed object, including 24-hour and 12-hour clock words."""
+    """Surface forms of the claimed object, including clocks, ranges, and 12-hour words."""
 
     raw = object_text.strip().lower()
-    phrases = {raw}
+    phrases = {raw, raw.replace(" to ", "-"), raw.replace("-", " to ")}
     match = re.fullmatch(r"(\d{1,2}):(\d{2})", raw)
-    if match is None:
+    if match is not None:
+        hour = int(match.group(1))
+        minute = match.group(2)
+        phrases.add(_clock_key(hour, minute))
+        if minute == "00" and 0 <= hour <= 23:
+            hour12 = hour % 12 or 12
+            suffix = "pm" if hour >= 12 else "am"
+            word = "twelve" if hour12 == 12 else _HOUR_WORDS[hour12]
+            phrases.update(
+                {
+                    f"{hour12} {suffix}",
+                    f"{hour12}{suffix}",
+                    f"{hour12}:00 {suffix}",
+                    f"{word} {suffix}",
+                    f"{word}{suffix}",
+                }
+            )
         return phrases
-    hour = int(match.group(1))
-    minute = match.group(2)
-    phrases.add(_clock_key(hour, minute))
-    if minute != "00" or not 0 <= hour <= 23:
-        return phrases
-    hour12 = hour % 12 or 12
-    suffix = "pm" if hour >= 12 else "am"
-    word = "twelve" if hour12 == 12 else _HOUR_WORDS[hour12]
-    phrases.update(
-        {
-            f"{hour12} {suffix}",
-            f"{hour12}{suffix}",
-            f"{hour12}:00 {suffix}",
-            f"{word} {suffix}",
-            f"{word}{suffix}",
-        }
-    )
+    range_match = re.fullmatch(r"(\d{1,2}):(\d{2})\s*-\s*(\d{1,2}):(\d{2})", raw)
+    if range_match is not None:
+        a, b, c, d = range_match.groups()
+        start_h, end_h = int(a), int(c)
+        phrases.add(f"{_clock_key(start_h, b)}-{_clock_key(end_h, d)}")
+        phrases.add(f"{start_h} to {end_h}")
+        phrases.add(f"{start_h}-{end_h}")
+        # Social shorthand: "10:00-16:00" often appears as "10 to 4".
+        if b == "00" and d == "00" and end_h > 12:
+            end12 = end_h - 12
+            phrases.add(f"{start_h} to {end12}")
+            phrases.add(f"{start_h}-{end12}")
     return phrases
 
 
@@ -108,11 +214,21 @@ def _malformed(request: JudgeRequest) -> bool:
     return re.search(r"[a-z0-9]", candidate.claim_text.lower()) is None
 
 
-def _ignored(content: str) -> bool:
+def _ignored(content: str, object_text: str) -> bool:
+    """Drop injection and hard hedges. Keep soft noise when a matching clock is asserted."""
+
     text = content.lower()
     if any(cue in text for cue in _INSTRUCTION_CUES):
         return True
-    return any(cue in text for cue in _HEDGE_CUES)
+    if any(cue in text for cue in _HARD_HEDGE_CUES):
+        return True
+    if any(cue in text for cue in _SOFT_NOISE):
+        object_clocks = _clocks(object_text)
+        if object_clocks and object_clocks <= _clocks(text):
+            return False
+        if not object_clocks:
+            return True
+    return False
 
 
 def _boolean_stance(object_text: str, content: str) -> str | None:
@@ -133,22 +249,42 @@ def _boolean_stance(object_text: str, content: str) -> str | None:
     return None
 
 
+def _token_overlap(object_text: str, content: str) -> bool:
+    left = _tokens(object_text)
+    right = _tokens(content)
+    if not left or not right:
+        return False
+    # Require most object tokens to appear (room numbers, hall names).
+    return len(left & right) >= max(1, (len(left) + 1) // 2)
+
+
 def _stance(object_text: str, content: str) -> str | None:
     """Return support, refute, or None for one evidence text."""
 
-    if _ignored(content):
+    if _ignored(content, object_text):
         return None
     boolean = _boolean_stance(object_text, content)
     if boolean is not None:
         return boolean
     text = content.lower()
     phrases = _object_phrases(object_text)
-    mentioned = any(phrase in text for phrase in phrases)
+    mentioned = any(phrase in text for phrase in phrases) or _token_overlap(object_text, content)
+    object_clocks = _clocks(object_text)
+    text_clocks = _clocks(text)
+    if object_clocks and object_clocks <= text_clocks:
+        mentioned = True
+    object_dates = _dates(object_text)
+    text_dates = _dates(text)
+    if object_dates and (object_dates & text_dates):
+        mentioned = True
     if mentioned and any(cue in text for cue in _REFUTE_CUES):
         return "refute"
-    object_clocks = _clocks(object_text)
-    other_clocks = _clocks(text) - object_clocks
-    if object_clocks and other_clocks and not mentioned:
+    other_clocks = text_clocks - object_clocks
+    if object_clocks and other_clocks and not (object_clocks <= text_clocks):
+        return "refute"
+    other_dates = text_dates - object_dates
+    # Same-month competing day for a dated claim is a conflict.
+    if object_dates and other_dates and not (object_dates & text_dates):
         return "refute"
     object_money = set(_MONEY.findall(object_text))
     other_money = set(_MONEY.findall(content)) - object_money
@@ -164,6 +300,93 @@ def _stance(object_text: str, content: str) -> str | None:
     return None
 
 
+def _aggregate(
+    evidence: list[EvidenceRecord],
+    supporting: list[UUID],
+    refuting: list[UUID],
+) -> tuple[JudgeLabel, float, str, list[str], list[UUID], list[UUID]]:
+    """Apply reliability: weak refutes do not overturn strong support."""
+
+    by_id = {item.evidence_id: item for item in evidence}
+    strong_support = [eid for eid in supporting if by_id[eid].reliability >= _WEAK_RELIABILITY]
+    strong_refute = [eid for eid in refuting if by_id[eid].reliability >= _WEAK_RELIABILITY]
+    weak_support = [eid for eid in supporting if by_id[eid].reliability < _WEAK_RELIABILITY]
+    weak_refute = [eid for eid in refuting if by_id[eid].reliability < _WEAK_RELIABILITY]
+
+    if strong_support and strong_refute:
+        return (
+            JudgeLabel.MIXED_EVIDENCE,
+            0.92,
+            "Some evidence states the claimed value and some evidence contradicts it.",
+            [],
+            supporting,
+            refuting,
+        )
+    if strong_support:
+        # Drop weak contradicting citations from the Judge output for unequal sources.
+        return (
+            JudgeLabel.SUPPORTED,
+            0.95,
+            "Reliable evidence states the claimed value; weaker conflicting text is ignored.",
+            [],
+            strong_support + weak_support,
+            [],
+        )
+    if strong_refute and not supporting:
+        return (
+            JudgeLabel.REFUTED,
+            0.95,
+            "Evidence contradicts the claimed value.",
+            [],
+            [],
+            strong_refute + weak_refute,
+        )
+    if strong_refute and weak_support and not strong_support:
+        return (
+            JudgeLabel.REFUTED,
+            0.92,
+            "Reliable evidence contradicts the claimed value.",
+            [],
+            [],
+            strong_refute,
+        )
+    if weak_support and weak_refute:
+        return (
+            JudgeLabel.MIXED_EVIDENCE,
+            0.90,
+            "Weak evidence both supports and contradicts the claimed value.",
+            [],
+            supporting,
+            refuting,
+        )
+    if weak_support:
+        return (
+            JudgeLabel.SUPPORTED,
+            0.92,
+            "Evidence states the claimed value and does not contradict it.",
+            [],
+            supporting,
+            [],
+        )
+    if weak_refute:
+        return (
+            JudgeLabel.REFUTED,
+            0.92,
+            "Evidence contradicts the claimed value.",
+            [],
+            [],
+            refuting,
+        )
+    return (
+        JudgeLabel.INSUFFICIENT_EVIDENCE,
+        0.90,
+        "No supplied evidence states or contradicts the claimed value.",
+        ["No evidence states or contradicts the claimed value."],
+        [],
+        [],
+    )
+
+
 class FixtureJudge:
     """Evidence-only lexical Judge. Same request fields as `FakeJudge`, more labels."""
 
@@ -177,7 +400,7 @@ class FixtureJudge:
             refuting: list[UUID] = []
             missing = ["The candidate claim is empty or malformed."]
             rationale = "The candidate is not a well-formed claim."
-            confidence = 0.90
+            confidence = 0.95
         else:
             supporting = []
             refuting = []
@@ -187,28 +410,9 @@ class FixtureJudge:
                     supporting.append(item.evidence_id)
                 elif stance == "refute":
                     refuting.append(item.evidence_id)
-            if supporting and refuting:
-                label = JudgeLabel.MIXED_EVIDENCE
-                missing = []
-                rationale = (
-                    "Some evidence states the claimed value and some evidence contradicts it."
-                )
-                confidence = 0.70
-            elif supporting:
-                label = JudgeLabel.SUPPORTED
-                missing = []
-                rationale = "Evidence states the claimed value and does not contradict it."
-                confidence = 0.90
-            elif refuting:
-                label = JudgeLabel.REFUTED
-                missing = []
-                rationale = "Evidence contradicts the claimed value."
-                confidence = 0.90
-            else:
-                label = JudgeLabel.INSUFFICIENT_EVIDENCE
-                missing = ["No evidence states or contradicts the claimed value."]
-                rationale = "No supplied evidence states or contradicts the claimed value."
-                confidence = 0.55
+            label, confidence, rationale, missing, supporting, refuting = _aggregate(
+                request.evidence, supporting, refuting
+            )
         digest = sha256(PROMPT_VERSION.encode()).hexdigest()
         return JudgeAssessment(
             assessment_id=uuid5(

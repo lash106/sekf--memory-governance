@@ -1,14 +1,14 @@
-﻿{
+{
   "n": 51,
-  "n_clean": 44,
+  "n_clean": 51,
   "finding_counts": {
     "UNKNOWN_EVIDENCE_ID": 0,
     "DUPLICATE_CITATION": 0,
     "CITED_AS_BOTH": 0,
     "MISSING_SUPPORTING_CITATION": 0,
     "MISSING_REFUTING_CITATION": 0,
-    "WRONG_LABEL": 7,
-    "OVERCONFIDENT_WRONG_LABEL": 1,
+    "WRONG_LABEL": 0,
+    "OVERCONFIDENT_WRONG_LABEL": 0,
     "UNDERCONFIDENT_DIRECTIONAL_LABEL": 0
   },
   "finding_rates": {
@@ -17,44 +17,44 @@
     "CITED_AS_BOTH": 0.0,
     "MISSING_SUPPORTING_CITATION": 0.0,
     "MISSING_REFUTING_CITATION": 0.0,
-    "WRONG_LABEL": 0.13725490196078433,
-    "OVERCONFIDENT_WRONG_LABEL": 0.0196078431372549,
+    "WRONG_LABEL": 0.0,
+    "OVERCONFIDENT_WRONG_LABEL": 0.0,
     "UNDERCONFIDENT_DIRECTIONAL_LABEL": 0.0
   },
   "by_category": {
     "conflicting_sources_similar_reliability": {
       "n": 3,
+      "n_clean": 3,
+      "UNKNOWN_EVIDENCE_ID": 0,
+      "DUPLICATE_CITATION": 0,
+      "CITED_AS_BOTH": 0,
+      "MISSING_SUPPORTING_CITATION": 0,
+      "MISSING_REFUTING_CITATION": 0,
+      "WRONG_LABEL": 0,
+      "OVERCONFIDENT_WRONG_LABEL": 0,
+      "UNDERCONFIDENT_DIRECTIONAL_LABEL": 0
+    },
+    "conflicting_sources_unequal_reliability": {
+      "n": 2,
       "n_clean": 2,
       "UNKNOWN_EVIDENCE_ID": 0,
       "DUPLICATE_CITATION": 0,
       "CITED_AS_BOTH": 0,
       "MISSING_SUPPORTING_CITATION": 0,
       "MISSING_REFUTING_CITATION": 0,
-      "WRONG_LABEL": 1,
-      "OVERCONFIDENT_WRONG_LABEL": 1,
-      "UNDERCONFIDENT_DIRECTIONAL_LABEL": 0
-    },
-    "conflicting_sources_unequal_reliability": {
-      "n": 2,
-      "n_clean": 1,
-      "UNKNOWN_EVIDENCE_ID": 0,
-      "DUPLICATE_CITATION": 0,
-      "CITED_AS_BOTH": 0,
-      "MISSING_SUPPORTING_CITATION": 0,
-      "MISSING_REFUTING_CITATION": 0,
-      "WRONG_LABEL": 1,
+      "WRONG_LABEL": 0,
       "OVERCONFIDENT_WRONG_LABEL": 0,
       "UNDERCONFIDENT_DIRECTIONAL_LABEL": 0
     },
     "duplicate_paraphrase": {
       "n": 5,
-      "n_clean": 4,
+      "n_clean": 5,
       "UNKNOWN_EVIDENCE_ID": 0,
       "DUPLICATE_CITATION": 0,
       "CITED_AS_BOTH": 0,
       "MISSING_SUPPORTING_CITATION": 0,
       "MISSING_REFUTING_CITATION": 0,
-      "WRONG_LABEL": 1,
+      "WRONG_LABEL": 0,
       "OVERCONFIDENT_WRONG_LABEL": 0,
       "UNDERCONFIDENT_DIRECTIONAL_LABEL": 0
     },
@@ -96,13 +96,13 @@
     },
     "overlapping_temporal_conflict": {
       "n": 5,
-      "n_clean": 4,
+      "n_clean": 5,
       "UNKNOWN_EVIDENCE_ID": 0,
       "DUPLICATE_CITATION": 0,
       "CITED_AS_BOTH": 0,
       "MISSING_SUPPORTING_CITATION": 0,
       "MISSING_REFUTING_CITATION": 0,
-      "WRONG_LABEL": 1,
+      "WRONG_LABEL": 0,
       "OVERCONFIDENT_WRONG_LABEL": 0,
       "UNDERCONFIDENT_DIRECTIONAL_LABEL": 0
     },
@@ -144,37 +144,37 @@
     },
     "supported_by_weak_source": {
       "n": 2,
-      "n_clean": 1,
+      "n_clean": 2,
       "UNKNOWN_EVIDENCE_ID": 0,
       "DUPLICATE_CITATION": 0,
       "CITED_AS_BOTH": 0,
       "MISSING_SUPPORTING_CITATION": 0,
       "MISSING_REFUTING_CITATION": 0,
-      "WRONG_LABEL": 1,
+      "WRONG_LABEL": 0,
       "OVERCONFIDENT_WRONG_LABEL": 0,
       "UNDERCONFIDENT_DIRECTIONAL_LABEL": 0
     },
     "supported_new_claim": {
       "n": 6,
-      "n_clean": 5,
+      "n_clean": 6,
       "UNKNOWN_EVIDENCE_ID": 0,
       "DUPLICATE_CITATION": 0,
       "CITED_AS_BOTH": 0,
       "MISSING_SUPPORTING_CITATION": 0,
       "MISSING_REFUTING_CITATION": 0,
-      "WRONG_LABEL": 1,
+      "WRONG_LABEL": 0,
       "OVERCONFIDENT_WRONG_LABEL": 0,
       "UNDERCONFIDENT_DIRECTIONAL_LABEL": 0
     },
     "unreliable_newer_contradiction": {
       "n": 6,
-      "n_clean": 5,
+      "n_clean": 6,
       "UNKNOWN_EVIDENCE_ID": 0,
       "DUPLICATE_CITATION": 0,
       "CITED_AS_BOTH": 0,
       "MISSING_SUPPORTING_CITATION": 0,
       "MISSING_REFUTING_CITATION": 0,
-      "WRONG_LABEL": 1,
+      "WRONG_LABEL": 0,
       "OVERCONFIDENT_WRONG_LABEL": 0,
       "UNDERCONFIDENT_DIRECTIONAL_LABEL": 0
     },
@@ -218,14 +218,14 @@
     },
     "MIXED_EVIDENCE": {
       "n": 6,
-      "n_clean": 4,
+      "n_clean": 6,
       "UNKNOWN_EVIDENCE_ID": 0,
       "DUPLICATE_CITATION": 0,
       "CITED_AS_BOTH": 0,
       "MISSING_SUPPORTING_CITATION": 0,
       "MISSING_REFUTING_CITATION": 0,
-      "WRONG_LABEL": 2,
-      "OVERCONFIDENT_WRONG_LABEL": 1,
+      "WRONG_LABEL": 0,
+      "OVERCONFIDENT_WRONG_LABEL": 0,
       "UNDERCONFIDENT_DIRECTIONAL_LABEL": 0
     },
     "REFUTED": {
@@ -242,20 +242,20 @@
     },
     "SUPPORTED": {
       "n": 31,
-      "n_clean": 26,
+      "n_clean": 31,
       "UNKNOWN_EVIDENCE_ID": 0,
       "DUPLICATE_CITATION": 0,
       "CITED_AS_BOTH": 0,
       "MISSING_SUPPORTING_CITATION": 0,
       "MISSING_REFUTING_CITATION": 0,
-      "WRONG_LABEL": 5,
+      "WRONG_LABEL": 0,
       "OVERCONFIDENT_WRONG_LABEL": 0,
       "UNDERCONFIDENT_DIRECTIONAL_LABEL": 0
     }
   },
   "label_metrics": {
     "n": 51,
-    "accuracy": 0.8627450980392157,
+    "accuracy": 1.0,
     "contradiction_f1": 1.0,
     "contradiction": {
       "precision": 1.0,
@@ -272,9 +272,7 @@
     },
     "confusion": {
       "SUPPORTED": {
-        "SUPPORTED": 26,
-        "INSUFFICIENT_EVIDENCE": 4,
-        "MIXED_EVIDENCE": 1
+        "SUPPORTED": 31
       },
       "REFUTED": {
         "REFUTED": 4
@@ -283,17 +281,15 @@
         "INSUFFICIENT_EVIDENCE": 9
       },
       "MIXED_EVIDENCE": {
-        "SUPPORTED": 1,
-        "INSUFFICIENT_EVIDENCE": 1,
-        "MIXED_EVIDENCE": 4
+        "MIXED_EVIDENCE": 6
       },
       "INVALID_INPUT": {
         "INVALID_INPUT": 1
       }
     }
   },
-  "brier": 0.10401960784313716,
-  "ece": 0.0784313725490196,
+  "brier": 0.0045882352941176464,
+  "ece": 0.06470588235294128,
   "cases": [
     {
       "case_id": "duplicate-01",
@@ -355,10 +351,8 @@
       "case_id": "duplicate-paraphrase-ml-01",
       "category": "duplicate_paraphrase",
       "gold_label": "SUPPORTED",
-      "predicted_label": "INSUFFICIENT_EVIDENCE",
-      "findings": [
-        "WRONG_LABEL"
-      ]
+      "predicted_label": "SUPPORTED",
+      "findings": []
     },
     {
       "case_id": "duplicate-value-format-ml-01",
@@ -371,10 +365,8 @@
       "case_id": "provenance-strong-new-ml-01",
       "category": "supported_new_claim",
       "gold_label": "SUPPORTED",
-      "predicted_label": "INSUFFICIENT_EVIDENCE",
-      "findings": [
-        "WRONG_LABEL"
-      ]
+      "predicted_label": "SUPPORTED",
+      "findings": []
     },
     {
       "case_id": "provenance-weak-source-ml-01",
@@ -387,20 +379,15 @@
       "case_id": "provenance-weak-source-ml-02",
       "category": "supported_by_weak_source",
       "gold_label": "SUPPORTED",
-      "predicted_label": "INSUFFICIENT_EVIDENCE",
-      "findings": [
-        "WRONG_LABEL"
-      ]
+      "predicted_label": "SUPPORTED",
+      "findings": []
     },
     {
       "case_id": "source-similar-ml-01",
       "category": "conflicting_sources_similar_reliability",
       "gold_label": "MIXED_EVIDENCE",
-      "predicted_label": "SUPPORTED",
-      "findings": [
-        "WRONG_LABEL",
-        "OVERCONFIDENT_WRONG_LABEL"
-      ]
+      "predicted_label": "MIXED_EVIDENCE",
+      "findings": []
     },
     {
       "case_id": "source-unequal-ml-01",
@@ -441,10 +428,8 @@
       "case_id": "temporal-overlap-ml-01",
       "category": "overlapping_temporal_conflict",
       "gold_label": "MIXED_EVIDENCE",
-      "predicted_label": "INSUFFICIENT_EVIDENCE",
-      "findings": [
-        "WRONG_LABEL"
-      ]
+      "predicted_label": "MIXED_EVIDENCE",
+      "findings": []
     },
     {
       "case_id": "temporal-overlap-ml-02",
@@ -611,10 +596,8 @@
       "case_id": "source-unequal-01",
       "category": "conflicting_sources_unequal_reliability",
       "gold_label": "SUPPORTED",
-      "predicted_label": "MIXED_EVIDENCE",
-      "findings": [
-        "WRONG_LABEL"
-      ]
+      "predicted_label": "SUPPORTED",
+      "findings": []
     },
     {
       "case_id": "supported-new-01",
@@ -655,10 +638,8 @@
       "case_id": "unreliable-newer-02",
       "category": "unreliable_newer_contradiction",
       "gold_label": "SUPPORTED",
-      "predicted_label": "INSUFFICIENT_EVIDENCE",
-      "findings": [
-        "WRONG_LABEL"
-      ]
+      "predicted_label": "SUPPORTED",
+      "findings": []
     },
     {
       "case_id": "unsupported-01",

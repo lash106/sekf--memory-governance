@@ -266,15 +266,24 @@ async def main() -> None:
     OUT.mkdir(parents=True, exist_ok=True)
     _write_jsonl(OUT / "fake_observations.jsonl", _rows(fake))
     _write_jsonl(OUT / "fixture_observations.jsonl", _rows(fixture))
+    fake_report = summary["fake_judge"]
+    fixture_report = summary["fixture_judge"]
+    assert isinstance(fake_report, dict)
+    assert isinstance(fixture_report, dict)
+    fake_labels = fake_report["label_metrics"]
+    fixture_labels = fixture_report["label_metrics"]
+    assert isinstance(fake_labels, dict)
+    assert isinstance(fixture_labels, dict)
     (OUT / "summary.json").write_text(json.dumps(summary, indent=2), encoding="utf-8")
-    print(f"cases {len(cases)}")
-    print(f"fake accuracy {summary['fake_judge']['label_metrics']['accuracy']:.4f}")
-    print(f"fake contradiction_f1 {summary['fake_judge']['label_metrics']['contradiction_f1']:.4f}")
-    print(f"fixture accuracy {summary['fixture_judge']['label_metrics']['accuracy']:.4f}")
-    print(
-        "fixture contradiction_f1 "
-        f"{summary['fixture_judge']['label_metrics']['contradiction_f1']:.4f}"
+    (OUT / "error_analysis.json").write_text(
+        json.dumps(fixture_report, indent=2),
+        encoding="utf-8",
     )
+    print(f"cases {len(cases)}")
+    print(f"fake accuracy {float(fake_labels['accuracy']):.4f}")
+    print(f"fake contradiction_f1 {float(fake_labels['contradiction_f1']):.4f}")
+    print(f"fixture accuracy {float(fixture_labels['accuracy']):.4f}")
+    print(f"fixture contradiction_f1 {float(fixture_labels['contradiction_f1']):.4f}")
     print(f"wrote {OUT}")
 
 

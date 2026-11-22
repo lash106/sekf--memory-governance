@@ -117,3 +117,81 @@ async def test_fake_judge_still_cannot_refute() -> None:
     fixture = await FixtureJudge().evaluate(request)
     assert fake.label is JudgeLabel.SUPPORTED
     assert fixture.label is JudgeLabel.REFUTED
+
+
+def _evidence_at(content: str, reliability: float, source_id: str = "src") -> EvidenceRecord:
+    return EvidenceRecord(
+        evidence_id=uuid4(),
+        content=content,
+        source_id=source_id,
+        source_type="official_document",
+        retrieved_at=NOW,
+        reliability=reliability,
+    )
+
+
+async def test_time_ranges_dates_and_room_tokens_support() -> None:
+    judge = FixtureJudge()
+    ranged = await judge.evaluate(
+        _request(
+            _candidate("12:00-17:00", claim_text="Open Sundays from 12:00 to 17:00."),
+            [_evidence("College note: maker space open Sundays, 12:00 to 17:00.")],
+        )
+    )
+    informal = await judge.evaluate(
+        _request(
+            _candidate("10:00-16:00", claim_text="Open Saturdays 10:00-16:00."),
+            [_evidence_at("Open Saturdays 10 to 4 for everyone.", 0.45, "discord")],
+        )
+    )
+    room = await judge.evaluate(
+        _request(
+            _candidate("Clark Hall 126", claim_text="Writing Center: Clark Hall, Rm 126."),
+            [_evidence("Find us in Clark Hall, Rm 126.")],
+        )
+    )
+    assert ranged.label is JudgeLabel.SUPPORTED
+    assert informal.label is JudgeLabel.SUPPORTED
+    assert room.label is JudgeLabel.SUPPORTED
+
+
+async def test_month_day_conflict_is_mixed_and_weak_blog_is_not() -> None:
+    judge = FixtureJudge()
+    mixed = await judge.evaluate(
+        _request(
+            _candidate("September 14", claim_text="Add/drop deadline is September 14."),
+            [
+                _evidence_at("Last day to add or drop is September 12.", 0.85, "registrar"),
+                _evidence_at("Students may add or drop until September 14.", 0.85, "dept"),
+            ],
+        )
+    )
+    written = await judge.evaluate(
+        _request(
+            _candidate("2026-11-07", claim_text="Registration deadline is November 7."),
+            [
+                _evidence("Register for fall courses by November 7."),
+                _evidence("Fall registration closes November 14."),
+            ],
+        )
+    )
+    unequal = await judge.evaluate(
+        _request(
+            _candidate("18:00"),
+            [
+                _evidence_at("Official registrar: Friday close 18:00.", 0.95, "official"),
+                _evidence_at("Anonymous blog: still 17:00.", 0.2, "blog"),
+            ],
+        )
+    )
+    social = await judge.evaluate(
+        _request(
+            _candidate("21:00"),
+            [_evidence_at("TikTok comment: open until 21:00 lol", 0.1, "social")],
+        )
+    )
+    assert mixed.label is JudgeLabel.MIXED_EVIDENCE
+    assert written.label is JudgeLabel.MIXED_EVIDENCE
+    assert unequal.label is JudgeLabel.SUPPORTED
+    assert social.label is JudgeLabel.SUPPORTED
+    assert set(unequal.refuting_evidence_ids) == set()

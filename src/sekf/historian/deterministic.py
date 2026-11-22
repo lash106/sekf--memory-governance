@@ -16,7 +16,8 @@ Decision outline for a candidate claim:
    - same value -> ``SAME_PERIOD`` + ``DUPLICATE`` (identical text) or ``PARAPHRASE``;
    - different value, candidate starts later and the old claim is open-ended
      -> ``NEWER_UPDATE`` / ``TEMPORAL_UPDATE`` and proposes superseding it;
-   - different value, no validity bounds on either side -> order by observation time;
+   - different value, candidate has no validity window -> order by observation time
+     (``observed_at`` vs the prior claim's ``updated_at``);
    - otherwise -> ``OVERLAPPING_VALIDITY`` or ``OLDER_INFORMATION`` / ``VALUE_CONFLICT``.
 
 Known v1 limitation: ``SOURCE_CONFLICT`` needs reading what each source says, so it is not
@@ -151,16 +152,17 @@ class DeterministicHistorian:
                 "Same value as an active claim, different wording.",
             )
 
-        bounded = any(v is not None for v in (cand.valid_from, cand.valid_to))
-        bounded = bounded or any(v is not None for v in (prior.valid_from, prior.valid_to))
-        if not bounded:
+        # A candidate with no validity window states no period of its own, so validity
+        # windows cannot order it against the prior claim. Fall back to observation time,
+        # whether or not the prior claim has a window (error analysis, group A).
+        if cand.valid_from is None and cand.valid_to is None:
             order = temporal_order(cand.observed_at, prior.updated_at, SAME_TIME_TOLERANCE)
             if order is TemporalOrder.NEWER:
                 return (
                     TemporalRelation.NEWER_UPDATE,
                     ConflictType.TEMPORAL_UPDATE,
                     prior.claim_id,
-                    "Different value observed after the active claim; no validity dates given.",
+                    "Different value seen after the active claim; candidate has no validity dates.",
                 )
             if order is TemporalOrder.OLDER:
                 return (

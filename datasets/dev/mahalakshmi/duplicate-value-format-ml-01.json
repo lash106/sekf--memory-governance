@@ -1,0 +1,67 @@
+{
+  "case_id": "duplicate-value-format-ml-01",
+  "category": "duplicate_paraphrase",
+  "split": "dev",
+  "annotators": [
+    "Mahalakshmi Rajkumar"
+  ],
+  "annotation_notes": "'6 PM' and '18:00' are the same time. Same value, different wording: attach the evidence (guide A5). The rule-based Historian compares value text, so it sees a different value (limitation H2).",
+  "initial_memory": [
+    {
+      "claim_id": "97f6f1c7-8221-5bde-b5a2-843442efe3df",
+      "claim_text": "The career center closes at 6 PM.",
+      "subject_key": "career_center",
+      "predicate_key": "closing_time",
+      "object_text": "6 PM",
+      "status": "ACTIVE",
+      "version": 1,
+      "valid_from": null,
+      "valid_to": null,
+      "confidence": 0.9,
+      "created_at": "2026-01-02T00:00:00Z",
+      "updated_at": "2026-01-02T00:00:00Z",
+      "supersedes_claim_id": null,
+      "evidence_ids": []
+    }
+  ],
+  "candidate": {
+    "claim_id": "482c0208-e38e-580c-afca-caa73acc5d38",
+    "claim_text": "The career center closes at 18:00.",
+    "subject_key": "career_center",
+    "predicate_key": "closing_time",
+    "object_text": "18:00",
+    "source_id": "career-center-site",
+    "observed_at": "2026-11-11T12:00:00Z",
+    "valid_from": null,
+    "valid_to": null,
+    "extractor_confidence": 0.9,
+    "metadata": {}
+  },
+  "evidence": [
+    {
+      "evidence_id": "94097c38-1b08-519e-b1e6-64069df4f17e",
+      "content": "Career Center hours: Monday to Friday, 09:00 to 18:00.",
+      "source_id": "career-center-site",
+      "source_type": "official_document",
+      "published_at": "2026-08-01T00:00:00Z",
+      "retrieved_at": "2026-11-11T12:00:00Z",
+      "reliability": 0.9,
+      "metadata": {}
+    }
+  ],
+  "gold": {
+    "judge_label": "SUPPORTED",
+    "temporal_relation": "SAME_PERIOD",
+    "conflict_type": "PARAPHRASE",
+    "final_action": "ATTACH_EVIDENCE",
+    "expected_memory_delta": {
+      "superseded_claim_ids": [],
+      "new_active_claim_ids": [],
+      "quarantined_claim_ids": [],
+      "rejected_claim_ids": [],
+      "attached_evidence_ids": [
+        "94097c38-1b08-519e-b1e6-64069df4f17e"
+      ]
+    }
+  }
+}

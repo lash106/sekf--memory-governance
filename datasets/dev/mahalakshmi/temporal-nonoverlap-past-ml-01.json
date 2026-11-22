@@ -1,0 +1,67 @@
+{
+  "case_id": "temporal-nonoverlap-past-ml-01",
+  "category": "non_overlapping_temporal_validity",
+  "split": "dev",
+  "annotators": [
+    "Mahalakshmi Rajkumar"
+  ],
+  "annotation_notes": "The candidate is about spring 2025, before the current fee period. A past fact does not contradict the current one: promote it as history, conflict NONE (guide B1).",
+  "initial_memory": [
+    {
+      "claim_id": "6e867d32-244d-5728-8e3c-8eadc5fcfbbf",
+      "claim_text": "The student activity fee is $95 per semester.",
+      "subject_key": "student_activity_fee",
+      "predicate_key": "amount_per_semester",
+      "object_text": "$95",
+      "status": "ACTIVE",
+      "version": 1,
+      "valid_from": "2026-08-01T00:00:00Z",
+      "valid_to": null,
+      "confidence": 0.9,
+      "created_at": "2026-07-15T00:00:00Z",
+      "updated_at": "2026-07-15T00:00:00Z",
+      "supersedes_claim_id": null,
+      "evidence_ids": []
+    }
+  ],
+  "candidate": {
+    "claim_id": "e4b9629f-5692-59c7-9ed4-6e220727713b",
+    "claim_text": "The student activity fee was $80 per semester in spring 2025.",
+    "subject_key": "student_activity_fee",
+    "predicate_key": "amount_per_semester",
+    "object_text": "$80",
+    "source_id": "bursar-archive",
+    "observed_at": "2026-11-05T10:00:00Z",
+    "valid_from": "2025-01-15T00:00:00Z",
+    "valid_to": "2025-05-31T00:00:00Z",
+    "extractor_confidence": 0.9,
+    "metadata": {}
+  },
+  "evidence": [
+    {
+      "evidence_id": "de7c5d2e-fc1e-5e2e-99c1-421bcd4a1abc",
+      "content": "Fee archive, Spring 2025: student activity fee $80 per semester.",
+      "source_id": "bursar-archive",
+      "source_type": "official_document",
+      "published_at": "2025-01-10T00:00:00Z",
+      "retrieved_at": "2026-11-05T10:00:00Z",
+      "reliability": 0.9,
+      "metadata": {}
+    }
+  ],
+  "gold": {
+    "judge_label": "SUPPORTED",
+    "temporal_relation": "NON_OVERLAPPING_VALIDITY",
+    "conflict_type": "NONE",
+    "final_action": "PROMOTE",
+    "expected_memory_delta": {
+      "superseded_claim_ids": [],
+      "new_active_claim_ids": [
+        "e4b9629f-5692-59c7-9ed4-6e220727713b"
+      ],
+      "quarantined_claim_ids": [],
+      "rejected_claim_ids": [],
+      "attached_evidence_ids": []
+    }
+  }
+}

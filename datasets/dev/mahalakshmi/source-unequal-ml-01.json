@@ -1,0 +1,79 @@
+{
+  "case_id": "source-unequal-ml-01",
+  "category": "conflicting_sources_unequal_reliability",
+  "split": "dev",
+  "annotators": [
+    "Mahalakshmi Rajkumar"
+  ],
+  "annotation_notes": "The official fee schedule (0.95) and an anonymous comment (0.2) disagree. Not a source conflict: the reliable source wins, so this is a newer update (guide B2).",
+  "initial_memory": [
+    {
+      "claim_id": "c2f1cf56-22b7-5437-88f1-1366e8ac7a84",
+      "claim_text": "An annual parking permit costs $180.",
+      "subject_key": "parking_permit",
+      "predicate_key": "annual_price",
+      "object_text": "$180",
+      "status": "ACTIVE",
+      "version": 1,
+      "valid_from": "2026-01-01T00:00:00Z",
+      "valid_to": null,
+      "confidence": 0.9,
+      "created_at": "2026-01-02T00:00:00Z",
+      "updated_at": "2026-01-02T00:00:00Z",
+      "supersedes_claim_id": null,
+      "evidence_ids": []
+    }
+  ],
+  "candidate": {
+    "claim_id": "2b6b90e0-57ab-5461-9bcf-8c979c22ae34",
+    "claim_text": "An annual parking permit costs $200 from January 1, 2027.",
+    "subject_key": "parking_permit",
+    "predicate_key": "annual_price",
+    "object_text": "$200",
+    "source_id": "transportation-services",
+    "observed_at": "2026-11-19T10:00:00Z",
+    "valid_from": "2027-01-01T00:00:00Z",
+    "valid_to": null,
+    "extractor_confidence": 0.9,
+    "metadata": {}
+  },
+  "evidence": [
+    {
+      "evidence_id": "857079f3-fa70-50c0-ae12-c0b464b2a28f",
+      "content": "2027 fee schedule: annual parking permit $200, effective January 1, 2027.",
+      "source_id": "transportation-services",
+      "source_type": "official_document",
+      "published_at": "2026-11-18T00:00:00Z",
+      "retrieved_at": "2026-11-19T10:00:00Z",
+      "reliability": 0.95,
+      "metadata": {}
+    },
+    {
+      "evidence_id": "b6906443-3910-5723-bf6c-f898b33617cc",
+      "content": "nah permits are still 180, they are not raising it",
+      "source_id": "anonymous-comment",
+      "source_type": "social_media",
+      "published_at": "2026-11-18T20:00:00Z",
+      "retrieved_at": "2026-11-19T10:00:00Z",
+      "reliability": 0.2,
+      "metadata": {}
+    }
+  ],
+  "gold": {
+    "judge_label": "SUPPORTED",
+    "temporal_relation": "NEWER_UPDATE",
+    "conflict_type": "TEMPORAL_UPDATE",
+    "final_action": "REVISE",
+    "expected_memory_delta": {
+      "superseded_claim_ids": [
+        "c2f1cf56-22b7-5437-88f1-1366e8ac7a84"
+      ],
+      "new_active_claim_ids": [
+        "2b6b90e0-57ab-5461-9bcf-8c979c22ae34"
+      ],
+      "quarantined_claim_ids": [],
+      "rejected_claim_ids": [],
+      "attached_evidence_ids": []
+    }
+  }
+}

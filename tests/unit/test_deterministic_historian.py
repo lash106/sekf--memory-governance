@@ -245,7 +245,24 @@ def _load(path: Path) -> dict[str, Any]:
     return data
 
 
-@pytest.mark.parametrize("path", sorted(CASES.glob("*.json")), ids=lambda p: p.stem)
+# Cases whose gold labels the rule-based Historian cannot reach by design.
+# See docs/limitations/historian-synthesizer.md. Remove an entry once it passes.
+KNOWN_GAPS = {
+    "source-similar-ml-01": "H1: rule-based Historian never outputs SOURCE_CONFLICT",
+    "duplicate-value-format-ml-01": "H2: '6 PM' vs '18:00' compared as text, not as a time",
+}
+
+
+def _gold_case_params() -> list[Any]:
+    params = []
+    for path in sorted(CASES.glob("*.json")):
+        reason = KNOWN_GAPS.get(path.stem)
+        marks = [pytest.mark.xfail(reason=reason, strict=True)] if reason else []
+        params.append(pytest.param(path, id=path.stem, marks=marks))
+    return params
+
+
+@pytest.mark.parametrize("path", _gold_case_params())
 def test_matches_gold_historian_labels(path: Path) -> None:
     case = _load(path)
     req = HistorianRequest(

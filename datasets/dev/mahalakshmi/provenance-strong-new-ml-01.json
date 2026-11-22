@@ -1,0 +1,50 @@
+{
+  "case_id": "provenance-strong-new-ml-01",
+  "category": "supported_new_claim",
+  "split": "dev",
+  "annotators": [
+    "Mahalakshmi Rajkumar"
+  ],
+  "annotation_notes": "New fact, nothing in memory, official source (0.95) states it directly: promote (A7). Pair with provenance-weak-source-ml-02: same shape, only the source differs.",
+  "initial_memory": [],
+  "candidate": {
+    "claim_id": "e7db6fbc-04a4-533e-8608-1a62ea09326d",
+    "claim_text": "The maker space is open on Sundays from 12:00 to 17:00.",
+    "subject_key": "maker_space",
+    "predicate_key": "sunday_hours",
+    "object_text": "12:00-17:00",
+    "source_id": "engineering-college",
+    "observed_at": "2026-11-13T19:00:00Z",
+    "valid_from": null,
+    "valid_to": null,
+    "extractor_confidence": 0.9,
+    "metadata": {}
+  },
+  "evidence": [
+    {
+      "evidence_id": "5dabd1da-a27c-5692-8108-5c04a223668c",
+      "content": "College of Engineering: the maker space is open Sundays, 12:00 to 17:00.",
+      "source_id": "engineering-college",
+      "source_type": "official_document",
+      "published_at": "2026-11-12T00:00:00Z",
+      "retrieved_at": "2026-11-13T19:00:00Z",
+      "reliability": 0.95,
+      "metadata": {}
+    }
+  ],
+  "gold": {
+    "judge_label": "SUPPORTED",
+    "temporal_relation": "NO_RELATED_CLAIM",
+    "conflict_type": "NONE",
+    "final_action": "PROMOTE",
+    "expected_memory_delta": {
+      "superseded_claim_ids": [],
+      "new_active_claim_ids": [
+        "e7db6fbc-04a4-533e-8608-1a62ea09326d"
+      ],
+      "quarantined_claim_ids": [],
+      "rejected_claim_ids": [],
+      "attached_evidence_ids": []
+    }
+  }
+}

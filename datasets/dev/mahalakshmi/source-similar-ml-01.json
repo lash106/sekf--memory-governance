@@ -1,0 +1,60 @@
+{
+  "case_id": "source-similar-ml-01",
+  "category": "conflicting_sources_similar_reliability",
+  "split": "dev",
+  "annotators": [
+    "Mahalakshmi Rajkumar"
+  ],
+  "annotation_notes": "Two official pages of similar standing (0.85 each) give different add/drop deadlines and nothing in memory decides it. Sources disagree: MIXED_EVIDENCE, SOURCE_CONFLICT, quarantine for a human (A3). The rule-based Historian cannot see this (limitation H1).",
+  "initial_memory": [],
+  "candidate": {
+    "claim_id": "5b2ade65-7276-513b-b3ef-5243a174c804",
+    "claim_text": "The fall 2026 add/drop deadline is September 14.",
+    "subject_key": "add_drop_deadline",
+    "predicate_key": "fall_2026_date",
+    "object_text": "September 14",
+    "source_id": "department-page",
+    "observed_at": "2026-09-02T09:00:00Z",
+    "valid_from": null,
+    "valid_to": null,
+    "extractor_confidence": 0.9,
+    "metadata": {}
+  },
+  "evidence": [
+    {
+      "evidence_id": "936ac66e-5f74-5bd1-8f51-9efdabc714ba",
+      "content": "Registrar calendar: last day to add or drop is September 12.",
+      "source_id": "registrar-calendar",
+      "source_type": "official_document",
+      "published_at": "2026-08-01T00:00:00Z",
+      "retrieved_at": "2026-09-02T09:00:00Z",
+      "reliability": 0.85,
+      "metadata": {}
+    },
+    {
+      "evidence_id": "9baa5363-ff1f-5292-a0a9-5f179e5f32e8",
+      "content": "Department page: students may add or drop classes until September 14.",
+      "source_id": "department-page",
+      "source_type": "official_document",
+      "published_at": "2026-08-15T00:00:00Z",
+      "retrieved_at": "2026-09-02T09:00:00Z",
+      "reliability": 0.85,
+      "metadata": {}
+    }
+  ],
+  "gold": {
+    "judge_label": "MIXED_EVIDENCE",
+    "temporal_relation": "NO_RELATED_CLAIM",
+    "conflict_type": "SOURCE_CONFLICT",
+    "final_action": "QUARANTINE",
+    "expected_memory_delta": {
+      "superseded_claim_ids": [],
+      "new_active_claim_ids": [],
+      "quarantined_claim_ids": [
+        "5b2ade65-7276-513b-b3ef-5243a174c804"
+      ],
+      "rejected_claim_ids": [],
+      "attached_evidence_ids": []
+    }
+  }
+}

@@ -1,0 +1,50 @@
+{
+  "case_id": "provenance-weak-source-ml-02",
+  "category": "supported_by_weak_source",
+  "split": "dev",
+  "annotators": [
+    "Mahalakshmi Rajkumar"
+  ],
+  "annotation_notes": "Nothing in memory contradicts it and the post asserts it plainly, but the only source is a club Discord message (0.45, below 0.6): quarantine, do not lose it (guide B4, A3).",
+  "initial_memory": [],
+  "candidate": {
+    "claim_id": "6a4768d3-a492-5ebc-8479-9081d4ce9983",
+    "claim_text": "The maker space is open on Saturdays from 10:00 to 16:00.",
+    "subject_key": "maker_space",
+    "predicate_key": "saturday_hours",
+    "object_text": "10:00-16:00",
+    "source_id": "club-discord",
+    "observed_at": "2026-11-13T19:00:00Z",
+    "valid_from": null,
+    "valid_to": null,
+    "extractor_confidence": 0.9,
+    "metadata": {}
+  },
+  "evidence": [
+    {
+      "evidence_id": "79030daf-ccd0-5e92-a652-968a4bf1ec10",
+      "content": "Maker space is open Saturdays 10 to 4 for everyone.",
+      "source_id": "club-discord",
+      "source_type": "chat",
+      "published_at": "2026-11-13T18:50:00Z",
+      "retrieved_at": "2026-11-13T19:00:00Z",
+      "reliability": 0.45,
+      "metadata": {}
+    }
+  ],
+  "gold": {
+    "judge_label": "SUPPORTED",
+    "temporal_relation": "NO_RELATED_CLAIM",
+    "conflict_type": "NONE",
+    "final_action": "QUARANTINE",
+    "expected_memory_delta": {
+      "superseded_claim_ids": [],
+      "new_active_claim_ids": [],
+      "quarantined_claim_ids": [
+        "6a4768d3-a492-5ebc-8479-9081d4ce9983"
+      ],
+      "rejected_claim_ids": [],
+      "attached_evidence_ids": []
+    }
+  }
+}

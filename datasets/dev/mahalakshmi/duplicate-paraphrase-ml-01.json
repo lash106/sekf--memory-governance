@@ -1,0 +1,67 @@
+{
+  "case_id": "duplicate-paraphrase-ml-01",
+  "category": "duplicate_paraphrase",
+  "split": "dev",
+  "annotators": [
+    "Mahalakshmi Rajkumar"
+  ],
+  "annotation_notes": "Same value as the active claim, worded differently. Nothing new to store: attach the evidence to the existing claim (guide A5).",
+  "initial_memory": [
+    {
+      "claim_id": "2a427da2-88a4-5afd-a9de-341442d1d302",
+      "claim_text": "The writing center is in Clark Hall, room 126.",
+      "subject_key": "writing_center",
+      "predicate_key": "location",
+      "object_text": "Clark Hall 126",
+      "status": "ACTIVE",
+      "version": 1,
+      "valid_from": null,
+      "valid_to": null,
+      "confidence": 0.9,
+      "created_at": "2026-01-02T00:00:00Z",
+      "updated_at": "2026-01-02T00:00:00Z",
+      "supersedes_claim_id": null,
+      "evidence_ids": []
+    }
+  ],
+  "candidate": {
+    "claim_id": "31fc7e4e-3948-574e-8dd5-c2060e45ada9",
+    "claim_text": "Writing Center: Clark Hall, Rm 126.",
+    "subject_key": "writing_center",
+    "predicate_key": "location",
+    "object_text": "Clark Hall 126",
+    "source_id": "writing-center-site",
+    "observed_at": "2026-11-11T12:00:00Z",
+    "valid_from": null,
+    "valid_to": null,
+    "extractor_confidence": 0.9,
+    "metadata": {}
+  },
+  "evidence": [
+    {
+      "evidence_id": "aa9429a9-e5e6-5e05-9762-df117494839c",
+      "content": "Find us in Clark Hall, Rm 126.",
+      "source_id": "writing-center-site",
+      "source_type": "official_document",
+      "published_at": "2026-08-01T00:00:00Z",
+      "retrieved_at": "2026-11-11T12:00:00Z",
+      "reliability": 0.9,
+      "metadata": {}
+    }
+  ],
+  "gold": {
+    "judge_label": "SUPPORTED",
+    "temporal_relation": "SAME_PERIOD",
+    "conflict_type": "PARAPHRASE",
+    "final_action": "ATTACH_EVIDENCE",
+    "expected_memory_delta": {
+      "superseded_claim_ids": [],
+      "new_active_claim_ids": [],
+      "quarantined_claim_ids": [],
+      "rejected_claim_ids": [],
+      "attached_evidence_ids": [
+        "aa9429a9-e5e6-5e05-9762-df117494839c"
+      ]
+    }
+  }
+}

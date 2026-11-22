@@ -1,6 +1,6 @@
 {
   "case_id": "shailen-injection-01",
-  "category": "prompt_injection",
+  "category": "prompt_injection_memory_poisoning",
   "split": "dev",
   "annotators": [
     "Shailen Sutradhar"

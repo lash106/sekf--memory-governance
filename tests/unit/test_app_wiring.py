@@ -18,7 +18,13 @@ def isolated_env(monkeypatch: pytest.MonkeyPatch) -> None:
     from sekf.judge import compose
 
     monkeypatch.setattr(compose, "_ENV_LOADED", True)
-    for name in ("SEKF_MEMORY", "SEKF_HISTORIAN", "SEKF_SYNTHESIZER", "SEKF_PROVIDER", "SEKF_POLICY"):
+    for name in (
+        "SEKF_MEMORY",
+        "SEKF_HISTORIAN",
+        "SEKF_SYNTHESIZER",
+        "SEKF_PROVIDER",
+        "SEKF_POLICY",
+    ):
         monkeypatch.delenv(name, raising=False)
     monkeypatch.setenv("SEKF_DB_URL", "sqlite://")  # the default store, in RAM for tests
 

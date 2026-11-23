@@ -25,6 +25,7 @@ Groq does not return `logprobs`, and a requested temperature of 0 may be sent as
 ```python
 import os
 from google.colab import userdata
+
 os.environ["SEKF_LLM_API_KEY"] = userdata.get("SEKF_LLM_API_KEY")
 os.environ["SEKF_PROVIDER"] = "openai"
 os.environ["SEKF_LLM_BASE_URL"] = "https://generativelanguage.googleapis.com/v1beta/openai/"
@@ -57,6 +58,7 @@ That sweep uses policy-v1. policy-v2 replaces support, refute, and source reliab
 
 ```python
 from sekf.judge.calibration import fit_temperature, apply_temperature
+
 temperature = fit_temperature(confidences, correct)
 print(temperature, apply_temperature(0.91, temperature))
 ```

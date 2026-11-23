@@ -20,7 +20,7 @@ Status checked against `origin/main` after PR #21 (2026-11-21).
 | Demo rehearsal of promote, revise, and quarantine | All four members | Needs one running server with all roles. |
 | Live `single_judge` row in the pilot | Whoever holds the API budget | Copy `huggingface.env.example` → `huggingface.env` (git-ignored) and set a key. Never commit the key. |
 | Second model, extra seeds, local model | Semester 2 | SPEC.md section 18 stops part one at the December demonstration. |
-| policy-v2 / memory projection / DecisionRecord risk fields | Shailen + Krishna (ADR) | Held on `sai-chetan/review-fixes` / `governance-metrics-v2`. **Not in this PR.** ADR number clashes with Krishna’s `0006-storage-baselines`. |
+| policy-v2 / memory projection / DecisionRecord risk fields | Shailen + Krishna (ADR) | Open as `sai-chetan/governance-metrics-v2` with **ADR 0007** (Krishna keeps `0006-storage-baselines`). Needs Shailen + Krishna review before merge. |
 
 ## How to re-run the saved offline pilot
 

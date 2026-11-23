@@ -1,4 +1,4 @@
-# ADR 0006: policy-v2, Markdown projection, and separate retrieval recall
+# ADR 0007: policy-v2, Markdown projection, and separate retrieval recall
 
 - Status: proposed for review by Shailen (policy, API, evaluation) and Krishna (memory)
 - Date: 2026-11-18

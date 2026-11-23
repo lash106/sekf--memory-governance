@@ -12,15 +12,15 @@ Owner: Sai Chetan Muppalla. Branch: `sai-chetan/sprint-3-4-judge`.
 
 ## Sprint 4 (hardening)
 
-- `fixture-judge-v2`: date/range parsing, room-token overlap, reliability-aware aggregation,
-  softer social-noise handling. Dev fixture score: accuracy 1.0, contradiction F1 1.0,
-  Brier 0.0046, ECE 0.0647 (51/51 clean). See `experiments/sai_chetan/dev_2026-11-20/`.
+- `fixture-judge-v3`: day-first dates (`15 September`), ranges, room-token overlap,
+  reliability-aware aggregation, softer social-noise handling. Re-run numbers live in
+  `experiments/sai_chetan/dev_2026-11-20/` (`python experiments/sai_chetan/run_dev_judge.py`).
 - Parallel-work constraints recorded in `docs/parallel-work.md` (Judge request = candidate + evidence only).
 - Live pilot path stays opt-in via gitignored `huggingface.env` (empty key in `huggingface.env.example`).
 - Module limitations: FakeJudge never emits REFUTED; FixtureJudge is lexical, not a model; cost is 0 for both offline scorers.
+- Dev pilot storage rows call Krishna's packaged baselines (dry_run), not in-script stubs.
 
 ## Out of scope here
 
 - policy-v2, memory projection, contract field changes (need Shailen/Krishna ADR).
-- Krishna storage baselines (PR #17).
 - Frozen `test/` split and official held-out run (need second annotator + Shailen runner).

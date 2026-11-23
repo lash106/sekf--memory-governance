@@ -1,6 +1,6 @@
 {
-  "n": 51,
-  "n_clean": 51,
+  "n": 63,
+  "n_clean": 63,
   "finding_counts": {
     "UNKNOWN_EVIDENCE_ID": 0,
     "DUPLICATE_CITATION": 0,
@@ -142,6 +142,90 @@
       "OVERCONFIDENT_WRONG_LABEL": 0,
       "UNDERCONFIDENT_DIRECTIONAL_LABEL": 0
     },
+    "state_transition_attach": {
+      "n": 1,
+      "n_clean": 1,
+      "UNKNOWN_EVIDENCE_ID": 0,
+      "DUPLICATE_CITATION": 0,
+      "CITED_AS_BOTH": 0,
+      "MISSING_SUPPORTING_CITATION": 0,
+      "MISSING_REFUTING_CITATION": 0,
+      "WRONG_LABEL": 0,
+      "OVERCONFIDENT_WRONG_LABEL": 0,
+      "UNDERCONFIDENT_DIRECTIONAL_LABEL": 0
+    },
+    "state_transition_escalate": {
+      "n": 1,
+      "n_clean": 1,
+      "UNKNOWN_EVIDENCE_ID": 0,
+      "DUPLICATE_CITATION": 0,
+      "CITED_AS_BOTH": 0,
+      "MISSING_SUPPORTING_CITATION": 0,
+      "MISSING_REFUTING_CITATION": 0,
+      "WRONG_LABEL": 0,
+      "OVERCONFIDENT_WRONG_LABEL": 0,
+      "UNDERCONFIDENT_DIRECTIONAL_LABEL": 0
+    },
+    "state_transition_keep_episodic": {
+      "n": 2,
+      "n_clean": 2,
+      "UNKNOWN_EVIDENCE_ID": 0,
+      "DUPLICATE_CITATION": 0,
+      "CITED_AS_BOTH": 0,
+      "MISSING_SUPPORTING_CITATION": 0,
+      "MISSING_REFUTING_CITATION": 0,
+      "WRONG_LABEL": 0,
+      "OVERCONFIDENT_WRONG_LABEL": 0,
+      "UNDERCONFIDENT_DIRECTIONAL_LABEL": 0
+    },
+    "state_transition_promote": {
+      "n": 3,
+      "n_clean": 3,
+      "UNKNOWN_EVIDENCE_ID": 0,
+      "DUPLICATE_CITATION": 0,
+      "CITED_AS_BOTH": 0,
+      "MISSING_SUPPORTING_CITATION": 0,
+      "MISSING_REFUTING_CITATION": 0,
+      "WRONG_LABEL": 0,
+      "OVERCONFIDENT_WRONG_LABEL": 0,
+      "UNDERCONFIDENT_DIRECTIONAL_LABEL": 0
+    },
+    "state_transition_quarantine": {
+      "n": 2,
+      "n_clean": 2,
+      "UNKNOWN_EVIDENCE_ID": 0,
+      "DUPLICATE_CITATION": 0,
+      "CITED_AS_BOTH": 0,
+      "MISSING_SUPPORTING_CITATION": 0,
+      "MISSING_REFUTING_CITATION": 0,
+      "WRONG_LABEL": 0,
+      "OVERCONFIDENT_WRONG_LABEL": 0,
+      "UNDERCONFIDENT_DIRECTIONAL_LABEL": 0
+    },
+    "state_transition_reject": {
+      "n": 1,
+      "n_clean": 1,
+      "UNKNOWN_EVIDENCE_ID": 0,
+      "DUPLICATE_CITATION": 0,
+      "CITED_AS_BOTH": 0,
+      "MISSING_SUPPORTING_CITATION": 0,
+      "MISSING_REFUTING_CITATION": 0,
+      "WRONG_LABEL": 0,
+      "OVERCONFIDENT_WRONG_LABEL": 0,
+      "UNDERCONFIDENT_DIRECTIONAL_LABEL": 0
+    },
+    "state_transition_revise": {
+      "n": 2,
+      "n_clean": 2,
+      "UNKNOWN_EVIDENCE_ID": 0,
+      "DUPLICATE_CITATION": 0,
+      "CITED_AS_BOTH": 0,
+      "MISSING_SUPPORTING_CITATION": 0,
+      "MISSING_REFUTING_CITATION": 0,
+      "WRONG_LABEL": 0,
+      "OVERCONFIDENT_WRONG_LABEL": 0,
+      "UNDERCONFIDENT_DIRECTIONAL_LABEL": 0
+    },
     "supported_by_weak_source": {
       "n": 2,
       "n_clean": 2,
@@ -193,8 +277,8 @@
   },
   "by_gold_label": {
     "INSUFFICIENT_EVIDENCE": {
-      "n": 9,
-      "n_clean": 9,
+      "n": 11,
+      "n_clean": 11,
       "UNKNOWN_EVIDENCE_ID": 0,
       "DUPLICATE_CITATION": 0,
       "CITED_AS_BOTH": 0,
@@ -205,8 +289,8 @@
       "UNDERCONFIDENT_DIRECTIONAL_LABEL": 0
     },
     "INVALID_INPUT": {
-      "n": 1,
-      "n_clean": 1,
+      "n": 2,
+      "n_clean": 2,
       "UNKNOWN_EVIDENCE_ID": 0,
       "DUPLICATE_CITATION": 0,
       "CITED_AS_BOTH": 0,
@@ -217,8 +301,8 @@
       "UNDERCONFIDENT_DIRECTIONAL_LABEL": 0
     },
     "MIXED_EVIDENCE": {
-      "n": 6,
-      "n_clean": 6,
+      "n": 7,
+      "n_clean": 7,
       "UNKNOWN_EVIDENCE_ID": 0,
       "DUPLICATE_CITATION": 0,
       "CITED_AS_BOTH": 0,
@@ -229,8 +313,8 @@
       "UNDERCONFIDENT_DIRECTIONAL_LABEL": 0
     },
     "REFUTED": {
-      "n": 4,
-      "n_clean": 4,
+      "n": 5,
+      "n_clean": 5,
       "UNKNOWN_EVIDENCE_ID": 0,
       "DUPLICATE_CITATION": 0,
       "CITED_AS_BOTH": 0,
@@ -241,8 +325,8 @@
       "UNDERCONFIDENT_DIRECTIONAL_LABEL": 0
     },
     "SUPPORTED": {
-      "n": 31,
-      "n_clean": 31,
+      "n": 38,
+      "n_clean": 38,
       "UNKNOWN_EVIDENCE_ID": 0,
       "DUPLICATE_CITATION": 0,
       "CITED_AS_BOTH": 0,
@@ -254,42 +338,42 @@
     }
   },
   "label_metrics": {
-    "n": 51,
+    "n": 63,
     "accuracy": 1.0,
     "contradiction_f1": 1.0,
     "contradiction": {
       "precision": 1.0,
       "recall": 1.0,
       "f1": 1.0,
-      "support": 4
+      "support": 5
     },
     "per_label_support": {
-      "SUPPORTED": 31,
-      "INSUFFICIENT_EVIDENCE": 9,
-      "REFUTED": 4,
-      "MIXED_EVIDENCE": 6,
-      "INVALID_INPUT": 1
+      "SUPPORTED": 38,
+      "INSUFFICIENT_EVIDENCE": 11,
+      "INVALID_INPUT": 2,
+      "REFUTED": 5,
+      "MIXED_EVIDENCE": 7
     },
     "confusion": {
       "SUPPORTED": {
-        "SUPPORTED": 31
+        "SUPPORTED": 38
       },
       "REFUTED": {
-        "REFUTED": 4
+        "REFUTED": 5
       },
       "INSUFFICIENT_EVIDENCE": {
-        "INSUFFICIENT_EVIDENCE": 9
+        "INSUFFICIENT_EVIDENCE": 11
       },
       "MIXED_EVIDENCE": {
-        "MIXED_EVIDENCE": 6
+        "MIXED_EVIDENCE": 7
       },
       "INVALID_INPUT": {
-        "INVALID_INPUT": 1
+        "INVALID_INPUT": 2
       }
     }
   },
-  "brier": 0.0045882352941176464,
-  "ece": 0.06470588235294128,
+  "brier": 0.004552380952380953,
+  "ece": 0.06444444444444453,
   "cases": [
     {
       "case_id": "duplicate-01",
@@ -313,8 +397,43 @@
       "findings": []
     },
     {
+      "case_id": "krishna-duplicate-exact-01",
+      "category": "state_transition_attach",
+      "gold_label": "SUPPORTED",
+      "predicted_label": "SUPPORTED",
+      "findings": []
+    },
+    {
       "case_id": "krishna-duplicate-paraphrase-01",
       "category": "duplicate_paraphrase",
+      "gold_label": "SUPPORTED",
+      "predicted_label": "SUPPORTED",
+      "findings": []
+    },
+    {
+      "case_id": "krishna-escalate-invalid-input-01",
+      "category": "state_transition_escalate",
+      "gold_label": "INVALID_INPUT",
+      "predicted_label": "INVALID_INPUT",
+      "findings": []
+    },
+    {
+      "case_id": "krishna-injection-active-intact-01",
+      "category": "state_transition_keep_episodic",
+      "gold_label": "INSUFFICIENT_EVIDENCE",
+      "predicted_label": "INSUFFICIENT_EVIDENCE",
+      "findings": []
+    },
+    {
+      "case_id": "krishna-keep-episodic-empty-memory-01",
+      "category": "state_transition_keep_episodic",
+      "gold_label": "INSUFFICIENT_EVIDENCE",
+      "predicted_label": "INSUFFICIENT_EVIDENCE",
+      "findings": []
+    },
+    {
+      "case_id": "krishna-nonoverlap-past-period-01",
+      "category": "state_transition_promote",
       "gold_label": "SUPPORTED",
       "predicted_label": "SUPPORTED",
       "findings": []
@@ -327,8 +446,57 @@
       "findings": []
     },
     {
+      "case_id": "krishna-promote-after-quarantined-01",
+      "category": "state_transition_promote",
+      "gold_label": "SUPPORTED",
+      "predicted_label": "SUPPORTED",
+      "findings": []
+    },
+    {
+      "case_id": "krishna-promote-after-rejected-01",
+      "category": "state_transition_promote",
+      "gold_label": "SUPPORTED",
+      "predicted_label": "SUPPORTED",
+      "findings": []
+    },
+    {
+      "case_id": "krishna-quarantine-source-conflict-01",
+      "category": "state_transition_quarantine",
+      "gold_label": "MIXED_EVIDENCE",
+      "predicted_label": "MIXED_EVIDENCE",
+      "findings": []
+    },
+    {
+      "case_id": "krishna-quarantine-weak-source-01",
+      "category": "state_transition_quarantine",
+      "gold_label": "SUPPORTED",
+      "predicted_label": "SUPPORTED",
+      "findings": []
+    },
+    {
+      "case_id": "krishna-reject-active-intact-01",
+      "category": "state_transition_reject",
+      "gold_label": "REFUTED",
+      "predicted_label": "REFUTED",
+      "findings": []
+    },
+    {
       "case_id": "krishna-reliable-newer-correction-01",
       "category": "reliable_newer_correction",
+      "gold_label": "SUPPORTED",
+      "predicted_label": "SUPPORTED",
+      "findings": []
+    },
+    {
+      "case_id": "krishna-revise-chain-01",
+      "category": "state_transition_revise",
+      "gold_label": "SUPPORTED",
+      "predicted_label": "SUPPORTED",
+      "findings": []
+    },
+    {
+      "case_id": "krishna-revise-with-quarantined-01",
+      "category": "state_transition_revise",
       "gold_label": "SUPPORTED",
       "predicted_label": "SUPPORTED",
       "findings": []

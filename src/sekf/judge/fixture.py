@@ -18,7 +18,7 @@ from uuid import NAMESPACE_URL, UUID, uuid5
 
 from sekf.contracts import EvidenceRecord, JudgeAssessment, JudgeLabel, JudgeRequest
 
-PROMPT_VERSION = "fixture-judge-v2"
+PROMPT_VERSION = "fixture-judge-v3"
 MODEL_ID = "fixture/judge"
 PROVIDER_ID = "fixture"
 
@@ -74,8 +74,14 @@ _INFORMAL_RANGE = re.compile(
     re.I,
 )
 _ISO_DATE = re.compile(r"\b(20\d{2})-(\d{2})-(\d{2})\b")
+_MONTH_NAMES = "|".join(_MONTHS)
 _MONTH_DAY = re.compile(
-    r"\b(" + "|".join(_MONTHS) + r")\s+(\d{1,2})(?:st|nd|rd|th)?(?:,?\s*(20\d{2}))?\b",
+    rf"\b({_MONTH_NAMES})\s+(\d{{1,2}})(?:st|nd|rd|th)?(?:,?\s*(20\d{{2}}))?\b",
+    re.I,
+)
+# British / registrar style: "15 September" and "15th September 2026".
+_DAY_MONTH = re.compile(
+    rf"\b(\d{{1,2}})(?:st|nd|rd|th)?\s+({_MONTH_NAMES})(?:,?\s*(20\d{{2}}))?\b",
     re.I,
 )
 _MONEY = re.compile(r"\$(\d+)")
@@ -146,19 +152,26 @@ def _clocks(text: str) -> set[str]:
     return found
 
 
+def _add_calendar_day(found: set[str], *, year: str | None, month: int, day: int) -> None:
+    if year:
+        found.add(f"{year}-{month:02d}-{day:02d}")
+    found.add(f"--{month:02d}-{day:02d}")
+
+
 def _dates(text: str) -> set[str]:
-    """Normalize calendar days to YYYY-MM-DD when year is known, else --MM-DD."""
+    """Normalize calendar days to YYYY-MM-DD when year is known, else --MM-DD.
+
+    Accepts ISO (`2026-09-15`), month-first (`September 15`), and day-first
+    (`15 September`) forms so registrar-style evidence is not missed.
+    """
 
     found: set[str] = set()
     for year, month, day in _ISO_DATE.findall(text):
-        found.add(f"{year}-{month}-{day}")
-        found.add(f"--{month}-{day}")
+        _add_calendar_day(found, year=year, month=int(month), day=int(day))
     for month_name, day, year in _MONTH_DAY.findall(text):
-        month = _MONTHS[month_name.lower()]
-        day_i = int(day)
-        if year:
-            found.add(f"{year}-{month:02d}-{day_i:02d}")
-        found.add(f"--{month:02d}-{day_i:02d}")
+        _add_calendar_day(found, year=year or None, month=_MONTHS[month_name.lower()], day=int(day))
+    for day, month_name, year in _DAY_MONTH.findall(text):
+        _add_calendar_day(found, year=year or None, month=_MONTHS[month_name.lower()], day=int(day))
     return found
 
 

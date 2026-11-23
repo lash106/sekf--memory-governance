@@ -2,7 +2,7 @@
   "owner": "Sai Chetan Muppalla",
   "split": "dev",
   "held_out_test": false,
-  "n_cases": 51,
+  "n_cases": 63,
   "run_mode": {
     "SEKF_MEMORY": "memory",
     "SEKF_PROVIDER": "fake",
@@ -12,22 +12,22 @@
     "seed": 0,
     "policy": "not applied",
     "single_judge": "not run; no live key in this process",
-    "fixture_prompt_version": "fixture-judge-v2",
+    "fixture_prompt_version": "fixture-judge-v3",
     "fixture_prompt_hash_meaning": "sha256 of the version string, not of a prompt file",
     "cost_usd": 0.0,
     "cost_note": "Neither row calls a priced model. gpt-4o-mini rates are not reused."
   },
   "fake_judge": {
-    "n": 51,
-    "n_clean": 30,
+    "n": 63,
+    "n_clean": 39,
     "finding_counts": {
       "UNKNOWN_EVIDENCE_ID": 0,
       "DUPLICATE_CITATION": 0,
       "CITED_AS_BOTH": 0,
       "MISSING_SUPPORTING_CITATION": 0,
       "MISSING_REFUTING_CITATION": 0,
-      "WRONG_LABEL": 21,
-      "OVERCONFIDENT_WRONG_LABEL": 21,
+      "WRONG_LABEL": 24,
+      "OVERCONFIDENT_WRONG_LABEL": 24,
       "UNDERCONFIDENT_DIRECTIONAL_LABEL": 0
     },
     "finding_rates": {
@@ -36,8 +36,8 @@
       "CITED_AS_BOTH": 0.0,
       "MISSING_SUPPORTING_CITATION": 0.0,
       "MISSING_REFUTING_CITATION": 0.0,
-      "WRONG_LABEL": 0.4117647058823529,
-      "OVERCONFIDENT_WRONG_LABEL": 0.4117647058823529,
+      "WRONG_LABEL": 0.38095238095238093,
+      "OVERCONFIDENT_WRONG_LABEL": 0.38095238095238093,
       "UNDERCONFIDENT_DIRECTIONAL_LABEL": 0.0
     },
     "by_category": {
@@ -161,6 +161,90 @@
         "OVERCONFIDENT_WRONG_LABEL": 1,
         "UNDERCONFIDENT_DIRECTIONAL_LABEL": 0
       },
+      "state_transition_attach": {
+        "n": 1,
+        "n_clean": 1,
+        "UNKNOWN_EVIDENCE_ID": 0,
+        "DUPLICATE_CITATION": 0,
+        "CITED_AS_BOTH": 0,
+        "MISSING_SUPPORTING_CITATION": 0,
+        "MISSING_REFUTING_CITATION": 0,
+        "WRONG_LABEL": 0,
+        "OVERCONFIDENT_WRONG_LABEL": 0,
+        "UNDERCONFIDENT_DIRECTIONAL_LABEL": 0
+      },
+      "state_transition_escalate": {
+        "n": 1,
+        "n_clean": 0,
+        "UNKNOWN_EVIDENCE_ID": 0,
+        "DUPLICATE_CITATION": 0,
+        "CITED_AS_BOTH": 0,
+        "MISSING_SUPPORTING_CITATION": 0,
+        "MISSING_REFUTING_CITATION": 0,
+        "WRONG_LABEL": 1,
+        "OVERCONFIDENT_WRONG_LABEL": 1,
+        "UNDERCONFIDENT_DIRECTIONAL_LABEL": 0
+      },
+      "state_transition_keep_episodic": {
+        "n": 2,
+        "n_clean": 2,
+        "UNKNOWN_EVIDENCE_ID": 0,
+        "DUPLICATE_CITATION": 0,
+        "CITED_AS_BOTH": 0,
+        "MISSING_SUPPORTING_CITATION": 0,
+        "MISSING_REFUTING_CITATION": 0,
+        "WRONG_LABEL": 0,
+        "OVERCONFIDENT_WRONG_LABEL": 0,
+        "UNDERCONFIDENT_DIRECTIONAL_LABEL": 0
+      },
+      "state_transition_promote": {
+        "n": 3,
+        "n_clean": 3,
+        "UNKNOWN_EVIDENCE_ID": 0,
+        "DUPLICATE_CITATION": 0,
+        "CITED_AS_BOTH": 0,
+        "MISSING_SUPPORTING_CITATION": 0,
+        "MISSING_REFUTING_CITATION": 0,
+        "WRONG_LABEL": 0,
+        "OVERCONFIDENT_WRONG_LABEL": 0,
+        "UNDERCONFIDENT_DIRECTIONAL_LABEL": 0
+      },
+      "state_transition_quarantine": {
+        "n": 2,
+        "n_clean": 1,
+        "UNKNOWN_EVIDENCE_ID": 0,
+        "DUPLICATE_CITATION": 0,
+        "CITED_AS_BOTH": 0,
+        "MISSING_SUPPORTING_CITATION": 0,
+        "MISSING_REFUTING_CITATION": 0,
+        "WRONG_LABEL": 1,
+        "OVERCONFIDENT_WRONG_LABEL": 1,
+        "UNDERCONFIDENT_DIRECTIONAL_LABEL": 0
+      },
+      "state_transition_reject": {
+        "n": 1,
+        "n_clean": 0,
+        "UNKNOWN_EVIDENCE_ID": 0,
+        "DUPLICATE_CITATION": 0,
+        "CITED_AS_BOTH": 0,
+        "MISSING_SUPPORTING_CITATION": 0,
+        "MISSING_REFUTING_CITATION": 0,
+        "WRONG_LABEL": 1,
+        "OVERCONFIDENT_WRONG_LABEL": 1,
+        "UNDERCONFIDENT_DIRECTIONAL_LABEL": 0
+      },
+      "state_transition_revise": {
+        "n": 2,
+        "n_clean": 2,
+        "UNKNOWN_EVIDENCE_ID": 0,
+        "DUPLICATE_CITATION": 0,
+        "CITED_AS_BOTH": 0,
+        "MISSING_SUPPORTING_CITATION": 0,
+        "MISSING_REFUTING_CITATION": 0,
+        "WRONG_LABEL": 0,
+        "OVERCONFIDENT_WRONG_LABEL": 0,
+        "UNDERCONFIDENT_DIRECTIONAL_LABEL": 0
+      },
       "supported_by_weak_source": {
         "n": 2,
         "n_clean": 1,
@@ -212,8 +296,8 @@
     },
     "by_gold_label": {
       "INSUFFICIENT_EVIDENCE": {
-        "n": 9,
-        "n_clean": 6,
+        "n": 11,
+        "n_clean": 8,
         "UNKNOWN_EVIDENCE_ID": 0,
         "DUPLICATE_CITATION": 0,
         "CITED_AS_BOTH": 0,
@@ -224,44 +308,44 @@
         "UNDERCONFIDENT_DIRECTIONAL_LABEL": 0
       },
       "INVALID_INPUT": {
-        "n": 1,
+        "n": 2,
         "n_clean": 0,
         "UNKNOWN_EVIDENCE_ID": 0,
         "DUPLICATE_CITATION": 0,
         "CITED_AS_BOTH": 0,
         "MISSING_SUPPORTING_CITATION": 0,
         "MISSING_REFUTING_CITATION": 0,
-        "WRONG_LABEL": 1,
-        "OVERCONFIDENT_WRONG_LABEL": 1,
+        "WRONG_LABEL": 2,
+        "OVERCONFIDENT_WRONG_LABEL": 2,
         "UNDERCONFIDENT_DIRECTIONAL_LABEL": 0
       },
       "MIXED_EVIDENCE": {
-        "n": 6,
+        "n": 7,
         "n_clean": 0,
         "UNKNOWN_EVIDENCE_ID": 0,
         "DUPLICATE_CITATION": 0,
         "CITED_AS_BOTH": 0,
         "MISSING_SUPPORTING_CITATION": 0,
         "MISSING_REFUTING_CITATION": 0,
-        "WRONG_LABEL": 6,
-        "OVERCONFIDENT_WRONG_LABEL": 6,
+        "WRONG_LABEL": 7,
+        "OVERCONFIDENT_WRONG_LABEL": 7,
         "UNDERCONFIDENT_DIRECTIONAL_LABEL": 0
       },
       "REFUTED": {
-        "n": 4,
+        "n": 5,
         "n_clean": 0,
         "UNKNOWN_EVIDENCE_ID": 0,
         "DUPLICATE_CITATION": 0,
         "CITED_AS_BOTH": 0,
         "MISSING_SUPPORTING_CITATION": 0,
         "MISSING_REFUTING_CITATION": 0,
-        "WRONG_LABEL": 4,
-        "OVERCONFIDENT_WRONG_LABEL": 4,
+        "WRONG_LABEL": 5,
+        "OVERCONFIDENT_WRONG_LABEL": 5,
         "UNDERCONFIDENT_DIRECTIONAL_LABEL": 0
       },
       "SUPPORTED": {
-        "n": 31,
-        "n_clean": 24,
+        "n": 38,
+        "n_clean": 31,
         "UNKNOWN_EVIDENCE_ID": 0,
         "DUPLICATE_CITATION": 0,
         "CITED_AS_BOTH": 0,
@@ -273,46 +357,46 @@
       }
     },
     "label_metrics": {
-      "n": 51,
-      "accuracy": 0.5882352941176471,
+      "n": 63,
+      "accuracy": 0.6190476190476191,
       "contradiction_f1": 0.0,
       "contradiction": {
         "precision": 0.0,
         "recall": 0.0,
         "f1": 0.0,
-        "support": 4
+        "support": 5
       },
       "per_label_support": {
-        "SUPPORTED": 31,
-        "INSUFFICIENT_EVIDENCE": 9,
-        "REFUTED": 4,
-        "MIXED_EVIDENCE": 6,
-        "INVALID_INPUT": 1
+        "SUPPORTED": 38,
+        "INSUFFICIENT_EVIDENCE": 11,
+        "INVALID_INPUT": 2,
+        "REFUTED": 5,
+        "MIXED_EVIDENCE": 7
       },
       "confusion": {
         "SUPPORTED": {
-          "SUPPORTED": 24,
+          "SUPPORTED": 31,
           "INSUFFICIENT_EVIDENCE": 7
         },
         "REFUTED": {
-          "INSUFFICIENT_EVIDENCE": 2,
+          "INSUFFICIENT_EVIDENCE": 3,
           "SUPPORTED": 2
         },
         "INSUFFICIENT_EVIDENCE": {
-          "INSUFFICIENT_EVIDENCE": 6,
+          "INSUFFICIENT_EVIDENCE": 8,
           "SUPPORTED": 3
         },
         "MIXED_EVIDENCE": {
-          "SUPPORTED": 5,
+          "SUPPORTED": 6,
           "INSUFFICIENT_EVIDENCE": 1
         },
         "INVALID_INPUT": {
-          "INSUFFICIENT_EVIDENCE": 1
+          "INSUFFICIENT_EVIDENCE": 2
         }
       }
     },
-    "brier": 0.33941176470588247,
-    "ece": 0.31176470588235294,
+    "brier": 0.3147619047619049,
+    "ece": 0.28095238095238095,
     "cases": [
       {
         "case_id": "duplicate-01",
@@ -336,8 +420,46 @@
         "findings": []
       },
       {
+        "case_id": "krishna-duplicate-exact-01",
+        "category": "state_transition_attach",
+        "gold_label": "SUPPORTED",
+        "predicted_label": "SUPPORTED",
+        "findings": []
+      },
+      {
         "case_id": "krishna-duplicate-paraphrase-01",
         "category": "duplicate_paraphrase",
+        "gold_label": "SUPPORTED",
+        "predicted_label": "SUPPORTED",
+        "findings": []
+      },
+      {
+        "case_id": "krishna-escalate-invalid-input-01",
+        "category": "state_transition_escalate",
+        "gold_label": "INVALID_INPUT",
+        "predicted_label": "INSUFFICIENT_EVIDENCE",
+        "findings": [
+          "WRONG_LABEL",
+          "OVERCONFIDENT_WRONG_LABEL"
+        ]
+      },
+      {
+        "case_id": "krishna-injection-active-intact-01",
+        "category": "state_transition_keep_episodic",
+        "gold_label": "INSUFFICIENT_EVIDENCE",
+        "predicted_label": "INSUFFICIENT_EVIDENCE",
+        "findings": []
+      },
+      {
+        "case_id": "krishna-keep-episodic-empty-memory-01",
+        "category": "state_transition_keep_episodic",
+        "gold_label": "INSUFFICIENT_EVIDENCE",
+        "predicted_label": "INSUFFICIENT_EVIDENCE",
+        "findings": []
+      },
+      {
+        "case_id": "krishna-nonoverlap-past-period-01",
+        "category": "state_transition_promote",
         "gold_label": "SUPPORTED",
         "predicted_label": "SUPPORTED",
         "findings": []
@@ -353,8 +475,63 @@
         ]
       },
       {
+        "case_id": "krishna-promote-after-quarantined-01",
+        "category": "state_transition_promote",
+        "gold_label": "SUPPORTED",
+        "predicted_label": "SUPPORTED",
+        "findings": []
+      },
+      {
+        "case_id": "krishna-promote-after-rejected-01",
+        "category": "state_transition_promote",
+        "gold_label": "SUPPORTED",
+        "predicted_label": "SUPPORTED",
+        "findings": []
+      },
+      {
+        "case_id": "krishna-quarantine-source-conflict-01",
+        "category": "state_transition_quarantine",
+        "gold_label": "MIXED_EVIDENCE",
+        "predicted_label": "SUPPORTED",
+        "findings": [
+          "WRONG_LABEL",
+          "OVERCONFIDENT_WRONG_LABEL"
+        ]
+      },
+      {
+        "case_id": "krishna-quarantine-weak-source-01",
+        "category": "state_transition_quarantine",
+        "gold_label": "SUPPORTED",
+        "predicted_label": "SUPPORTED",
+        "findings": []
+      },
+      {
+        "case_id": "krishna-reject-active-intact-01",
+        "category": "state_transition_reject",
+        "gold_label": "REFUTED",
+        "predicted_label": "INSUFFICIENT_EVIDENCE",
+        "findings": [
+          "WRONG_LABEL",
+          "OVERCONFIDENT_WRONG_LABEL"
+        ]
+      },
+      {
         "case_id": "krishna-reliable-newer-correction-01",
         "category": "reliable_newer_correction",
+        "gold_label": "SUPPORTED",
+        "predicted_label": "SUPPORTED",
+        "findings": []
+      },
+      {
+        "case_id": "krishna-revise-chain-01",
+        "category": "state_transition_revise",
+        "gold_label": "SUPPORTED",
+        "predicted_label": "SUPPORTED",
+        "findings": []
+      },
+      {
+        "case_id": "krishna-revise-with-quarantined-01",
+        "category": "state_transition_revise",
         "gold_label": "SUPPORTED",
         "predicted_label": "SUPPORTED",
         "findings": []
@@ -737,8 +914,8 @@
     ]
   },
   "fixture_judge": {
-    "n": 51,
-    "n_clean": 51,
+    "n": 63,
+    "n_clean": 63,
     "finding_counts": {
       "UNKNOWN_EVIDENCE_ID": 0,
       "DUPLICATE_CITATION": 0,
@@ -880,6 +1057,90 @@
         "OVERCONFIDENT_WRONG_LABEL": 0,
         "UNDERCONFIDENT_DIRECTIONAL_LABEL": 0
       },
+      "state_transition_attach": {
+        "n": 1,
+        "n_clean": 1,
+        "UNKNOWN_EVIDENCE_ID": 0,
+        "DUPLICATE_CITATION": 0,
+        "CITED_AS_BOTH": 0,
+        "MISSING_SUPPORTING_CITATION": 0,
+        "MISSING_REFUTING_CITATION": 0,
+        "WRONG_LABEL": 0,
+        "OVERCONFIDENT_WRONG_LABEL": 0,
+        "UNDERCONFIDENT_DIRECTIONAL_LABEL": 0
+      },
+      "state_transition_escalate": {
+        "n": 1,
+        "n_clean": 1,
+        "UNKNOWN_EVIDENCE_ID": 0,
+        "DUPLICATE_CITATION": 0,
+        "CITED_AS_BOTH": 0,
+        "MISSING_SUPPORTING_CITATION": 0,
+        "MISSING_REFUTING_CITATION": 0,
+        "WRONG_LABEL": 0,
+        "OVERCONFIDENT_WRONG_LABEL": 0,
+        "UNDERCONFIDENT_DIRECTIONAL_LABEL": 0
+      },
+      "state_transition_keep_episodic": {
+        "n": 2,
+        "n_clean": 2,
+        "UNKNOWN_EVIDENCE_ID": 0,
+        "DUPLICATE_CITATION": 0,
+        "CITED_AS_BOTH": 0,
+        "MISSING_SUPPORTING_CITATION": 0,
+        "MISSING_REFUTING_CITATION": 0,
+        "WRONG_LABEL": 0,
+        "OVERCONFIDENT_WRONG_LABEL": 0,
+        "UNDERCONFIDENT_DIRECTIONAL_LABEL": 0
+      },
+      "state_transition_promote": {
+        "n": 3,
+        "n_clean": 3,
+        "UNKNOWN_EVIDENCE_ID": 0,
+        "DUPLICATE_CITATION": 0,
+        "CITED_AS_BOTH": 0,
+        "MISSING_SUPPORTING_CITATION": 0,
+        "MISSING_REFUTING_CITATION": 0,
+        "WRONG_LABEL": 0,
+        "OVERCONFIDENT_WRONG_LABEL": 0,
+        "UNDERCONFIDENT_DIRECTIONAL_LABEL": 0
+      },
+      "state_transition_quarantine": {
+        "n": 2,
+        "n_clean": 2,
+        "UNKNOWN_EVIDENCE_ID": 0,
+        "DUPLICATE_CITATION": 0,
+        "CITED_AS_BOTH": 0,
+        "MISSING_SUPPORTING_CITATION": 0,
+        "MISSING_REFUTING_CITATION": 0,
+        "WRONG_LABEL": 0,
+        "OVERCONFIDENT_WRONG_LABEL": 0,
+        "UNDERCONFIDENT_DIRECTIONAL_LABEL": 0
+      },
+      "state_transition_reject": {
+        "n": 1,
+        "n_clean": 1,
+        "UNKNOWN_EVIDENCE_ID": 0,
+        "DUPLICATE_CITATION": 0,
+        "CITED_AS_BOTH": 0,
+        "MISSING_SUPPORTING_CITATION": 0,
+        "MISSING_REFUTING_CITATION": 0,
+        "WRONG_LABEL": 0,
+        "OVERCONFIDENT_WRONG_LABEL": 0,
+        "UNDERCONFIDENT_DIRECTIONAL_LABEL": 0
+      },
+      "state_transition_revise": {
+        "n": 2,
+        "n_clean": 2,
+        "UNKNOWN_EVIDENCE_ID": 0,
+        "DUPLICATE_CITATION": 0,
+        "CITED_AS_BOTH": 0,
+        "MISSING_SUPPORTING_CITATION": 0,
+        "MISSING_REFUTING_CITATION": 0,
+        "WRONG_LABEL": 0,
+        "OVERCONFIDENT_WRONG_LABEL": 0,
+        "UNDERCONFIDENT_DIRECTIONAL_LABEL": 0
+      },
       "supported_by_weak_source": {
         "n": 2,
         "n_clean": 2,
@@ -931,8 +1192,8 @@
     },
     "by_gold_label": {
       "INSUFFICIENT_EVIDENCE": {
-        "n": 9,
-        "n_clean": 9,
+        "n": 11,
+        "n_clean": 11,
         "UNKNOWN_EVIDENCE_ID": 0,
         "DUPLICATE_CITATION": 0,
         "CITED_AS_BOTH": 0,
@@ -943,8 +1204,8 @@
         "UNDERCONFIDENT_DIRECTIONAL_LABEL": 0
       },
       "INVALID_INPUT": {
-        "n": 1,
-        "n_clean": 1,
+        "n": 2,
+        "n_clean": 2,
         "UNKNOWN_EVIDENCE_ID": 0,
         "DUPLICATE_CITATION": 0,
         "CITED_AS_BOTH": 0,
@@ -955,8 +1216,8 @@
         "UNDERCONFIDENT_DIRECTIONAL_LABEL": 0
       },
       "MIXED_EVIDENCE": {
-        "n": 6,
-        "n_clean": 6,
+        "n": 7,
+        "n_clean": 7,
         "UNKNOWN_EVIDENCE_ID": 0,
         "DUPLICATE_CITATION": 0,
         "CITED_AS_BOTH": 0,
@@ -967,8 +1228,8 @@
         "UNDERCONFIDENT_DIRECTIONAL_LABEL": 0
       },
       "REFUTED": {
-        "n": 4,
-        "n_clean": 4,
+        "n": 5,
+        "n_clean": 5,
         "UNKNOWN_EVIDENCE_ID": 0,
         "DUPLICATE_CITATION": 0,
         "CITED_AS_BOTH": 0,
@@ -979,8 +1240,8 @@
         "UNDERCONFIDENT_DIRECTIONAL_LABEL": 0
       },
       "SUPPORTED": {
-        "n": 31,
-        "n_clean": 31,
+        "n": 38,
+        "n_clean": 38,
         "UNKNOWN_EVIDENCE_ID": 0,
         "DUPLICATE_CITATION": 0,
         "CITED_AS_BOTH": 0,
@@ -992,42 +1253,42 @@
       }
     },
     "label_metrics": {
-      "n": 51,
+      "n": 63,
       "accuracy": 1.0,
       "contradiction_f1": 1.0,
       "contradiction": {
         "precision": 1.0,
         "recall": 1.0,
         "f1": 1.0,
-        "support": 4
+        "support": 5
       },
       "per_label_support": {
-        "SUPPORTED": 31,
-        "INSUFFICIENT_EVIDENCE": 9,
-        "REFUTED": 4,
-        "MIXED_EVIDENCE": 6,
-        "INVALID_INPUT": 1
+        "SUPPORTED": 38,
+        "INSUFFICIENT_EVIDENCE": 11,
+        "INVALID_INPUT": 2,
+        "REFUTED": 5,
+        "MIXED_EVIDENCE": 7
       },
       "confusion": {
         "SUPPORTED": {
-          "SUPPORTED": 31
+          "SUPPORTED": 38
         },
         "REFUTED": {
-          "REFUTED": 4
+          "REFUTED": 5
         },
         "INSUFFICIENT_EVIDENCE": {
-          "INSUFFICIENT_EVIDENCE": 9
+          "INSUFFICIENT_EVIDENCE": 11
         },
         "MIXED_EVIDENCE": {
-          "MIXED_EVIDENCE": 6
+          "MIXED_EVIDENCE": 7
         },
         "INVALID_INPUT": {
-          "INVALID_INPUT": 1
+          "INVALID_INPUT": 2
         }
       }
     },
-    "brier": 0.0045882352941176464,
-    "ece": 0.06470588235294128,
+    "brier": 0.004552380952380953,
+    "ece": 0.06444444444444453,
     "cases": [
       {
         "case_id": "duplicate-01",
@@ -1051,8 +1312,43 @@
         "findings": []
       },
       {
+        "case_id": "krishna-duplicate-exact-01",
+        "category": "state_transition_attach",
+        "gold_label": "SUPPORTED",
+        "predicted_label": "SUPPORTED",
+        "findings": []
+      },
+      {
         "case_id": "krishna-duplicate-paraphrase-01",
         "category": "duplicate_paraphrase",
+        "gold_label": "SUPPORTED",
+        "predicted_label": "SUPPORTED",
+        "findings": []
+      },
+      {
+        "case_id": "krishna-escalate-invalid-input-01",
+        "category": "state_transition_escalate",
+        "gold_label": "INVALID_INPUT",
+        "predicted_label": "INVALID_INPUT",
+        "findings": []
+      },
+      {
+        "case_id": "krishna-injection-active-intact-01",
+        "category": "state_transition_keep_episodic",
+        "gold_label": "INSUFFICIENT_EVIDENCE",
+        "predicted_label": "INSUFFICIENT_EVIDENCE",
+        "findings": []
+      },
+      {
+        "case_id": "krishna-keep-episodic-empty-memory-01",
+        "category": "state_transition_keep_episodic",
+        "gold_label": "INSUFFICIENT_EVIDENCE",
+        "predicted_label": "INSUFFICIENT_EVIDENCE",
+        "findings": []
+      },
+      {
+        "case_id": "krishna-nonoverlap-past-period-01",
+        "category": "state_transition_promote",
         "gold_label": "SUPPORTED",
         "predicted_label": "SUPPORTED",
         "findings": []
@@ -1065,8 +1361,57 @@
         "findings": []
       },
       {
+        "case_id": "krishna-promote-after-quarantined-01",
+        "category": "state_transition_promote",
+        "gold_label": "SUPPORTED",
+        "predicted_label": "SUPPORTED",
+        "findings": []
+      },
+      {
+        "case_id": "krishna-promote-after-rejected-01",
+        "category": "state_transition_promote",
+        "gold_label": "SUPPORTED",
+        "predicted_label": "SUPPORTED",
+        "findings": []
+      },
+      {
+        "case_id": "krishna-quarantine-source-conflict-01",
+        "category": "state_transition_quarantine",
+        "gold_label": "MIXED_EVIDENCE",
+        "predicted_label": "MIXED_EVIDENCE",
+        "findings": []
+      },
+      {
+        "case_id": "krishna-quarantine-weak-source-01",
+        "category": "state_transition_quarantine",
+        "gold_label": "SUPPORTED",
+        "predicted_label": "SUPPORTED",
+        "findings": []
+      },
+      {
+        "case_id": "krishna-reject-active-intact-01",
+        "category": "state_transition_reject",
+        "gold_label": "REFUTED",
+        "predicted_label": "REFUTED",
+        "findings": []
+      },
+      {
         "case_id": "krishna-reliable-newer-correction-01",
         "category": "reliable_newer_correction",
+        "gold_label": "SUPPORTED",
+        "predicted_label": "SUPPORTED",
+        "findings": []
+      },
+      {
+        "case_id": "krishna-revise-chain-01",
+        "category": "state_transition_revise",
+        "gold_label": "SUPPORTED",
+        "predicted_label": "SUPPORTED",
+        "findings": []
+      },
+      {
+        "case_id": "krishna-revise-with-quarantined-01",
+        "category": "state_transition_revise",
         "gold_label": "SUPPORTED",
         "predicted_label": "SUPPORTED",
         "findings": []
@@ -1389,21 +1734,21 @@
     ]
   },
   "generic_ensemble_fake": {
-    "n": 51,
-    "macro_f1": 0.11788211788211789,
-    "promotion_precision": 0.23529411764705882,
-    "promotion_recall": 0.8,
+    "n": 63,
+    "macro_f1": 0.1285714285714286,
+    "promotion_precision": 0.2619047619047619,
+    "promotion_recall": 0.8461538461538461,
     "revision_accuracy": 0.0,
-    "identical_member_panels": 51,
+    "identical_member_panels": 63,
     "note": "Three FakeJudge votes. SUPPORTED maps to PROMOTE. REFUTED is never emitted."
   },
   "generic_ensemble_fixture": {
-    "n": 51,
-    "macro_f1": 0.5934959349593496,
-    "promotion_precision": 0.3225806451612903,
+    "n": 63,
+    "macro_f1": 0.5966386554621849,
+    "promotion_precision": 0.34210526315789475,
     "promotion_recall": 1.0,
     "revision_accuracy": 0.0,
-    "identical_member_panels": 51,
+    "identical_member_panels": 63,
     "note": "The fixture ignores seed, so three members match. That is the temperature-0 degeneration in SPEC.md section 12.3, recorded here."
   },
   "descriptive_temperature_fit_on_these_same_rows": 0.05,

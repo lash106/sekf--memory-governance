@@ -13,6 +13,7 @@ from sekf.judge.error_analysis import (
     analyze_judge_evidence,
 )
 from sekf.judge.fake import FakeJudge
+from sekf.judge.fixture import FixtureJudge
 from sekf.judge.freeze import assert_prompts_frozen
 from sekf.judge.interface import Judge
 from sekf.judge.llm import LLMJudge
@@ -26,6 +27,7 @@ from sekf.judge.metrics import (
 __all__ = [
     "CalibrationReport",
     "FakeJudge",
+    "FixtureJudge",
     "Judge",
     "JudgeEvidenceReport",
     "JudgeMetricsReport",

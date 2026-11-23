@@ -1,0 +1,67 @@
+{
+  "case_id": "krishna-promote-after-quarantined-01",
+  "category": "state_transition_promote",
+  "split": "dev",
+  "annotators": [
+    "Krishna Panjiyar"
+  ],
+  "annotation_notes": "Only a QUARANTINED claim exists, so nothing is active: NO_RELATED_CLAIM, PROMOTE. Storage check: the quarantined claim stays QUARANTINED and the new claim is ACTIVE v1.",
+  "initial_memory": [
+    {
+      "claim_id": "4a95c535-7c5a-5af2-a423-776976bb36c7",
+      "claim_text": "The gym closes at 23:00 on weekdays.",
+      "subject_key": "gym",
+      "predicate_key": "closing_time_weekday",
+      "object_text": "23:00",
+      "status": "QUARANTINED",
+      "version": 1,
+      "valid_from": null,
+      "valid_to": null,
+      "confidence": 0.9,
+      "created_at": "2026-09-20T00:00:00Z",
+      "updated_at": "2026-09-20T00:00:00Z",
+      "supersedes_claim_id": null,
+      "evidence_ids": []
+    }
+  ],
+  "candidate": {
+    "claim_id": "8ba83082-a7ed-53e4-ae4c-ac1801a99ed4",
+    "claim_text": "The gym closes at 22:00 on weekdays.",
+    "subject_key": "gym",
+    "predicate_key": "closing_time_weekday",
+    "object_text": "22:00",
+    "source_id": "student-chat",
+    "observed_at": "2026-10-08T12:00:00Z",
+    "valid_from": null,
+    "valid_to": null,
+    "extractor_confidence": 0.9,
+    "metadata": {}
+  },
+  "evidence": [
+    {
+      "evidence_id": "b96e5f29-d784-5ebf-a0e0-17b1ea7fbd52",
+      "content": "Recreation center hours: weekdays 06:00 to 22:00.",
+      "source_id": "recreation-website",
+      "source_type": "official_document",
+      "published_at": "2026-08-15T00:00:00Z",
+      "retrieved_at": "2026-10-08T12:00:00Z",
+      "reliability": 0.95,
+      "metadata": {}
+    }
+  ],
+  "gold": {
+    "judge_label": "SUPPORTED",
+    "temporal_relation": "NO_RELATED_CLAIM",
+    "conflict_type": "NONE",
+    "final_action": "PROMOTE",
+    "expected_memory_delta": {
+      "superseded_claim_ids": [],
+      "new_active_claim_ids": [
+        "8ba83082-a7ed-53e4-ae4c-ac1801a99ed4"
+      ],
+      "quarantined_claim_ids": [],
+      "rejected_claim_ids": [],
+      "attached_evidence_ids": []
+    }
+  }
+}

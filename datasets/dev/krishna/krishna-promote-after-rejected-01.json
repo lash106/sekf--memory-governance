@@ -1,0 +1,67 @@
+{
+  "case_id": "krishna-promote-after-rejected-01",
+  "category": "state_transition_promote",
+  "split": "dev",
+  "annotators": [
+    "Krishna Panjiyar"
+  ],
+  "annotation_notes": "Earlier wrong claim was REJECTED (kept for audit). A new supported claim for the same key is PROMOTE. Storage check: the rejected claim is not reopened.",
+  "initial_memory": [
+    {
+      "claim_id": "76e1a8f6-7199-59ee-b5aa-4cb5a3ba96cd",
+      "claim_text": "The bookstore opens at 07:00.",
+      "subject_key": "bookstore",
+      "predicate_key": "opening_time",
+      "object_text": "07:00",
+      "status": "REJECTED",
+      "version": 1,
+      "valid_from": null,
+      "valid_to": null,
+      "confidence": 0.9,
+      "created_at": "2026-09-10T00:00:00Z",
+      "updated_at": "2026-09-10T00:00:00Z",
+      "supersedes_claim_id": null,
+      "evidence_ids": []
+    }
+  ],
+  "candidate": {
+    "claim_id": "07f4647e-2fd1-57ce-a109-0411fc257b70",
+    "claim_text": "The bookstore opens at 09:00.",
+    "subject_key": "bookstore",
+    "predicate_key": "opening_time",
+    "object_text": "09:00",
+    "source_id": "student-chat",
+    "observed_at": "2026-10-06T08:30:00Z",
+    "valid_from": null,
+    "valid_to": null,
+    "extractor_confidence": 0.9,
+    "metadata": {}
+  },
+  "evidence": [
+    {
+      "evidence_id": "b9c1c0a8-d421-5574-ba9e-bf1a93e2946e",
+      "content": "Campus bookstore: open daily from 09:00.",
+      "source_id": "bookstore-website",
+      "source_type": "official_document",
+      "published_at": "2026-08-25T00:00:00Z",
+      "retrieved_at": "2026-10-06T08:30:00Z",
+      "reliability": 0.9,
+      "metadata": {}
+    }
+  ],
+  "gold": {
+    "judge_label": "SUPPORTED",
+    "temporal_relation": "NO_RELATED_CLAIM",
+    "conflict_type": "NONE",
+    "final_action": "PROMOTE",
+    "expected_memory_delta": {
+      "superseded_claim_ids": [],
+      "new_active_claim_ids": [
+        "07f4647e-2fd1-57ce-a109-0411fc257b70"
+      ],
+      "quarantined_claim_ids": [],
+      "rejected_claim_ids": [],
+      "attached_evidence_ids": []
+    }
+  }
+}

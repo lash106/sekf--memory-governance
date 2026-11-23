@@ -30,6 +30,15 @@ REQUIRED_CATEGORIES = {
 # Extra categories beyond the required 13, each backed by a rule in ANNOTATION_GUIDE.md.
 EXTRA_CATEGORIES = {
     "supported_by_weak_source",  # guide B4: weak source, no conflict -> QUARANTINE (A3)
+    # Krishna Sprint 2 storage-check cases (SPEC.md section 18): exercise one final action
+    # against the SQL store. Not a section 13.3 evidence category.
+    "state_transition_attach",
+    "state_transition_escalate",
+    "state_transition_keep_episodic",
+    "state_transition_promote",
+    "state_transition_quarantine",
+    "state_transition_reject",
+    "state_transition_revise",
 }
 
 KNOWN_CATEGORIES = REQUIRED_CATEGORIES | EXTRA_CATEGORIES

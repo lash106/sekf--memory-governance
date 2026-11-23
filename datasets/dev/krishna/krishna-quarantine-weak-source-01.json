@@ -1,0 +1,67 @@
+{
+  "case_id": "krishna-quarantine-weak-source-01",
+  "category": "state_transition_quarantine",
+  "split": "dev",
+  "annotators": [
+    "Krishna Panjiyar"
+  ],
+  "annotation_notes": "Assertive but weak source (reliability 0.3) disagrees with the ACTIVE value: A3, QUARANTINE. Storage check: the ACTIVE claim stays ACTIVE and unchanged.",
+  "initial_memory": [
+    {
+      "claim_id": "49fdc202-ce12-54e9-8801-14a2b81b4b88",
+      "claim_text": "Parking lot B costs $8 a day.",
+      "subject_key": "parking_lot_b",
+      "predicate_key": "daily_fee",
+      "object_text": "8",
+      "status": "ACTIVE",
+      "version": 1,
+      "valid_from": "2026-01-01T00:00:00Z",
+      "valid_to": null,
+      "confidence": 0.9,
+      "created_at": "2026-01-04T00:00:00Z",
+      "updated_at": "2026-01-04T00:00:00Z",
+      "supersedes_claim_id": null,
+      "evidence_ids": []
+    }
+  ],
+  "candidate": {
+    "claim_id": "d34d37b0-f7fb-5624-b05d-f29743f7302d",
+    "claim_text": "Parking lot B costs $12 a day.",
+    "subject_key": "parking_lot_b",
+    "predicate_key": "daily_fee",
+    "object_text": "12",
+    "source_id": "tiktok-comment",
+    "observed_at": "2026-10-11T19:00:00Z",
+    "valid_from": null,
+    "valid_to": null,
+    "extractor_confidence": 0.9,
+    "metadata": {}
+  },
+  "evidence": [
+    {
+      "evidence_id": "1dc73e7c-c098-5bca-86ec-db96903eba83",
+      "content": "Parking lot B is $12 a day now, they raised it.",
+      "source_id": "tiktok-comment",
+      "source_type": "social_media",
+      "published_at": "2026-10-11T18:00:00Z",
+      "retrieved_at": "2026-10-11T19:00:00Z",
+      "reliability": 0.3,
+      "metadata": {}
+    }
+  ],
+  "gold": {
+    "judge_label": "SUPPORTED",
+    "temporal_relation": "NEWER_UPDATE",
+    "conflict_type": "TEMPORAL_UPDATE",
+    "final_action": "QUARANTINE",
+    "expected_memory_delta": {
+      "superseded_claim_ids": [],
+      "new_active_claim_ids": [],
+      "quarantined_claim_ids": [
+        "d34d37b0-f7fb-5624-b05d-f29743f7302d"
+      ],
+      "rejected_claim_ids": [],
+      "attached_evidence_ids": []
+    }
+  }
+}

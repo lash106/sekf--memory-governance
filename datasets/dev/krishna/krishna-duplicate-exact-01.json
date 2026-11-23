@@ -1,0 +1,67 @@
+{
+  "case_id": "krishna-duplicate-exact-01",
+  "category": "state_transition_attach",
+  "split": "dev",
+  "annotators": [
+    "Krishna Panjiyar"
+  ],
+  "annotation_notes": "Same wording and value as the ACTIVE claim (DUPLICATE). Storage check: no new claim and no new version; the new evidence is linked to the existing claim.",
+  "initial_memory": [
+    {
+      "claim_id": "d27d368d-8b86-5b6c-98d0-6e3566a55d63",
+      "claim_text": "The pool has 6 lap lanes.",
+      "subject_key": "pool",
+      "predicate_key": "lap_lane_count",
+      "object_text": "6",
+      "status": "ACTIVE",
+      "version": 1,
+      "valid_from": null,
+      "valid_to": null,
+      "confidence": 0.9,
+      "created_at": "2026-02-01T00:00:00Z",
+      "updated_at": "2026-02-01T00:00:00Z",
+      "supersedes_claim_id": null,
+      "evidence_ids": []
+    }
+  ],
+  "candidate": {
+    "claim_id": "cb905ae0-2381-5799-a9e4-107c5917364e",
+    "claim_text": "The pool has 6 lap lanes.",
+    "subject_key": "pool",
+    "predicate_key": "lap_lane_count",
+    "object_text": "6",
+    "source_id": "student-chat",
+    "observed_at": "2026-10-07T17:00:00Z",
+    "valid_from": null,
+    "valid_to": null,
+    "extractor_confidence": 0.9,
+    "metadata": {}
+  },
+  "evidence": [
+    {
+      "evidence_id": "a7eb04f6-7ddd-5534-b5ff-18176f6fa422",
+      "content": "Aquatics page: the pool has 6 lap lanes.",
+      "source_id": "aquatics-website",
+      "source_type": "official_document",
+      "published_at": "2026-09-01T00:00:00Z",
+      "retrieved_at": "2026-10-07T17:00:00Z",
+      "reliability": 0.93,
+      "metadata": {}
+    }
+  ],
+  "gold": {
+    "judge_label": "SUPPORTED",
+    "temporal_relation": "SAME_PERIOD",
+    "conflict_type": "DUPLICATE",
+    "final_action": "ATTACH_EVIDENCE",
+    "expected_memory_delta": {
+      "superseded_claim_ids": [],
+      "new_active_claim_ids": [],
+      "quarantined_claim_ids": [],
+      "rejected_claim_ids": [],
+      "attached_evidence_ids": [
+        "a7eb04f6-7ddd-5534-b5ff-18176f6fa422"
+      ]
+    }
+  }
+}

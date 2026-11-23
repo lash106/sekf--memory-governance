@@ -1,0 +1,67 @@
+{
+  "case_id": "krishna-nonoverlap-past-period-01",
+  "category": "state_transition_promote",
+  "split": "dev",
+  "annotators": [
+    "Krishna Panjiyar"
+  ],
+  "annotation_notes": "The candidate describes a period that ended a year ago, so it does not replace the current claim (ruling B1): PROMOTE, conflict NONE. Storage check: both claims are ACTIVE afterwards and nothing is superseded. A latest-write-wins rule gets this wrong.",
+  "initial_memory": [
+    {
+      "claim_id": "c4fce792-40b5-5997-9b5b-bed98589740b",
+      "claim_text": "The library closes at 22:00 on weekdays.",
+      "subject_key": "library",
+      "predicate_key": "closing_time_weekday",
+      "object_text": "22:00",
+      "status": "ACTIVE",
+      "version": 1,
+      "valid_from": "2026-08-20T00:00:00Z",
+      "valid_to": null,
+      "confidence": 0.9,
+      "created_at": "2026-08-21T00:00:00Z",
+      "updated_at": "2026-08-21T00:00:00Z",
+      "supersedes_claim_id": null,
+      "evidence_ids": []
+    }
+  ],
+  "candidate": {
+    "claim_id": "f6108f4c-47bb-5d57-8fc3-9ef211973cef",
+    "claim_text": "In summer 2025 the library closed at 20:00 on weekdays.",
+    "subject_key": "library",
+    "predicate_key": "closing_time_weekday",
+    "object_text": "20:00",
+    "source_id": "library-archive",
+    "observed_at": "2026-10-15T14:00:00Z",
+    "valid_from": "2025-06-01T00:00:00Z",
+    "valid_to": "2025-08-15T00:00:00Z",
+    "extractor_confidence": 0.9,
+    "metadata": {}
+  },
+  "evidence": [
+    {
+      "evidence_id": "e5e9d917-7607-5ae0-bcc9-9782e0affee6",
+      "content": "Archived summer 2025 hours: weekdays close at 20:00.",
+      "source_id": "library-archive",
+      "source_type": "official_document",
+      "published_at": "2025-06-01T00:00:00Z",
+      "retrieved_at": "2026-10-15T14:00:00Z",
+      "reliability": 0.9,
+      "metadata": {}
+    }
+  ],
+  "gold": {
+    "judge_label": "SUPPORTED",
+    "temporal_relation": "NON_OVERLAPPING_VALIDITY",
+    "conflict_type": "NONE",
+    "final_action": "PROMOTE",
+    "expected_memory_delta": {
+      "superseded_claim_ids": [],
+      "new_active_claim_ids": [
+        "f6108f4c-47bb-5d57-8fc3-9ef211973cef"
+      ],
+      "quarantined_claim_ids": [],
+      "rejected_claim_ids": [],
+      "attached_evidence_ids": []
+    }
+  }
+}

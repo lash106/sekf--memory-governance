@@ -1,0 +1,48 @@
+{
+  "case_id": "krishna-keep-episodic-empty-memory-01",
+  "category": "state_transition_keep_episodic",
+  "split": "dev",
+  "annotators": [
+    "Krishna Panjiyar"
+  ],
+  "annotation_notes": "Hedged evidence does not assert the value: INSUFFICIENT_EVIDENCE, KEEP_EPISODIC (A2). Storage check: no claim of any status is created; only the episode is kept.",
+  "initial_memory": [],
+  "candidate": {
+    "claim_id": "aa1223e8-0a30-5169-8960-ceee716b4324",
+    "claim_text": "The quad concert starts at 18:00.",
+    "subject_key": "quad",
+    "predicate_key": "event_start_time",
+    "object_text": "18:00",
+    "source_id": "student-chat",
+    "observed_at": "2026-10-13T11:00:00Z",
+    "valid_from": null,
+    "valid_to": null,
+    "extractor_confidence": 0.9,
+    "metadata": {}
+  },
+  "evidence": [
+    {
+      "evidence_id": "0610d623-d81f-57df-a559-76b9da5c765d",
+      "content": "Maybe the quad concert starts around 6?? not sure.",
+      "source_id": "student-chat",
+      "source_type": "chat_message",
+      "published_at": "2026-10-13T10:55:00Z",
+      "retrieved_at": "2026-10-13T11:00:00Z",
+      "reliability": 0.4,
+      "metadata": {}
+    }
+  ],
+  "gold": {
+    "judge_label": "INSUFFICIENT_EVIDENCE",
+    "temporal_relation": "NO_RELATED_CLAIM",
+    "conflict_type": "NONE",
+    "final_action": "KEEP_EPISODIC",
+    "expected_memory_delta": {
+      "superseded_claim_ids": [],
+      "new_active_claim_ids": [],
+      "quarantined_claim_ids": [],
+      "rejected_claim_ids": [],
+      "attached_evidence_ids": []
+    }
+  }
+}

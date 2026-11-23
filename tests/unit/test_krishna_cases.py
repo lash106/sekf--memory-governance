@@ -1,4 +1,4 @@
-"""Krishna's Sprint 0 `datasets/dev/krishna` cases load and have coherent memory deltas."""
+"""Krishna's `datasets/dev/krishna` cases (Sprint 0 and 2) load and have coherent deltas."""
 
 from __future__ import annotations
 
@@ -24,8 +24,8 @@ CASES = sorted(
 )
 
 
-def test_five_cases_present() -> None:
-    assert len(CASES) >= 5
+def test_fifteen_cases_present() -> None:
+    assert len(CASES) >= 15
 
 
 @pytest.mark.parametrize("path", CASES, ids=lambda p: p.stem)

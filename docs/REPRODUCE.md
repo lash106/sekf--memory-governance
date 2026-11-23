@@ -76,6 +76,17 @@ run manifest and the resumable results file already in `src/sekf/evaluation/`:
 The final instructions here will be the exact command that runs the pilot on `datasets/dev/`
 and the command that rebuilds the summary table from the saved results file alone.
 
+## 5b. Storage baselines and memory deltas (no network, no model)
+
+```bash
+.venv/bin/python scripts/run_state_transition_eval.py --owner krishna --json /tmp/state.json
+```
+
+Runs `direct_storage`, `latest_write_wins`, `static_rag` and an offline council stand-in on
+the dev cases against a fresh seeded store per case, then compares what changed in memory with
+each case's `expected_memory_delta`. The council row uses a fake Judge: it checks the wiring,
+it is not a result. Design and limits: `docs/decisions/0006-storage-baselines.md`.
+
 ## 6. Labeling and agreement
 
 Gold labels follow `datasets/ANNOTATION_GUIDE.md`. Each frozen test case is labeled

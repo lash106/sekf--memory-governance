@@ -87,7 +87,8 @@ def test_markdown_projection_is_idempotent_and_a_failed_write_keeps_nothing(
     project_bundle(tmp_path, bundle)
     audit = (tmp_path / "L3_AUDIT_LOG.md").read_text(encoding="utf-8")
     assert audit.count(str(decision.decision_id)) == 1
-    assert (tmp_path / "L2_CLAIMS.md").is_file()
+    claims = (tmp_path / "L2_CLAIMS.md").read_text(encoding="utf-8")
+    assert claims.count(str(decision.decision_id)) == 1
 
     repo = InMemoryRepository()
     repo.markdown_root = tmp_path / "broken"
@@ -99,6 +100,47 @@ def test_markdown_projection_is_idempotent_and_a_failed_write_keeps_nothing(
     with pytest.raises(CommitRejected, match="not kept"):
         repo.apply_decision(bundle)
     assert repo.decision_count() == 0
+
+
+def test_markdown_projection_retry_finishes_after_partial_claims_write(
+    tmp_path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Audit is written last. A crash after L2 must still complete on retry."""
+
+    cand = make_candidate()
+    historian = make_historian(cand)
+    judge = make_judge(cand)
+    decision = PolicyEngine().decide(make_context(candidate=cand, historian=historian, judge=judge))
+    bundle = CommitBundle(candidate=cand, decision=decision, historian=historian, judge=judge)
+    marker = f"decision:{decision.decision_id}"
+
+    real_append = __import__("sekf.memory.markdown_projection", fromlist=["_append"])._append
+    calls = {"n": 0}
+
+    def flaky_append(path, text):  # type: ignore[no-untyped-def]
+        calls["n"] += 1
+        real_append(path, text)
+        # Fail once after L2_CLAIMS lands and before L3_AUDIT_LOG.
+        if path.name == "L2_CLAIMS.md" and calls["n"] == 1:
+            raise OSError("disk full after claims")
+
+    monkeypatch.setattr("sekf.memory.markdown_projection._append", flaky_append)
+    with pytest.raises(OSError, match="disk full after claims"):
+        project_bundle(tmp_path, bundle)
+
+    claims = tmp_path / "L2_CLAIMS.md"
+    audit = tmp_path / "L3_AUDIT_LOG.md"
+    assert claims.is_file() and marker in claims.read_text(encoding="utf-8")
+    assert not audit.is_file() or marker not in audit.read_text(encoding="utf-8")
+
+    # Retry: skip the claims line already written; write the audit completion marker.
+    project_bundle(tmp_path, bundle)
+    assert marker in audit.read_text(encoding="utf-8")
+    assert claims.read_text(encoding="utf-8").count(marker) == 1
+    # A second retry is a no-op.
+    project_bundle(tmp_path, bundle)
+    assert claims.read_text(encoding="utf-8").count(marker) == 1
+    assert audit.read_text(encoding="utf-8").count(marker) == 1
 
 
 def test_brief_omits_an_old_candidate_without_deleting_it() -> None:

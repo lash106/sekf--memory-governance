@@ -27,11 +27,12 @@ from contextlib import asynccontextmanager
 from pathlib import Path
 
 from fastapi import Depends, FastAPI, HTTPException, Request
+from fastapi.responses import JSONResponse
 
 from sekf import __version__
 from sekf.api.orchestrator import Governance
 from sekf.contracts import CONTRACT_VERSION, DecideRequest, DecideResponse
-from sekf.errors import ConfigurationError
+from sekf.errors import ConfigurationError, ProjectionFailed, SekfError
 from sekf.historian import DeterministicHistorian, FakeHistorian, Historian, LLMHistorian
 from sekf.judge.compose import build_judge_from_env, load_project_env
 from sekf.memory import InMemoryRepository, MemoryRepository, build_memory_repository
@@ -147,6 +148,30 @@ async def _lifespan(app: FastAPI) -> AsyncIterator[None]:
 def create_app(governance: Governance | None = None) -> FastAPI:
     app = FastAPI(title="SEKF", version=__version__, lifespan=_lifespan)
     app.state.governance = governance or build_default_governance()
+
+    @app.exception_handler(ProjectionFailed)
+    async def projection_failed_handler(_request: Request, exc: ProjectionFailed) -> JSONResponse:
+        # Decision is already in SQL; tell the client to retry the same decision_id.
+        return JSONResponse(
+            status_code=503,
+            content={
+                "error": "ProjectionFailed",
+                "detail": str(exc),
+                "retryable": True,
+                "note": (
+                    "The decision is committed in the memory store. "
+                    "Retry the same request to finish the Markdown projection."
+                ),
+            },
+        )
+
+    @app.exception_handler(SekfError)
+    async def sekf_error_handler(_request: Request, exc: SekfError) -> JSONResponse:
+        # ProjectionFailed has its own 503 handler (registered above; more specific).
+        return JSONResponse(
+            status_code=400,
+            content={"error": type(exc).__name__, "detail": str(exc)},
+        )
 
     @app.get("/health")
     async def health() -> dict[str, str]:

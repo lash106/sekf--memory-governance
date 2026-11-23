@@ -96,6 +96,24 @@ def live_configured() -> bool:
     return bool((os.getenv("SEKF_LLM_API_KEY") or "").strip())
 
 
+def require_live_permission() -> None:
+    """Block a live demo until an operator explicitly allows the configured token.
+
+    A non-empty `SEKF_LLM_API_KEY` (from the process env or a loaded env file) is
+    not enough. Set `SEKF_ALLOW_LIVE=1` only after confirming the token is yours
+    and approved for this run. Offline demos leave the key empty.
+    """
+
+    if (os.getenv("SEKF_ALLOW_LIVE") or "").strip() == "1":
+        return
+    raise SystemExit(
+        "Live pilot blocked: SEKF_LLM_API_KEY is set, but SEKF_ALLOW_LIVE is not 1. "
+        "Confirm the token is allowed for this demonstration, then export "
+        "SEKF_ALLOW_LIVE=1. For offline scoring, clear SEKF_LLM_API_KEY "
+        "(and any key in .env / huggingface.env)."
+    )
+
+
 def live_run_config() -> RunConfig:
     model = (os.getenv("SEKF_LLM_MODEL") or "gpt-4o-mini").strip() or "gpt-4o-mini"
     return RunConfig(model=model, temperature=0.0, seed=0, timeout_s=60.0)
@@ -336,6 +354,8 @@ def write_readme(summary: dict[str, Any], n_cases: int, sha: str, notes: list[st
 async def main() -> None:
     env_files = load_env()
     live = live_configured()
+    if live:
+        require_live_permission()
     fake_cfg = fake_run_config()
     live_cfg = live_run_config() if live else fake_cfg
     cases = load_cases()

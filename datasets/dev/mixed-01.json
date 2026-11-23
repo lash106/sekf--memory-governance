@@ -1,11 +1,12 @@
 {
   "case_id": "mixed-01",
-  "category": "overlapping_temporal_conflict",
+  "category": "conflicting_sources_similar_reliability",
   "split": "dev",
   "annotators": [
-    "Sai Chetan Muppalla"
+    "Sai Chetan Muppalla",
+    "Sai Chetan Muppalla (Historian error analysis, 2026-11-21)"
   ],
-  "annotation_notes": "Sai Chetan evidence/governance case (overlapping_temporal_conflict).",
+  "annotation_notes": "Sai Chetan evidence/governance case (conflicting_sources_similar_reliability). Relabeled: Two equal-reliability sources disagree: SOURCE_CONFLICT by the guide definition, not VALUE_CONFLICT. Category set to conflicting_sources_similar_reliability to match the temporal/conflict labels (Historian error analysis, group C).",
   "initial_memory": [
     {
       "claim_id": "3a36cbf6-c3a4-55cc-93ca-71a4634850bf",
@@ -62,7 +63,7 @@
   "gold": {
     "judge_label": "MIXED_EVIDENCE",
     "temporal_relation": "NEWER_UPDATE",
-    "conflict_type": "VALUE_CONFLICT",
+    "conflict_type": "SOURCE_CONFLICT",
     "final_action": "QUARANTINE",
     "expected_memory_delta": {
       "superseded_claim_ids": [],

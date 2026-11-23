@@ -3,9 +3,10 @@
   "category": "conflicting_sources_similar_reliability",
   "split": "dev",
   "annotators": [
-    "Shailen Sutradhar"
+    "Shailen Sutradhar",
+    "Sai Chetan Muppalla (second annotator, Historian error analysis, 2026-11-21)"
   ],
-  "annotation_notes": "Two official offices published conflicting prices on the same day and neither outranks the other. No basis to replace or reject: quarantine and let a human decide. Existing claim stays ACTIVE.",
+  "annotation_notes": "Two official offices published conflicting prices on the same day and neither outranks the other. No basis to replace or reject: quarantine and let a human decide. Existing claim stays ACTIVE. Relabeled temporal OVERLAPPING_VALIDITY -> NEWER_UPDATE to match source-similar-01 (candidate valid_from later than an open-ended claim).",
   "initial_memory": [
     {
       "claim_id": "50e6d035-1630-5945-aa82-815a7269b5f8",
@@ -61,7 +62,7 @@
   ],
   "gold": {
     "judge_label": "MIXED_EVIDENCE",
-    "temporal_relation": "OVERLAPPING_VALIDITY",
+    "temporal_relation": "NEWER_UPDATE",
     "conflict_type": "SOURCE_CONFLICT",
     "final_action": "QUARANTINE",
     "expected_memory_delta": {

@@ -132,6 +132,18 @@ RELABEL_NOTES = {
     "this is an ordinary temporal update (guide rule B2).",
     "poison-01": "The only evidence is an injected instruction from a low-reliability source; "
     "it supports nothing, so keep as episodic only (guide rules A2, A4).",
+    "mixed-01": "Two equal-reliability sources disagree: SOURCE_CONFLICT by the guide "
+    "definition, not VALUE_CONFLICT. Category set to conflicting_sources_similar_reliability "
+    "to match the temporal/conflict labels (Historian error analysis, group C).",
+    "supported-paraphrase-02": "Claim text matches the ACTIVE claim word-for-word; only the "
+    "evidence is reworded ('six PM'). Guide: same value, same wording -> DUPLICATE, not "
+    "PARAPHRASE (Historian error analysis, group C).",
+}
+
+# Who recorded the relabel. Default is the earlier guide pass with Shailen.
+RELABEL_REVIEWERS = {
+    "mixed-01": "Sai Chetan Muppalla (Historian error analysis, 2026-11-21)",
+    "supported-paraphrase-02": "Sai Chetan Muppalla (Historian error analysis, 2026-11-21)",
 }
 
 
@@ -368,7 +380,7 @@ def build_cases() -> list[dict]:
         ),
         (
             "mixed-01",
-            "overlapping_temporal_conflict",
+            "conflicting_sources_similar_reliability",
             base_memory("17:00"),
             cand("18:00"),
             [
@@ -381,7 +393,7 @@ def build_cases() -> list[dict]:
             ],
             "MIXED_EVIDENCE",
             "NEWER_UPDATE",
-            "VALUE_CONFLICT",
+            "SOURCE_CONFLICT",
             "QUARANTINE",
         ),
         (
@@ -392,7 +404,7 @@ def build_cases() -> list[dict]:
             [evid("FYI lab Friday shutdown is six PM.")],
             "SUPPORTED",
             "SAME_PERIOD",
-            "PARAPHRASE",
+            "DUPLICATE",
             "ATTACH_EVIDENCE",
         ),
         (
@@ -465,7 +477,11 @@ def build_cases() -> list[dict]:
             "category": category,
             "split": "dev",
             "annotators": ["Sai Chetan Muppalla"]
-            + (["Shailen Sutradhar (relabel)"] if case_id in RELABEL_NOTES else []),
+            + (
+                [RELABEL_REVIEWERS.get(case_id, "Shailen Sutradhar (relabel)")]
+                if case_id in RELABEL_NOTES
+                else []
+            ),
             "annotation_notes": f"Sai Chetan evidence/governance case ({category})."
             + (f" Relabeled: {RELABEL_NOTES[case_id]}" if case_id in RELABEL_NOTES else ""),
             "initial_memory": memory,

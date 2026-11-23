@@ -106,6 +106,13 @@ List exactly what changes, by id:
   action stays `QUARANTINE`), `nonoverlap-temporal-01` (`REVISE` → `PROMOTE`), `source-unequal-01`
   (conflict `SOURCE_CONFLICT` → `TEMPORAL_UPDATE`), `poison-01` (`QUARANTINE` → `KEEP_EPISODIC`).
   Added `mahalakshmi/provenance-weak-source-ml-01` (rule B4).
-- **Open for the team to review:** `mixed-01` and `overlap-conflict-01` label two disagreeing
-  sources as `VALUE_CONFLICT`; by the `SOURCE_CONFLICT` definition above, `mixed-01` (two sources
-  of equal standing) may need `SOURCE_CONFLICT`. Left unchanged until a second annotator looks.
+- **Open for the team to review:** `overlap-conflict-01` still labels two disagreeing sources as
+  `VALUE_CONFLICT`; confirm whether that case should stay or move to `SOURCE_CONFLICT`.
+- **2026-11-21 (second annotator, Sai Chetan, Historian error analysis group C).**
+  `supported-paraphrase-02`: `PARAPHRASE` → `DUPLICATE` (claim text identical to memory).
+  `mixed-01`: `VALUE_CONFLICT` → `SOURCE_CONFLICT`, category →
+  `conflicting_sources_similar_reliability`.
+  `shailen/shailen-source-similar-01`: temporal `OVERLAPPING_VALIDITY` → `NEWER_UPDATE` (align
+  with `source-similar-01`).
+  `krishna/krishna-poisoning-01`: conflict `VALUE_CONFLICT` → `TEMPORAL_UPDATE` (newer different
+  value; source weakness changes the action, not the conflict label).

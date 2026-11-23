@@ -155,6 +155,25 @@ async def test_time_ranges_dates_and_room_tokens_support() -> None:
     assert room.label is JudgeLabel.SUPPORTED
 
 
+async def test_day_first_date_refutes_iso_object() -> None:
+    """Registrar copy often writes '15 September'; that must refute 2026-10-15."""
+
+    judge = FixtureJudge()
+    assessment = await judge.evaluate(
+        _request(
+            _candidate("2026-10-15", claim_text="The add/drop deadline is 15 October."),
+            [
+                _evidence(
+                    "Registrar calendar: the add/drop deadline is 15 September; "
+                    "no extension has been announced."
+                )
+            ],
+        )
+    )
+    assert assessment.label is JudgeLabel.REFUTED
+    assert assessment.refuting_evidence_ids
+
+
 async def test_month_day_conflict_is_mixed_and_weak_blog_is_not() -> None:
     judge = FixtureJudge()
     mixed = await judge.evaluate(

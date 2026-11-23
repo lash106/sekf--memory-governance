@@ -24,11 +24,12 @@ from typing import Any
 from live_retry import with_retries
 
 from sekf.api.orchestrator import Governance
+from sekf.baselines import DirectStorageBaseline, LatestWriteWinsBaseline, StaticRagBaseline
 from sekf.baselines.generic_ensemble.baseline import GenericEnsembleBaseline
 from sekf.baselines.single_judge.baseline import SingleJudgeBaseline
+from sekf.baselines.storage_common import StorageBaseline
 from sekf.contracts import (
     CandidateClaim,
-    ClaimStatus,
     DecideMode,
     DecideRequest,
     EvidenceRecord,
@@ -93,6 +94,24 @@ def git_sha() -> str:
 
 def live_configured() -> bool:
     return bool((os.getenv("SEKF_LLM_API_KEY") or "").strip())
+
+
+def require_live_permission() -> None:
+    """Block a live demo until an operator explicitly allows the configured token.
+
+    A non-empty `SEKF_LLM_API_KEY` (from the process env or a loaded env file) is
+    not enough. Set `SEKF_ALLOW_LIVE=1` only after confirming the token is yours
+    and approved for this run. Offline demos leave the key empty.
+    """
+
+    if (os.getenv("SEKF_ALLOW_LIVE") or "").strip() == "1":
+        return
+    raise SystemExit(
+        "Live pilot blocked: SEKF_LLM_API_KEY is set, but SEKF_ALLOW_LIVE is not 1. "
+        "Confirm the token is allowed for this demonstration, then export "
+        "SEKF_ALLOW_LIVE=1. For offline scoring, clear SEKF_LLM_API_KEY "
+        "(and any key in .env / huggingface.env)."
+    )
 
 
 def live_run_config() -> RunConfig:
@@ -169,31 +188,18 @@ def macro_f1(gold: list[str], pred: list[str]) -> float:
     return sum(scores) / len(scores) if scores else 0.0
 
 
-def latest_write_wins(request: DecideRequest, memory: list[ExistingClaim]) -> str:
-    active = [
-        claim
-        for claim in memory
-        if claim.status is ClaimStatus.ACTIVE
-        and claim.subject_key == request.candidate.subject_key
-        and claim.predicate_key == request.candidate.predicate_key
-        and claim.claim_id != request.candidate.claim_id
-    ]
-    newer = [claim for claim in active if request.candidate.observed_at > claim.updated_at]
-    if newer:
-        return FinalAction.REVISE.value
-    if active:
-        return FinalAction.KEEP_EPISODIC.value
-    return FinalAction.PROMOTE.value
+async def run_storage(
+    baseline_cls: type[StorageBaseline],
+    request: DecideRequest,
+    memory: list[ExistingClaim],
+) -> dict[str, Any]:
+    """Score Krishna's packaged storage baselines (dry_run; no store write)."""
 
-
-def direct_storage() -> str:
-    return FinalAction.PROMOTE.value
-
-
-def static_rag() -> str:
-    """Specified static RAG: retrieve and answer, never write governed memory."""
-
-    return FinalAction.KEEP_EPISODIC.value
+    baseline = baseline_cls(InMemoryRepository(memory))
+    started = time.perf_counter()
+    response = await baseline.decide(request)
+    wall = int((time.perf_counter() - started) * 1000)
+    return _row(response.decision.final_action.value, response, wall, None)
 
 
 async def run_council(
@@ -244,20 +250,6 @@ def _row(action: str, response: Any, wall_ms: int, judge: Any) -> dict[str, Any]
         "estimated_cost_usd": cost.estimated_cost_usd,
         "rule_ids": list(response.decision.rule_ids_fired),
         "error": response.role_errors[0].error_type if response.role_errors else None,
-    }
-
-
-def rule_row(action: str) -> dict[str, Any]:
-    return {
-        "final_action": action,
-        "judge_label": None,
-        "wall_ms": 0,
-        "llm_calls": 0,
-        "input_tokens": 0,
-        "output_tokens": 0,
-        "estimated_cost_usd": 0.0,
-        "rule_ids": [],
-        "error": None,
     }
 
 
@@ -362,6 +354,8 @@ def write_readme(summary: dict[str, Any], n_cases: int, sha: str, notes: list[st
 async def main() -> None:
     env_files = load_env()
     live = live_configured()
+    if live:
+        require_live_permission()
     fake_cfg = fake_run_config()
     live_cfg = live_run_config() if live else fake_cfg
     cases = load_cases()
@@ -385,9 +379,9 @@ async def main() -> None:
         gold_action = case["gold"]["final_action"]
         gold_judge = case["gold"]["judge_label"]
         runs: dict[str, dict[str, Any]] = {
-            "direct_storage": rule_row(direct_storage()),
-            "latest_write_wins": rule_row(latest_write_wins(fake_request, memory)),
-            "static_rag": rule_row(static_rag()),
+            "direct_storage": await run_storage(DirectStorageBaseline, fake_request, memory),
+            "latest_write_wins": await run_storage(LatestWriteWinsBaseline, fake_request, memory),
+            "static_rag": await run_storage(StaticRagBaseline, fake_request, memory),
             "generic_ensemble": await run_ensemble(fake_request, memory, FakeJudge()),
         }
         if live and provider is not None and live_judge is not None:
@@ -422,17 +416,17 @@ async def main() -> None:
 
     notes = [
         (
-            "direct_storage: in-script stub until Krishna PR #17 merges. "
+            "direct_storage: Krishna `DirectStorageBaseline` (dry_run). "
             "Every parsed candidate is PROMOTE."
         ),
         (
-            "latest_write_wins: in-script stub until Krishna PR #17 merges. "
-            "REVISE when a related ACTIVE claim is older than the candidate; "
-            "KEEP_EPISODIC when not older; otherwise PROMOTE."
+            "latest_write_wins: Krishna `LatestWriteWinsBaseline` (dry_run). "
+            "REVISE when the candidate is newer than the current ACTIVE claim; "
+            "KEEP_EPISODIC when not newer; otherwise PROMOTE."
         ),
         (
-            "static_rag: in-script stub until Krishna PR #17 merges. "
-            "Never writes governed memory, so the scored action is KEEP_EPISODIC."
+            "static_rag: Krishna `StaticRagBaseline` (dry_run). "
+            "Retrieves by lexical overlap but never writes; action is KEEP_EPISODIC."
         ),
         (
             "single_judge: live Mem0-style baseline through the OpenAI-compatible provider."

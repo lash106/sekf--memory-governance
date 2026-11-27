@@ -1,7 +1,7 @@
 """FastAPI application. Owner: Shailen.
 
-Only `/health` and `/v1/decide` exist so far. Baseline and experiment endpoints
-(SPEC.md section 10.3) are added in later sprints.
+`/health`, `/v1/decide`, offline baseline decide, and the offline experiment runner.
+Markdown projection is opt-in via `SEKF_MARKDOWN_DIR`.
 
 Which implementation each role uses is chosen from the environment (or `.env`):
 `SEKF_MEMORY` (`sql` default, or `memory`), `SEKF_HISTORIAN` and `SEKF_SYNTHESIZER`
@@ -36,7 +36,7 @@ from sekf.errors import ConfigurationError, ProjectionFailed, SekfError
 from sekf.historian import DeterministicHistorian, FakeHistorian, Historian, LLMHistorian
 from sekf.judge.compose import build_judge_from_env, load_project_env
 from sekf.memory import InMemoryRepository, MemoryRepository, build_memory_repository
-from sekf.policy import PolicyEngine, PolicyEngineV2
+from sekf.policy import PolicyEngine
 from sekf.providers import create_provider_from_env
 from sekf.synthesizer import (
     DeterministicSynthesizer,
@@ -117,17 +117,8 @@ def build_default_governance() -> Governance:
         historian=build_historian_from_env(),
         judge=build_judge_from_env(),
         synthesizer=build_synthesizer_from_env(),
-        policy=build_policy_from_env(),
+        policy=PolicyEngine(),
     )
-
-
-def build_policy_from_env() -> PolicyEngine:
-    """`SEKF_POLICY=v1` (default) or `v2`. Any other value is an error."""
-
-    choice = _env_choice("SEKF_POLICY", "v1", {"v1", "policy-v1", "v2", "policy-v2"})
-    if choice in {"v2", "policy-v2"}:
-        return PolicyEngineV2()
-    return PolicyEngine()
 
 
 def get_governance(request: Request) -> Governance:
@@ -182,12 +173,6 @@ def create_app(governance: Governance | None = None) -> FastAPI:
         body: DecideRequest, gov: Governance = Depends(get_governance)
     ) -> DecideResponse:
         return await gov.decide(body)
-
-    @app.get("/v1/customers/{subject_key}/brief")
-    async def customer_brief(
-        subject_key: str, gov: Governance = Depends(get_governance)
-    ) -> dict[str, object]:
-        return gov.customer_brief(subject_key)
 
     @app.post("/v1/baselines/{baseline_name}/decide", response_model=DecideResponse)
     async def baseline_decide(

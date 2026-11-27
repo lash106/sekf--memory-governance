@@ -33,7 +33,6 @@ os.environ["SEKF_LLM_MODEL"] = "gemini-2.0-flash"
 os.environ["SEKF_HISTORIAN"] = "llm"
 os.environ["SEKF_SYNTHESIZER"] = "llm"
 os.environ["SEKF_MEMORY"] = "sql"
-os.environ["SEKF_POLICY"] = "v1"  # set v2 only when you mean to
 ```
 
 3. Smoke. `scripts/smoke_llm.py` refuses to run when the provider is fake or the key is missing, and it caps the number of calls.
@@ -48,7 +47,7 @@ os.environ["SEKF_POLICY"] = "v1"  # set v2 only when you mean to
 !python scripts/sweep_policy_thresholds.py cached_contexts.jsonl
 ```
 
-That sweep uses policy-v1. policy-v2 replaces support, refute, and source reliability from the risk tier, so sweeping those three on v2 would not change them.
+That sweep uses policy-v1.
 
 5. Offline score and calibration. This does not call a model:
 
@@ -63,4 +62,5 @@ temperature = fit_temperature(confidences, correct)
 print(temperature, apply_temperature(0.91, temperature))
 ```
 
-Misclassified rows in `experiments/offline_dev.json` under `policy_v2_per_case` are the export for a later fine-tune. This repository does not download or train a local model.
+Misclassified rows in `experiments/offline_dev.json` are the export for a later fine-tune.
+This repository does not download or train a local model.

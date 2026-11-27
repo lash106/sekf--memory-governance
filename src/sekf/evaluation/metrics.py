@@ -1,4 +1,4 @@
-"""SPEC.md section 14 metrics plus three governance additions. Deterministic. No LLM.
+"""SPEC.md section 14 metrics for the offline Sprint-3 harness. Deterministic. No LLM.
 
 Contradiction F1 uses the Judge label REFUTED, matching the rest of this repository.
 False-promotion rate is separate: it counts ACTIVE promotions of refuted or conflicting cases.
@@ -86,12 +86,6 @@ def revision_accuracy(gold: Sequence[str], predicted: Sequence[str]) -> float | 
     return sum(left == right for left, right in paired) / len(paired)
 
 
-def rate_where(predicted: Sequence[str], action: str) -> float:
-    if not predicted:
-        return 0.0
-    return sum(item == action for item in predicted) / len(predicted)
-
-
 def unnecessary_quarantine_rate(gold: Sequence[str], predicted: Sequence[str]) -> float:
     """Predicted QUARANTINE on a case whose gold action is not QUARANTINE, over all cases."""
 
@@ -127,32 +121,6 @@ def false_promotion_rate(
         return 0.0, 0, 0
     hits = sum(1 for index in risky if predicted_actions[index] == FinalAction.PROMOTE.value)
     return hits / len(risky), hits, len(risky)
-
-
-def executive_action(final_action: str, compliance: str | None) -> str:
-    """Approve / Hold / Deny / Escalate. A compliance DENY overrides an epistemic approval."""
-
-    if compliance and compliance.startswith("DENY"):
-        return "DENY"
-    if final_action == FinalAction.ESCALATE_FOR_REVIEW.value:
-        return "ESCALATE"
-    if final_action == FinalAction.REJECT.value:
-        return "DENY"
-    if final_action in {
-        FinalAction.PROMOTE.value,
-        FinalAction.REVISE.value,
-        FinalAction.ATTACH_EVIDENCE.value,
-    }:
-        return "APPROVE"
-    return "HOLD"
-
-
-def executive_accuracy(gold: Sequence[str], predicted: Sequence[str]) -> float | None:
-    if len(gold) != len(predicted):
-        raise ValueError("gold and predicted must have the same length")
-    if not gold:
-        return None
-    return sum(left == right for left, right in zip(gold, predicted, strict=True)) / len(gold)
 
 
 def percentile(values: Sequence[float], pct: float) -> float:

@@ -1,7 +1,8 @@
 """Offline experiment runner for datasets/dev. No network.
 
-Scores direct_storage, latest_write_wins, static_rag, generic_ensemble (FakeJudge),
-policy-v1, and policy-v2. single_judge is reported as not_run: it needs a live provider.
+Scores the real packages in `src/sekf/baselines/` (direct_storage, latest_write_wins,
+static_rag, generic_ensemble with FakeJudge) plus the governed council on policy-v1.
+single_judge is reported as not_run: it needs a live provider.
 """
 
 from __future__ import annotations
@@ -12,6 +13,8 @@ from typing import Any
 from uuid import uuid4
 
 from sekf.api.orchestrator import Governance
+from sekf.baselines import DirectStorageBaseline, LatestWriteWinsBaseline, StaticRagBaseline
+from sekf.baselines.generic_ensemble.baseline import GenericEnsembleBaseline
 from sekf.contracts import (
     CandidateClaim,
     DecideMode,
@@ -20,31 +23,27 @@ from sekf.contracts import (
     ExistingClaim,
 )
 from sekf.evaluation.metrics import (
-    executive_accuracy,
-    executive_action,
     false_promotion_rate,
     macro_f1,
     paired_bootstrap_interval,
     percentile,
     promotion_scores,
-    rate_where,
     revision_accuracy,
     unnecessary_quarantine_rate,
-)
-from sekf.evaluation.systems import (
-    direct_storage_action,
-    latest_write_wins_action,
-    static_rag_action,
 )
 from sekf.historian import DeterministicHistorian
 from sekf.judge import FakeJudge
 from sekf.memory.in_memory import InMemoryRepository
 from sekf.memory.retrieval import hybrid_search, retrieval_recall_at_k
-from sekf.policy import PolicyEngine, PolicyEngineV2, compliance_outcome
-from sekf.policy.v2 import EPISODIC_TTL_DAYS
+from sekf.policy import PolicyEngine
 from sekf.synthesizer import DeterministicSynthesizer
 
 _DEV = Path(__file__).resolve().parents[3] / "datasets" / "dev"
+_STORAGE = {
+    "direct_storage": DirectStorageBaseline,
+    "latest_write_wins": LatestWriteWinsBaseline,
+    "static_rag": StaticRagBaseline,
+}
 
 
 def load_dev_cases(root: Path | None = None) -> list[dict[str, Any]]:
@@ -73,18 +72,34 @@ def _memory(data: dict[str, Any]) -> InMemoryRepository:
     return InMemoryRepository(claims)
 
 
-async def _council_action(
-    data: dict[str, Any], policy: PolicyEngine
-) -> tuple[str, int, int, float]:
+async def _council_action(data: dict[str, Any]) -> tuple[str, int, int, float]:
     request = _request(data)
     governance = Governance(
         memory=_memory(data),
         historian=DeterministicHistorian(),
         judge=FakeJudge(),
         synthesizer=DeterministicSynthesizer(),
-        policy=policy,
+        policy=PolicyEngine(),
     )
     response = await governance.decide(request)
+    cost = response.decision.cost
+    return (
+        response.decision.final_action.value,
+        cost.input_tokens + cost.output_tokens,
+        cost.llm_calls,
+        cost.estimated_cost_usd,
+    )
+
+
+async def _baseline_action(name: str, data: dict[str, Any]) -> tuple[str, int, int, float]:
+    """Run one packaged baseline in dry_run and return action plus cost fields."""
+
+    request = _request(data)
+    memory = _memory(data)
+    if name == "generic_ensemble":
+        response = await GenericEnsembleBaseline(FakeJudge(), memory=memory).decide(request)
+    else:
+        response = await _STORAGE[name](memory).decide(request)
     cost = response.decision.cost
     return (
         response.decision.final_action.value,
@@ -116,7 +131,6 @@ def _summarize(name: str, rows: list[dict[str, Any]]) -> dict[str, Any]:
     precision, recall = promotion_scores(gold, pred)
     interval = paired_bootstrap_interval(gold, pred, macro_f1, n_resamples=400, seed=0)
     judge_rows = sum(1 for row in rows if row.get("gold_judge"))
-    # Council rows do not store a separate predicted judge label in this summary.
     false_rate, false_hits, false_n = false_promotion_rate(
         gold,
         pred,
@@ -124,11 +138,6 @@ def _summarize(name: str, rows: list[dict[str, Any]]) -> dict[str, Any]:
         gold_conflict=[row.get("gold_conflict") or "NONE" for row in rows],
     )
     recalls = [row["retrieval_recall"] for row in rows if row["retrieval_recall"] is not None]
-    executives = [
-        (row["gold_executive"], row["predicted_executive"])
-        for row in rows
-        if row.get("gold_executive")
-    ]
     return {
         "system": name,
         "n": len(rows),
@@ -138,16 +147,10 @@ def _summarize(name: str, rows: list[dict[str, Any]]) -> dict[str, Any]:
         "promotion_recall": recall,
         "revision_accuracy": revision_accuracy(gold, pred),
         "unnecessary_quarantine_rate": unnecessary_quarantine_rate(gold, pred),
-        "escalation_rate": rate_where(pred, "ESCALATE_FOR_REVIEW"),
         "false_promotion_rate": false_rate,
         "false_promotion_hits": false_hits,
         "false_promotion_support": false_n,
         "retrieval_recall_at_5": (sum(recalls) / len(recalls)) if recalls else None,
-        "executive_accuracy": executive_accuracy(
-            [pair[0] for pair in executives], [pair[1] for pair in executives]
-        )
-        if executives
-        else None,
         "p95_latency_ms": percentile([float(row["latency_ms"]) for row in rows], 95),
         "tokens": sum(row["tokens"] for row in rows),
         "llm_calls": sum(row["llm_calls"] for row in rows),
@@ -163,45 +166,32 @@ def _summarize(name: str, rows: list[dict[str, Any]]) -> dict[str, Any]:
 async def run_dev_cases(cases: list[dict[str, Any]]) -> dict[str, Any]:
     """Score one list of case objects. `cases` already includes the gold object."""
 
-    per_case: list[dict[str, Any]] = []
     buckets: dict[str, list[dict[str, Any]]] = {
         "direct_storage": [],
         "latest_write_wins": [],
         "static_rag": [],
+        "generic_ensemble": [],
         "policy-v1": [],
-        "policy-v2": [],
     }
     for data in cases:
         gold = data["gold"]
         gold_action = str(gold["final_action"])
-        request = _request(data)
-        memory = _memory(data)
-        related = memory.search_related_claims(request.candidate)
-        actions = {
-            "direct_storage": direct_storage_action().value,
-            "latest_write_wins": latest_write_wins_action(request, related).value,
-            "static_rag": static_rag_action().value,
-            "policy-v1": (await _council_action(data, PolicyEngine()))[0],
-            "policy-v2": (await _council_action(data, PolicyEngineV2()))[0],
-        }
-        v1_detail = await _council_action(data, PolicyEngine())
         recall = _recall(data)
-        compliance = compliance_outcome(request.candidate)
-        for name, action in actions.items():
-            if name == "policy-v1":
-                action, tokens, calls, cost = v1_detail
-            elif name == "policy-v2":
-                action, tokens, calls, cost = await _council_action(data, PolicyEngineV2())
-            else:
-                tokens, calls, cost = 0, 0, 0.0
+        council = await _council_action(data)
+        actions: dict[str, tuple[str, int, int, float]] = {
+            "direct_storage": await _baseline_action("direct_storage", data),
+            "latest_write_wins": await _baseline_action("latest_write_wins", data),
+            "static_rag": await _baseline_action("static_rag", data),
+            "generic_ensemble": await _baseline_action("generic_ensemble", data),
+            "policy-v1": council,
+        }
+        for name, (action, tokens, calls, cost) in actions.items():
             row = {
                 "case_id": data.get("case_id", data.get("_path")),
                 "gold_action": gold_action,
                 "predicted_action": action,
                 "gold_judge": gold.get("judge_label"),
                 "gold_conflict": gold.get("conflict_type"),
-                "gold_executive": gold.get("executive_action"),
-                "predicted_executive": executive_action(action, compliance),
                 "retrieval_recall": recall,
                 "latency_ms": 0,
                 "tokens": tokens,
@@ -209,8 +199,6 @@ async def run_dev_cases(cases: list[dict[str, Any]]) -> dict[str, Any]:
                 "cost": cost,
             }
             buckets[name].append(row)
-            if name == "policy-v2":
-                per_case.append(row)
     summaries = [_summarize(name, rows) for name, rows in buckets.items()]
     summaries.append(
         {
@@ -221,21 +209,9 @@ async def run_dev_cases(cases: list[dict[str, Any]]) -> dict[str, Any]:
             ),
         }
     )
-    summaries.append(
-        {
-            "system": "generic_ensemble",
-            "status": "not_run_in_batch",
-            "reason": (
-                "Use POST /v1/baselines/generic_ensemble/decide. "
-                "The batch runner keeps the council on DeterministicHistorian and FakeJudge."
-            ),
-        }
-    )
     return {
         "n_cases": len(cases),
-        "episodic_ttl_days": EPISODIC_TTL_DAYS,
         "systems": summaries,
-        "policy_v2_per_case": per_case,
     }
 
 

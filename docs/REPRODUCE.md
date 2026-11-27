@@ -62,19 +62,34 @@ sqlite3 data/sekf.sqlite3 "select substr(claim_id,1,8), status, object_text, ver
 With Docker the database is inside the volume: `docker exec <container> python -c "..."` or
 mount the volume on the host.
 
-## 5. Re-run the experiment and reproduce the summary **(pending)**
+## 5. Re-run the experiment and reproduce the summary
 
-Needs the evaluation runner (merging from the `sai-chetan/review-fixes` branch) wired to the
-run manifest and the resumable results file already in `src/sekf/evaluation/`:
+```bash
+.venv/bin/python scripts/run_experiment.py --dataset datasets/dev --run-dir runs/dev-fixture --judge fixture
+```
 
-- `manifest.py` records the git commit (and whether the tree was dirty), the dataset hash, every
-  prompt file's hash, the model, the policy and thresholds, the run configuration, and the
-  relevant `SEKF_*` settings. No API key is ever written.
-- `jsonl_store.py` writes one line per (case, system) as it finishes, so a crashed run resumes
-  where it stopped, and refuses to append to a file that belongs to a different manifest.
+Scores every system on the same cases in dry-run mode (nothing is written to a database):
+the storage baselines, `generic_ensemble`, `single_judge` (live model only), the council on
+policy-v1, and the five SPEC.md section 12.2 ablations. It writes three files to the run
+directory:
 
-The final instructions here will be the exact command that runs the pilot on `datasets/dev/`
-and the command that rebuilds the summary table from the saved results file alone.
+- `manifest.json`: git commit and dirty flag, dataset hash, prompt hashes, Judge, systems,
+  policy and thresholds, run configuration, allowlisted `SEKF_*` settings. No API key.
+- `results.jsonl`: one line per (case, system), fsynced as it finishes.
+- `summary.json`: section 14 metrics per system with 95% bootstrap intervals, plus a paired
+  bootstrap of the macro-F1 difference between the council and each other system.
+
+Running the same command again resumes a crashed run, or, if it already finished, rebuilds
+`summary.json` from `results.jsonl` without running anything. If the code, data, prompts,
+Judge or system list changed, it refuses and names the difference.
+
+`--judge` is `fake` (CI stand-in, never refutes), `fixture` (rule-based, offline; developed on
+`datasets/dev`, so dev scores are optimistic), or `env` (the live model from `SEKF_PROVIDER`,
+`SEKF_LLM_API_KEY`, `SEKF_LLM_MODEL`).
+
+**(pending)** The held-out run. A dataset under a `test` directory is refused without
+`--confirm-held-out`, and a held-out run also needs a clean git tree. `datasets/test/` does not
+exist yet.
 
 ## 5b. Storage baselines and memory deltas (no network, no model)
 

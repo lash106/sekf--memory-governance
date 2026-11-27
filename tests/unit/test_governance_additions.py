@@ -1,5 +1,6 @@
 """Metrics, retrieval, markdown projection, and the offline experiment API."""
 
+from datetime import UTC, datetime
 from uuid import uuid4
 
 import pytest
@@ -14,7 +15,7 @@ from tests.conftest import (
 )
 
 from sekf.api import Governance, create_app
-from sekf.contracts import CommitBundle
+from sekf.contracts import ClaimStatus, CommitBundle, ExistingClaim
 from sekf.errors import CommitRejected
 from sekf.evaluation.metrics import (
     false_promotion_rate,
@@ -164,3 +165,36 @@ def test_baseline_and_experiment_routes() -> None:
     assert client.post("/v1/baselines/not-a-baseline/decide", json=payload).status_code == 404
     missing = client.get("/v1/experiments/does-not-exist")
     assert missing.status_code == 404
+
+
+def test_brief_omits_an_old_candidate_without_deleting_it() -> None:
+    old = make_existing(ClaimStatus.CANDIDATE).model_copy(
+        update={
+            "subject_key": "customer-1",
+            "updated_at": datetime(2020, 1, 1, tzinfo=UTC),
+            "created_at": datetime(2020, 1, 1, tzinfo=UTC),
+        }
+    )
+    active = ExistingClaim.model_validate(
+        {
+            **old.model_dump(mode="json"),
+            "claim_id": str(uuid4()),
+            "status": "ACTIVE",
+            "updated_at": NOW.isoformat(),
+        }
+    )
+    repo = InMemoryRepository([old, active])
+    governance = Governance(
+        memory=repo,
+        historian=FakeHistorian(),
+        judge=FakeJudge(),
+        synthesizer=FakeSynthesizer(),
+        policy=PolicyEngine(),
+        clock=lambda: NOW,
+    )
+    client = TestClient(create_app(governance))
+    body = client.get("/v1/customers/customer-1/brief").json()
+    assert body["hidden_expired_candidates"] == 1
+    assert len(body["claims"]) == 1
+    assert body["claims"][0]["status"] == "ACTIVE"
+    assert repo.get_claim(old.claim_id) is not None

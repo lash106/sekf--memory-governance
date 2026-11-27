@@ -1,7 +1,7 @@
 """FastAPI application. Owner: Shailen.
 
-Only `/health` and `/v1/decide` exist so far. Baseline and experiment endpoints
-(SPEC.md section 10.3) are added in later sprints.
+`/health`, `/v1/decide`, offline baseline decide, and the offline experiment runner.
+Markdown projection is opt-in via `SEKF_MARKDOWN_DIR`.
 
 Which implementation each role uses is chosen from the environment (or `.env`):
 `SEKF_MEMORY` (`sql` default, or `memory`), `SEKF_HISTORIAN` and `SEKF_SYNTHESIZER`
@@ -24,13 +24,15 @@ store holds a connection pool).
 import os
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
+from pathlib import Path
 
-from fastapi import Depends, FastAPI, Request
+from fastapi import Depends, FastAPI, HTTPException, Request
+from fastapi.responses import JSONResponse
 
 from sekf import __version__
 from sekf.api.orchestrator import Governance
 from sekf.contracts import CONTRACT_VERSION, DecideRequest, DecideResponse
-from sekf.errors import ConfigurationError
+from sekf.errors import ConfigurationError, ProjectionFailed, SekfError
 from sekf.historian import DeterministicHistorian, FakeHistorian, Historian, LLMHistorian
 from sekf.judge.compose import build_judge_from_env, load_project_env
 from sekf.memory import InMemoryRepository, MemoryRepository, build_memory_repository
@@ -106,8 +108,12 @@ def build_default_governance() -> Governance:
     fake Judge, deterministic policy.
     """
 
+    memory = build_memory_from_env()
+    markdown_dir = os.getenv("SEKF_MARKDOWN_DIR")
+    if markdown_dir:
+        memory.markdown_root = Path(markdown_dir)
     return Governance(
-        memory=build_memory_from_env(),
+        memory=memory,
         historian=build_historian_from_env(),
         judge=build_judge_from_env(),
         synthesizer=build_synthesizer_from_env(),
@@ -134,6 +140,30 @@ def create_app(governance: Governance | None = None) -> FastAPI:
     app = FastAPI(title="SEKF", version=__version__, lifespan=_lifespan)
     app.state.governance = governance or build_default_governance()
 
+    @app.exception_handler(ProjectionFailed)
+    async def projection_failed_handler(_request: Request, exc: ProjectionFailed) -> JSONResponse:
+        # Decision is already in SQL; tell the client to retry the same decision_id.
+        return JSONResponse(
+            status_code=503,
+            content={
+                "error": "ProjectionFailed",
+                "detail": str(exc),
+                "retryable": True,
+                "note": (
+                    "The decision is committed in the memory store. "
+                    "Retry the same request to finish the Markdown projection."
+                ),
+            },
+        )
+
+    @app.exception_handler(SekfError)
+    async def sekf_error_handler(_request: Request, exc: SekfError) -> JSONResponse:
+        # ProjectionFailed has its own 503 handler (registered above; more specific).
+        return JSONResponse(
+            status_code=400,
+            content={"error": type(exc).__name__, "detail": str(exc)},
+        )
+
     @app.get("/health")
     async def health() -> dict[str, str]:
         return {"status": "ok", "version": __version__, "contract_version": CONTRACT_VERSION}
@@ -143,5 +173,30 @@ def create_app(governance: Governance | None = None) -> FastAPI:
         body: DecideRequest, gov: Governance = Depends(get_governance)
     ) -> DecideResponse:
         return await gov.decide(body)
+
+    @app.post("/v1/baselines/{baseline_name}/decide", response_model=DecideResponse)
+    async def baseline_decide(
+        baseline_name: str, body: DecideRequest, gov: Governance = Depends(get_governance)
+    ) -> DecideResponse:
+        from sekf.evaluation.systems import baseline_response
+
+        return await baseline_response(baseline_name, body, gov._memory, gov._clock())
+
+    @app.post("/v1/experiments/run")
+    async def run_experiment(limit: int = 0) -> dict[str, object]:
+        from sekf.evaluation.runner import start_offline_run
+
+        try:
+            return await start_offline_run(app, limit=limit)
+        except ValueError as exc:
+            raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+    @app.get("/v1/experiments/{run_id}")
+    async def get_experiment(run_id: str) -> dict[str, object]:
+        runs: dict[str, dict[str, object]] = getattr(app.state, "experiments", {})
+        found = runs.get(run_id)
+        if found is None:
+            raise HTTPException(status_code=404, detail=f"unknown run_id {run_id}")
+        return found
 
     return app

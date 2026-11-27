@@ -39,7 +39,8 @@ from sekf.contracts import (
     TemporalRelation,
     check_bundle_consistency,
 )
-from sekf.errors import CommitRejected
+from sekf.errors import CommitRejected, ProjectionFailed
+from sekf.memory.markdown_projection import project_bundle
 from sekf.memory.migrate import run_migrations
 from sekf.memory.schema import (
     CandidateRow,
@@ -140,6 +141,7 @@ class SqlMemoryRepository:
     def __init__(self, engine: Engine, *, clock: Callable[[], datetime] = _utcnow) -> None:
         self._engine = engine
         self._clock = clock
+        self.markdown_root: Path | None = None
 
     @classmethod
     def from_url(
@@ -180,6 +182,16 @@ class SqlMemoryRepository:
                 yield session
 
     # --------------------------------------------------------------------- reads
+
+    def claims_for_subject(self, subject_key: str) -> list[ExistingClaim]:
+        """Every stored claim for one subject, oldest first."""
+        with self._read() as s:
+            rows = s.scalars(
+                select(ClaimRow)
+                .where(ClaimRow.subject_key == subject_key)
+                .order_by(ClaimRow.created_at, ClaimRow.claim_id)
+            ).all()
+            return self._to_models(s, list(rows))
 
     def search_related_claims(self, claim: CandidateClaim) -> list[ExistingClaim]:
         """Every stored claim (any status) with the candidate's subject and predicate keys."""
@@ -320,24 +332,43 @@ class SqlMemoryRepository:
             with self._write() as s:
                 replay = self._replay(s, bundle)
                 if replay is not None:
-                    return replay
-                key = self._key_row(s, bundle.candidate.subject_key, bundle.candidate.predicate_key)
-                key.revision += 1  # serializes commits on this key (row lock outside SQLite)
-                s.flush()
-                current = self._related(s, bundle.candidate)
-                _check_snapshot(current, bundle.memory_before)
-                return self._commit(s, bundle, current)
+                    result = replay
+                else:
+                    key = self._key_row(
+                        s, bundle.candidate.subject_key, bundle.candidate.predicate_key
+                    )
+                    key.revision += 1  # serializes commits on this key (row lock outside SQLite)
+                    s.flush()
+                    current = self._related(s, bundle.candidate)
+                    _check_snapshot(current, bundle.memory_before)
+                    result = self._commit(s, bundle, current)
         except IntegrityError as exc:
             # Lost a race: another transaction committed the same decision or the same key.
             stored = self.get_bundle(UUID(did))
             if stored is not None and stored.decision.request_hash == bundle.decision.request_hash:
-                return _replayed(bundle)
-            raise CommitRejected(
-                f"concurrent commit conflict; retry with a fresh read: {exc.orig}"
-            ) from exc
+                result = _replayed(bundle)
+            else:
+                raise CommitRejected(
+                    f"concurrent commit conflict; retry with a fresh read: {exc.orig}"
+                ) from exc
         except OperationalError as exc:
             raise CommitRejected(
                 f"memory store unavailable; nothing was written: {exc.orig}"
+            ) from exc
+        self._project(bundle)
+        return result
+
+    def _project(self, bundle: CommitBundle) -> None:
+        """Write the Markdown copy after the database commit. Idempotent by decision id."""
+
+        if self.markdown_root is None:
+            return
+        try:
+            project_bundle(self.markdown_root, bundle)
+        except OSError as exc:
+            raise ProjectionFailed(
+                f"decision {bundle.decision.decision_id} is committed; "
+                f"markdown projection failed: {exc}"
             ) from exc
 
     # ------------------------------------------------------------------ internals

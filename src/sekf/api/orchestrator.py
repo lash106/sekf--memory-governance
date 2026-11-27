@@ -31,9 +31,7 @@ from sekf.errors import CallUsage, RoleTimeout, SekfError
 from sekf.historian import Historian
 from sekf.judge import Judge
 from sekf.memory import MemoryRepository
-from sekf.memory.retention import claim_visible_in_brief
 from sekf.policy import DecisionPolicy
-from sekf.policy.v2 import EPISODIC_TTL_DAYS
 from sekf.synthesizer import Synthesizer
 
 T = TypeVar("T")
@@ -176,24 +174,6 @@ class Governance:
             role_errors=role_errors,
             wall_latency_ms=int((time.perf_counter() - started) * 1000),
         )
-
-    def customer_brief(
-        self, subject_key: str, *, episodic_ttl_days: int = EPISODIC_TTL_DAYS
-    ) -> dict[str, object]:
-        """Claims for one subject. Expired candidates stay stored and are left out of the brief."""
-
-        now = self._clock()
-        claims = self._memory.claims_for_subject(subject_key)
-        visible = [
-            claim for claim in claims if claim_visible_in_brief(claim, now, episodic_ttl_days)
-        ]
-        return {
-            "subject_key": subject_key,
-            "episodic_ttl_days": episodic_ttl_days,
-            "hidden_expired_candidates": len(claims) - len(visible),
-            "claims": [claim.model_dump(mode="json") for claim in visible],
-            "note": "Expired candidate claims remain in the store. This brief omits them.",
-        }
 
     async def aclose(self) -> None:
         """Release resources owned by the roles and the store (HTTP clients, DB connections).

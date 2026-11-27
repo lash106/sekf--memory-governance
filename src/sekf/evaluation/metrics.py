@@ -162,3 +162,41 @@ def paired_bootstrap_interval(
     low = stats[int(0.025 * (n_resamples - 1))]
     high = stats[int(0.975 * (n_resamples - 1))]
     return Interval(point, low, high)
+
+
+def paired_difference_interval(
+    gold: Sequence[str],
+    predicted_a: Sequence[str],
+    predicted_b: Sequence[str],
+    score: Callable[[Sequence[str], Sequence[str]], float],
+    *,
+    n_resamples: int = 1000,
+    seed: int = 0,
+) -> Interval:
+    """95% paired bootstrap interval for `score(a) - score(b)` on the same cases.
+
+    Each resample draws one set of case indexes and scores both systems on it, so the
+    interval reflects the difference between systems, not each system's own spread. An
+    interval that excludes 0 means `a` and `b` differ on this data.
+    """
+
+    if not len(gold) == len(predicted_a) == len(predicted_b):
+        raise ValueError("gold and both predictions must have the same length")
+    if n_resamples < 1:
+        raise ValueError("n_resamples must be >= 1")
+    point = score(gold, predicted_a) - score(gold, predicted_b)
+    if not gold:
+        return Interval(point, point, point)
+    rng = random.Random(seed)
+    stats: list[float] = []
+    n = len(gold)
+    for _ in range(n_resamples):
+        idx = [rng.randrange(n) for _ in range(n)]
+        g = [gold[i] for i in idx]
+        stats.append(
+            score(g, [predicted_a[i] for i in idx]) - score(g, [predicted_b[i] for i in idx])
+        )
+    stats.sort()
+    return Interval(
+        point, stats[int(0.025 * (n_resamples - 1))], stats[int(0.975 * (n_resamples - 1))]
+    )
